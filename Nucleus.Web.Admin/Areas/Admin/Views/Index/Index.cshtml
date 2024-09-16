@@ -37,9 +37,12 @@
         <button class="btn btn-sm btn-dark nucleus-material-icon dock-top-btn" title="Dock Controls Top">&#xe5cf;</button>
       </div>
       <ul>
-        @if (Model.IsSiteAdmin)
+        @if (Model.IsSystemAdministrator)
         {
           @await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("System", "View system information and logs.", "~/Admin/System/Index", "Y", "&#xe871;", "SystemIcon"))
+        }
+        @if (Model.IsSiteAdmin)
+        {
           @await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Pages", "Manage your pages.", "~/Admin/Pages/Index" + "?pageId=" + @Model.CurrentPage.Id, "P", "&#xef42;", "PagesIcon"))
           @await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Manage", "Administer site-specific entities and settings.", "~/Admin/Manage/Index", "M", "&#xf02e;", "ManageIcon"))
         }
@@ -63,8 +66,8 @@
       <div class="nucleus-control-panel-content-header border-bottom mb-1">
         <h1 id="nucleus-control-panel-heading"></h1>
         <a aria-label="Help" id="nucleus-control-panel-helpbutton" class="btn btn-sm btn-help nucleus-material-icon collapse" target="_blank" href="">&#xe887;</a>
-        <a class="btn btn-sm nucleus-material-icon nucleus-btn-close-frame">&#xe5cd;</a>
         <a class="btn btn-sm nucleus-material-icon nucleus-btn-page-back" data-target=".nucleus-adminpage">&#xe5c4;</a>
+        <a class="btn btn-sm nucleus-material-icon nucleus-btn-close-frame">&#xe5cd;</a>
       </div>
       <div class="nucleus-adminpage nucleus-admin-content">
         <div class="nucleus-admin-index-spinner-wrapper">

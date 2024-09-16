@@ -10,6 +10,14 @@ public class ConfigSettings
   internal const string SITESETTING_INDEX_NAME = "azuresearch:indexname";
   internal const string SITESETTING_SERVER_APIKEY = "azuresearch:apikey";
   internal const string SITESETTING_INDEXER_NAME = "azuresearch:indexername";
+  internal const string SITESETTING_SEMANTIC_RANKING_CONFIGURATION_NAME = "azuresearch:semantic-ranking-configuration-name";
+  
+  internal const string SITESETTING_VECTORIZATION_ENABLED = "azuresearch:vectorization-enabled";
+
+  internal const string SITESETTING_OPENAI_ENDPOINT = "azuresearch:openai-endpoint";
+  internal const string SITESETTING_OPENAI_APIKEY = "azuresearch:openai-apikey";
+  internal const string SITESETTING_OPENAI_DEPLOYMENTNAME = "azuresearch:openapi-deployment-name";
+
 
   internal const string SITESETTING_ATTACHMENT_MAXSIZE = "azuresearch:attachment-maxsize";
   internal const string SITESETTING_INDEXING_PAUSE = "azuresearch:indexing-pause";
@@ -26,8 +34,19 @@ public class ConfigSettings
   //internal const string SITESETTING_BOOST_ATTACHMENT_TITLE = "azuresearch:boost-attachment-title";
 
   public string ServerUrl { get; set; }
+
   public string IndexName { get; set; }
+
   public string IndexerName { get; set; }
+
+  public string SemanticConfigurationName { get; set; }
+
+  public Boolean VectorizationEnabled { get; set; }
+
+  public string AzureOpenAIEndpoint { get; set; }
+  public string EncryptedAzureOpenAIApiKey { get; set; }
+  public string AzureOpenAIDeploymentName { get; set; }
+
   public int AttachmentMaxSize { get; set; } = 32;
 
   public string EncryptedApiKey { get; set; }
@@ -35,8 +54,6 @@ public class ConfigSettings
   public double IndexingPause { get; set; } = 1;
 
   public Nucleus.Abstractions.Search.SearchQuery.BoostSettings Boost { get; set; } = new();
-
-  public List<string> Indexers { get; set; }
 
   // This constructor is used by model binding
   public ConfigSettings() { }
@@ -56,6 +73,16 @@ public class ConfigSettings
     if (site.SiteSettings.TryGetValue(ConfigSettings.SITESETTING_INDEXER_NAME, out string indexerName))
     {
       this.IndexerName = indexerName;
+    }
+
+    if (site.SiteSettings.TryGetValue(ConfigSettings.SITESETTING_SEMANTIC_RANKING_CONFIGURATION_NAME, out string semanticConfigurationName))
+    {
+      this.SemanticConfigurationName = semanticConfigurationName;
+    }
+
+    if (site.SiteSettings.TryGetValue(ConfigSettings.SITESETTING_VECTORIZATION_ENABLED, out Boolean vectorizationEnabled))
+    {
+      this.VectorizationEnabled = vectorizationEnabled;
     }
 
     if (site.SiteSettings.TryGetValue(ConfigSettings.SITESETTING_SERVER_APIKEY, out string encryptedApiKey))
@@ -79,6 +106,21 @@ public class ConfigSettings
       }
     }
 
+    if (site.SiteSettings.TryGetValue(ConfigSettings.SITESETTING_OPENAI_ENDPOINT, out string openAIEndPoint))
+    {      
+      this.AzureOpenAIEndpoint = openAIEndPoint;      
+    }
+
+    if (site.SiteSettings.TryGetValue(ConfigSettings.SITESETTING_OPENAI_APIKEY, out string encryptedOpenAIApiKey))
+    {
+      this.EncryptedAzureOpenAIApiKey = encryptedOpenAIApiKey;
+    }
+
+    if (site.SiteSettings.TryGetValue(ConfigSettings.SITESETTING_OPENAI_DEPLOYMENTNAME, out string deploymentName))
+    {
+      this.AzureOpenAIDeploymentName = deploymentName;
+    }
+
     //this.Boost.Title = GetSetting(site, SITESETTING_BOOST_TITLE, this.Boost.Title);
     //this.Boost.Summary = GetSetting(site, SITESETTING_BOOST_SUMMARY, this.Boost.Summary);
     //this.Boost.Categories = GetSetting(site, SITESETTING_BOOST_CATEGORIES, this.Boost.Categories);
@@ -89,6 +131,50 @@ public class ConfigSettings
     //this.Boost.AttachmentKeywords = GetSetting(site, SITESETTING_BOOST_ATTACHMENT_KEYWORDS, this.Boost.AttachmentKeywords);
     //this.Boost.AttachmentName = GetSetting(site, SITESETTING_BOOST_ATTACHMENT_NAME, this.Boost.AttachmentName);
     //this.Boost.AttachmentTitle = GetSetting(site, SITESETTING_BOOST_ATTACHMENT_TITLE, this.Boost.AttachmentTitle);
+  }
+
+  public void SaveSettings(Site site, string apiKey, string openAIApiKey)
+  {
+    if (!this.ServerUrl.StartsWith("http"))
+    {
+      this.ServerUrl = "http://" + this.ServerUrl;
+    }
+
+    site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_SERVER_URL, this.ServerUrl);
+    site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_INDEX_NAME, this.IndexName);
+
+    if (apiKey != ViewModels.Settings.DUMMY_APIKEY)
+    {
+      site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_SERVER_APIKEY, ConfigSettings.EncryptApiKey(site, apiKey));
+    }
+
+    site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_ATTACHMENT_MAXSIZE, this.AttachmentMaxSize);
+    site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_INDEXING_PAUSE, this.IndexingPause);
+
+    site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_INDEXER_NAME, this.IndexerName);
+    site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_SEMANTIC_RANKING_CONFIGURATION_NAME, this.SemanticConfigurationName);
+    site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_VECTORIZATION_ENABLED, this.VectorizationEnabled);
+
+    site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_OPENAI_ENDPOINT, this.AzureOpenAIEndpoint);
+    
+    if (openAIApiKey != ViewModels.Settings.DUMMY_APIKEY)
+    {
+      site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_OPENAI_APIKEY, ConfigSettings.EncryptApiKey(site, openAIApiKey));
+    }
+
+    site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_OPENAI_DEPLOYMENTNAME, this.AzureOpenAIDeploymentName);
+
+    //site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_TITLE, this.Boost.Title);
+    //site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_SUMMARY, this.Boost.Summary);
+    //site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_CATEGORIES, this.Boost.Categories);
+    //site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_KEYWORDS, this.Boost.Keywords);
+    //site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_CONTENT, this.Boost.Content);
+
+    //site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_ATTACHMENT_AUTHOR, this.Boost.AttachmentAuthor);
+    //site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_ATTACHMENT_KEYWORDS, this.Boost.AttachmentKeywords);
+    //site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_ATTACHMENT_NAME, this.Boost.AttachmentName);
+    //site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_ATTACHMENT_TITLE, this.Boost.AttachmentTitle);
+
   }
 
   private double GetSetting(Site site, string key, double defaultValue)

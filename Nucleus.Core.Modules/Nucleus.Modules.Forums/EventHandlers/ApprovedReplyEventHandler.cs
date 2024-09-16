@@ -1,38 +1,47 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Nucleus.Abstractions.EventHandlers.SystemEventTypes;
-using Nucleus.Modules.Forums.Models;
-using Nucleus.Abstractions.Models;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.Managers;
-using Nucleus.Extensions.Authorization;
+using Nucleus.Modules.Forums.Models;
 
-namespace Nucleus.Modules.Forums.EventHandlers
-{
-	public class ApprovedReplyEventHandler : Nucleus.Abstractions.EventHandlers.ISingletonSystemEventHandler<Reply, Approved>
+namespace Nucleus.Modules.Forums.EventHandlers;
+
+public class ApprovedReplyEventHandler : Nucleus.Abstractions.EventHandlers.ISingletonSystemEventHandler<Reply, Approved>
 	{		
 		private ForumsManager ForumsManager { get; }
 		private IUserManager UserManager { get; }
+  private ILogger Logger { get; }
 
-    public ApprovedReplyEventHandler(ForumsManager forumsManager, IUserManager userManager)
+  public ApprovedReplyEventHandler(ForumsManager forumsManager, IUserManager userManager, ILogger<ApprovedReplyEventHandler> logger)
 		{
-    	this.ForumsManager = forumsManager;
+  	this.ForumsManager = forumsManager;
 			this.UserManager = userManager;
+    this.Logger = logger;
 		}
 
-		public async Task Invoke(Reply reply)
-		{
-			// Re-get the reply, as it may not be fully populated
-			reply = await this.ForumsManager.GetForumPostReply(reply.Id);
-      
+  public async Task Invoke(Reply reply)
+  {
+    this.Logger?.LogDebug("Approve reply event detected, reply id '{replyid}'.", reply.Id);
+    try
+    {
+      // Re-get the reply, as it may not be fully populated
+      reply = await this.ForumsManager.GetForumPostReply(reply.Id);
+
       if (reply.IsApproved)
-			{
-				await reply.CreateModerationApprovedEmail(this.ForumsManager, this.UserManager);
-				await reply.CreateSubscriptionEmail(this.ForumsManager);
-			}
-		}
+      {
+        await reply.CreateModerationApprovedEmail(this.ForumsManager, this.UserManager, this.Logger);
+        await reply.CreateSubscriptionEmail(this.ForumsManager, this.Logger);
+      }
+      else
+      {
+        this.Logger?.LogDebug("Skipped notification for '{replyid}' because it is not approved'.", reply.Id);
+      }
+    }
+    catch (Exception ex)
+    {
+      this.Logger?.LogError(ex, "Approve reply event.");
+    }
   }
 }
 

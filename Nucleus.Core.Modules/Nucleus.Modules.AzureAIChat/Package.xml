@@ -1,0 +1,44 @@
+<package id="e9e3de3b-ab7e-49ee-8d91-f65fe28a5f7f" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
+  <name>Azure AI Chat</name>
+  <version>1.0.0.0</version>
+  <publisher name="Inventua" url="https://www.inventua.com/nucleus" email="support@inventua.com" />
+  <description>
+		This module works with the Azure Search extension and service to provide an AI-powered chat service.
+	</description>
+  <compatibility minVersion="2.0.0.0" maxVersion="*" />
+  <components>
+    <component folderName="AzureAIChat" optional="false">
+      <moduleDefinition id="81046b51-6666-414c-b33e-a830daf5855e">
+        <friendlyName>Azure AI Chat</friendlyName>
+        <extension>AzureAIChat</extension>
+        <viewController>AzureAIChatViewerController</viewController>
+        <settingsController>AzureAIChatSettingsController</settingsController>
+        <viewAction>Index</viewAction>
+        <editAction>Settings</editAction>
+      </moduleDefinition>
+      <file name="readme.txt" />
+      <!-- 
+        when the project property GenerateEmbeddedFilesManifest=true and your static resources Build Action=Embedded resource, static resource
+        files do not need to be included in package.xml (this file) 
+      -->
+      <!--<file name="viewer.css" />
+			<file name="settings.css" />-->
+      <folder name="bin">
+        <file name="Nucleus.Modules.AzureAIChat.dll" />
+        <file name="OpenAI.dll" />
+        <file name="System.ClientModel.dll" />
+        <file name="Microsoft.Bcl.AsyncInterfaces.dll" />
+        <file name="Azure.Core.dll" />
+        <file name="Azure.AI.OpenAI.dll" />
+      </folder>
+      <!-- 
+        when the project property RazorCompileOnBuild=true view (.cshtml) files do not need to be included in package.xml (this file) 
+      -->
+      <!--<folder name="Views">
+				<file name="_ViewImports.cshtml" />
+				<file name="Viewer.cshtml" />
+				<file name="Settings.cshtml" />
+			</folder>-->
+    </component>
+  </components>
+</package>

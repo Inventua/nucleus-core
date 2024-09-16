@@ -156,7 +156,7 @@ namespace Nucleus.Web
           logging.AddTextFileLogger(this.Configuration);
           logging.AddAzureWebAppDiagnostics();
         });
-
+        
         services.Logger().LogInformation($"App Data Folder:         [{this.Configuration.GetValue<String>($"{Nucleus.Abstractions.Models.Configuration.FolderOptions.Section}:DataFolder")}]");
 
         // Enable Open Telemetry metrics and tracing, if configured

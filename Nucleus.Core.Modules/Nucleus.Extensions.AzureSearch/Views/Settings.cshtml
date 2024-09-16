@@ -10,19 +10,68 @@
   {
     <fieldset role="group" aria-label="Settings" class="flex-1">
       <div class="nucleus-flex-fields">
-        <SettingsControl caption="Azure Search Server Url" helptext="Enter the URL for your Azure Search server, including the port.">
+        <SettingsControl caption="Azure Search Server Url" helptext="Enter the URL for your Azure Search service.">
           @Html.TextBoxFor(model => model.ServerUrl)
         </SettingsControl>
 
-        <SettingsControl caption="Index Name" helptext="Enter the index name to use for this site.">
+        <SettingsControl caption="Index Name" helptext="Enter the index name to use for this site. The index will be created automatically.">
           @Html.TextBoxFor(model => model.IndexName)
         </SettingsControl>
       </div>
 
       <div class="nucleus-flex-fields">
-        <SettingsControl caption="Api Key" helptext="Enter the Azure search Api Key.  You can find this value in Azure Portal/Azure Search/Settings/Keys.">
+        <SettingsControl caption="Api Key" helptext="Enter your Azure search Api Key.  You can find this value in Azure Portal/Azure Search/Settings/Keys.">
           @Html.PasswordFor(model => model.ApiKey, new { @value = Model.ApiKey })
         </SettingsControl>
+      </div>
+
+      <div class="nucleus-flex-fields">
+        <SettingsControl caption="Azure Semantic Ranking Configuration" helptext="Select the Azure Search Semantic Ranking Configuration to use during search. This feature is only available in the Basic and higher Azure pricing tiers.">
+          @Html.DropDownListFor(model => model.SemanticConfigurationName, new SelectList(Model.Semanticonfigurations), "(none)")
+        </SettingsControl>
+
+        <button type="submit" class="btn btn-secondary" data-target=".nucleus-editor-panel.parent()" formaction="@Url.NucleusAction("Settings", "AzureSearchSettings", "AzureSearch")">Refresh</button>
+        <button type="submit" class="btn btn-success" data-target=".nucleus-editor-panel.parent()" data-confirm="This will create a Semantic Ranking Configuration for your index. If you already have a semantic ranking configuration, some settings may be overwritten. Do you want to continue?" formaction="@Url.NucleusAction("AddSemanticRanking", "AzureSearchSettings", "AzureSearch")">Create</button>
+      </div>
+
+      <div class="mb-4">
+        <h3>Vectorization</h3>
+        @Html.HiddenFor(model => model.VectorizationEnabled)
+        @if (Model.VectorizationEnabled)
+        {
+          <div>Vectorization is enabled.</div>
+        }
+        else
+        {
+          <div class="alert alert-warning">
+            <p>
+              To use Vectorization, you must first set up a Azure Open AI service and then create a "Deployment" for your Azure Open AI service. When you create
+              your deployment, select the 'text-embedding-ada-002' model. This feature is only available in the Basic and higher Azure pricing tiers.
+            </p>
+            <p class="mb-0">
+              Make sure to review Azure Open AI pricing before enabling the service.
+            </p>
+          </div>
+        }
+
+        <SettingsControl caption="Azure Open AI Endpoint" helptext="">
+          @Html.TextBoxFor(model => model.AzureOpenAIEndpoint)
+        </SettingsControl>
+
+        <div class="nucleus-flex-fields">
+          <SettingsControl caption="Azure Open AI Key" helptext="">
+            @Html.PasswordFor(model => model.AzureOpenAIApiKey, new { @value = Model.AzureOpenAIApiKey })
+          </SettingsControl>
+
+          <SettingsControl caption="Azure Open AI Deployment Name" helptext="">
+            @Html.TextBoxFor(model => model.AzureOpenAIDeploymentName)
+          </SettingsControl>
+        </div>
+
+        @if (!Model.VectorizationEnabled)
+        {
+          <button type="submit" class="btn btn-success me-auto" data-target=".nucleus-editor-panel.parent()" data-confirm="This will enable vectorization by creating vector fields in your index, and adding vector search profiles, algorithms and vectorizer settings. This will create a Semantic Ranking Configuration for your index. If you already have a semantic ranking configuration, some settings may be overwritten. Do you want to continue? Once enabled, this setting can not be  disabled. Do you want to continue?" formaction="@Url.NucleusAction("AddVectorization", "AzureSearchSettings", "AzureSearch")">Enable Vectorization</button>
+        }
       </div>
 
       <div class="nucleus-flex-fields">
@@ -42,6 +91,7 @@
           @Html.RangeFor(model => model.IndexingPause, 0, 15, 0.5)
         </SettingsControl>
       </div>
+
 
       @* <h3>Boost</h3>
     <div class="w-75">
@@ -80,7 +130,7 @@
       @Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "AzureSearchSettings", "AzureSearch"), new { })
       @Html.SubmitButton("", "Get Index Count", @Url.NucleusAction("GetIndexCount", "AzureSearchSettings", "AzureSearch"), new { })
       @* @Html.SubmitButton("", "Get Index Settings", @Url.NucleusAction("GetIndexSettings", "AzureSearchSettings", "AzureSearch"), new { }) *@
-      @Html.SubmitButton("", "Clear Index", @Url.NucleusAction("ClearIndex", "AzureSearchSettings", "AzureSearch"), new { @class = "btn btn-danger", @data_confirm = "This will delete the selected Azure Search index, and it will be automatically re-created the next time the search feeder runs.  Do you want to continue?" })
+      @Html.SubmitButton("", "Clear Index", @Url.NucleusAction("ClearIndex", "AzureSearchSettings", "AzureSearch"), new { @class = "btn btn-danger", @data_confirm = "This will delete the selected Azure Search index, and then automatically re-create it.  Do you want to continue?" })
     </div>
   }
 </div>

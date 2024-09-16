@@ -1,0 +1,87 @@
+﻿@model Nucleus.Modules.AzureAIChat.ViewModels.Settings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@Html.AddStyle("~!/../settings.css")
+<h1 class="nucleus-modal-caption">Azure AI Settings</h1>
+<div class="alert alert-info">
+  This module shares settings with the Azure Search extension. Use the Manage/Azure Search Settings page to set up your Azure Search service and Azure AI 
+  service and API keys.
+</div>
+
+@using (Html.BeginNucleusForm("SaveSettings", "SaveSettings", "AzureAIChatSettings", "AzureAIChat", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+  <fieldset role="group" aria-labelledby="heading" class="flex-grow-1">
+    <SettingsControl caption="OpenAI Chat Model Deployment Name" helptext="Enter the name of a chat model that you have deployed in Azure AI Studio.">
+      @Html.TextBoxFor(model => model.OpenAIChatModelDeploymentName)
+    </SettingsControl>
+
+    <SettingsControl caption="OpenAI Role" helptext="Additional instructions for the model to inform how it should behave and any context it should reference when generating a response. You can describe the assistant's personality and tell it how to format responses.">
+      @Html.TextAreaFor(model => model.OpenAIRoleInfo, new { @rows = "5" })
+    </SettingsControl>
+
+    <div class="nucleus-flex-fields">
+      <SettingsControl caption="OpenAI History Count" helptext="The number of previously-asked questions to submit along with your question. This setting can be useful if you want to be able to ask follow-up questions, but a non-zero setting can configure the AI model if you ask a completely different question.">
+        @Html.TextBoxFor(model => model.OpenAIChatHistoryCount, new { @type = "number", @min = "1", @class = "" })
+      </SettingsControl>
+
+      <SettingsControl caption="OpenAI Max Tokens" helptext="The maximum number of tokens allowed for the generated answer. A lower setting will make the response shorter, but if it is too low, the response won’t contain enough information.">
+        @Html.TextBoxFor(model => model.OpenAIMaxTokens, new { @type = "number", @min = "0", @max = "4096", @class = "" })
+      </SettingsControl>
+
+      <SettingsControl caption="OpenAI Top N Documents" helptext="This setting controls the number of document chunks provided to the large language model for formulating the final response.">
+        @Html.TextBoxFor(model => model.OpenAITopNDocuments, new { @type = "number", @min = "1", @max = "40", @class = "" })
+      </SettingsControl>
+    </div>
+
+    <div class="nucleus-flex-fields">
+      <SettingsControl caption="Show in-scope results only" class="inner-inline" rendermode="LabelLast" helptext="When this setting is disabled, the model supplements its responses with its own knowledge in addition to your documents. When this setting is enabled, the model attempts to only rely on your documents for responses.">
+        @Html.CheckBoxFor(model => model.OpenAIInScopeOnly, new { @class = "ToggleSwitch" })
+      </SettingsControl>
+    </div>
+
+    <div class="nucleus-flex-fields">
+      <SettingsControl caption="Strictness" helptext="Determines the system's aggressiveness in filtering search documents based on their similarity scores. Higher settings apply more rigorous filtering.">
+        @Html.RangeFor(model => model.OpenAIStrictness, 1, 5, 1)
+      </SettingsControl>
+
+      <div></div>
+    </div>
+
+    <div class="nucleus-flex-fields">
+      <SettingsControl caption="Temperature" helptext="Controls randomness. A lower (or zero) value will produce more repetitive responses, and a higher value (1) will result in more creative responses.">
+        @Html.RangeFor(model => model.OpenAITemperature, 0, 1, .001)
+      </SettingsControl>
+
+      <SettingsControl caption="Top P" helptext="Similar to temperature, this controls randomness but uses a different method. Lowering Top P will narrow the model’s token selection to likelier tokens. Increasing Top P will let the model choose from tokens with both high and low likelihood. Try adjusting temperature or Top P but not both.">
+        @Html.RangeFor(model => model.OpenAITopP, 0, 1, .001)
+      </SettingsControl>
+    </div>
+
+    <div class="nucleus-flex-fields">
+      <SettingsControl caption="Frequency Penalty" helptext="Reduce the chance of repeating a token proportionally based on how often it has appeared in the text so far. This decreases the likelihood of repeating the exact same text in a response.">
+        @Html.RangeFor(model => model.OpenAIFrequencyPenalty, 0, 2, .001)
+      </SettingsControl>
+
+      <SettingsControl caption="Presence Penalty" helptext="Reduce the chance of repeating any token that has appeared in the text at all so far. This increases the likelihood of introducing new topics in a response.">
+        @Html.RangeFor(model => model.OpenAIPresencePenalty, 0, 2, .001)
+      </SettingsControl>
+    </div>
+
+    <h3>Error Handling</h3>
+    <div class="nucleus-flex-fields">
+      <SettingsControl caption="Maximum Retries" helptext="Sets how many times to retry the Open AI service if an error is returned.">
+        @Html.RangeFor(model => model.OpenAIMaxRetries, 0, 3, 1)
+      </SettingsControl>
+
+      <SettingsControl caption="Retry Pause (seconds)" helptext="Specifies the pause time (in seconds) between retries after an error.">
+        @Html.RangeFor(model => model.OpenAIRetryPauseSeconds, 1, 15, 1)
+      </SettingsControl>
+    </div>
+  </fieldset>
+
+  <div class="nucleus-form-buttonrow">
+    @Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "AzureAIChatSettings", "AzureAIChat"), new { })
+  </div>
+}

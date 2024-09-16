@@ -120,7 +120,8 @@ namespace Nucleus.Extensions.ElasticSearch
           .SelectMany(highlight => highlight.Value)
           .SelectMany(highlightValue => ExtractHighlightedTerms(highlightValue))
           .Where(value => !String.IsNullOrEmpty(value))
-          .Distinct()
+          // https://developer.mozilla.org/en-US/docs/Web/URI/Fragment/Text_fragments: Matches are case-insensitive.
+          .Distinct(StringComparer.OrdinalIgnoreCase)
           .ToList(),
 
         Site = await this.SiteManager.Get(document.SiteId),

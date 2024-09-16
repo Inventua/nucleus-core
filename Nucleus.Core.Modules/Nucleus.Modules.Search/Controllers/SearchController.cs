@@ -119,7 +119,6 @@ public class SearchController : Controller
     {
       resultsPage = await this.PageManager.Get(resultsPageId);
     }
-
     viewModel.ResultsUrl = $"~{resultsPage?.DefaultPageRoute()?.Path ?? this.Context.Page.DefaultPageRoute().Path}";
 
     ISearchProvider searchProvider = GetSelectedSearchProvider(viewModel.SearchProvider); //.Settings);
@@ -247,7 +246,6 @@ public class SearchController : Controller
 
     if (this.Context.Module != null)
     {
-      //GetSettings(viewModel.Settings);
       viewModel.GetSettings(this.Context.Module);
     }
 
@@ -261,7 +259,6 @@ public class SearchController : Controller
         }
         else
         {
-          //searchProvider = this.SearchProviders.Where(provider => provider.GetType().FullName.Equals(viewModel.Settings.SearchProvider)).FirstOrDefault();
           searchProvider = this.SearchProviders.Where(provider => provider.GetType().FullName.Equals(viewModel.SearchProvider)).FirstOrDefault();
         }
       }

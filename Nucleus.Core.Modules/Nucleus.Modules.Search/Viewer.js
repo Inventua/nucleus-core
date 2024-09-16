@@ -65,7 +65,12 @@
       }
 
       let form = jQuery(element).parents('form');
-      window.location = form.attr('data-resultsurl') + '?search=' + form.find(selectorPrefix + '.search-term').val();
+      if (typeof form.attr('data-resultsurl') !== 'undefined' && form.attr('data-resultsurl') !== '')
+      {
+        window.location = form.attr('data-resultsurl') + '?search=' + form.find(selectorPrefix + '.search-term').val();
+        return false;
+      }
+      return true;
     }
 
     return this.each(function ()

@@ -1,0 +1,46 @@
+﻿@model Nucleus.Modules.AzureAIChat.ViewModels.Viewer
+@using Nucleus.Abstractions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Modules.AzureAIChat.ViewModels
+@Html.AddStyle("~!/../viewer.css")
+
+@using (Html.BeginNucleusForm("Chat", "AzureAIChatViewer", "AzureAIChat", FormMethod.Post, new { @enctype = "multipart/form-data", @class = "azure-ai-chat" }))
+{
+  <div class="d-flex gap-2 align-items-center mb-2">
+    @Html.TextBoxFor(model => model.Question, new { @class = "chat-question flex-1", @placeholder = "message", @type = "search" })
+    <button type="button" class="btn btn-secondary btn-clear">Clear</button>
+    <button type="submit" class="btn btn-primary nucleus-show-progress nucleus-show-progress-after" data-target=".azure-ai-chat .next-answer">Go</button>
+  </div>
+
+  <div class="answers scrollable">
+  </div>
+
+  <div class="next-answer" />
+}
+
+<script>
+  jQuery('.azure-ai-chat .btn-clear').on('click', function () 
+  { 
+    jQuery(this).parents('.azure-ai-chat')
+      .first()
+      .find('.answers')
+      .html('');
+  });
+
+  jQuery('.azure-ai-chat').on('success', function (target, data, url, event, status, request)
+  {
+    var newContent = jQuery(this).find('.next-answer');
+
+    if (newContent.find('.alert-warning').length === 0)
+    {
+      jQuery(this).find('.chat-question')
+      .val('')
+      .focus();
+    }
+
+    jQuery(this).find('.answers').prepend(newContent.children());
+
+
+  });
+</script>

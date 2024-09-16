@@ -226,6 +226,7 @@ body
   .nucleus-admin-content table.headers-column th
   {
     text-align: left;
+    vertical-align: top;
     padding-right: 2rem;
     min-width: 12rem;
     white-space: nowrap;
@@ -1189,7 +1190,7 @@ ul.nucleus-control-panel-items button
 #system-logs .log-levels, #task-logs .log-levels
 {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(3, 1fr);
 }
 
 #system-logs .nucleus-copy-button, #task-logs .nucleus-copy-button

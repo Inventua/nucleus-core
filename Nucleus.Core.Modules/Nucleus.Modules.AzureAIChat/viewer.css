@@ -1,0 +1,32 @@
+﻿.azure-ai-chat .answers h3
+{
+  font-size: 1.1rem;
+}
+
+.azure-ai-chat .answers .btn-close
+{
+  height: auto;
+  width: auto;
+}
+
+.azure-ai-chat .answers .btn-close:focus, .azure-ai-chat .answers .btn-close:active
+{
+  outline: none;
+  box-shadow: none;
+}
+
+.azure-ai-chat .answers .citation-reference
+{
+  display: inline-block;
+  padding: 0 0.25rem;
+  margin: 1px;
+  text-decoration: none;
+  background-color: rgba(var(--bs-link-color-rgb), var(--bs-link-opacity, 1));
+  color: white;
+}
+
+.azure-ai-chat [type=search]
+{
+  /* undo bootstrap/ios styling for search text box */
+  outline-style: none;
+}

@@ -34,6 +34,9 @@
         <file name="Microsoft.Bcl.AsyncInterfaces.dll" />
         <file name="OpenAI.dll" />
         <file name="Azure.AI.OpenAI.dll" />
+        <file name="Azure.Storage.Blobs.dll" />
+        <file name="System.IO.Hashing.dll" />
+        <file name="Azure.Storage.Common.dll" />
       </folder>
       <!-- 
         when the project property RazorCompileOnBuild=true view (.cshtml) files do not need to be included in package.xml (this file) 

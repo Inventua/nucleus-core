@@ -34,7 +34,7 @@ internal class AzureSearchDocument : IDisposable
   /// Constructor used when generating a feed.
   /// </summary>
   /// <param name="content"></param>
-  public AzureSearchDocument(ContentMetaData content, ConfigSettings settings)
+  public AzureSearchDocument(ContentMetaData content, ConfigSettings settings, List<string> azureFileSystemProviders)
   {
     this.Id = GenerateId(content);
 
@@ -49,10 +49,13 @@ internal class AzureSearchDocument : IDisposable
     this.ContentType = content.ContentType;
     this.Type = content.Type;
 
-    if (content.Content.Length != 0 && (settings.AttachmentMaxSize == 0 || content.Content.Length <= settings.AttachmentMaxSize * 1024 * 1024))
+    if (!IsAzureFile(content, azureFileSystemProviders) && content.Content.Length != 0 && (settings.AttachmentMaxSize == 0 || content.Content.Length <= settings.AttachmentMaxSize * 1024 * 1024))
     {
-      // set content if the content size is less than "max size". ToText can return null if the content type can't be converted to text,
-      // which prevents the content index property from being modified (see comments below) 
+      // set content if the content size is:
+      // - not stored in Azure Blob Storage
+      // - less than "max size"
+      // - Can be convered to text by ToText(). ToText can return null if the content type can't be converted to text
+      //   which prevents the content index property from being modified (see comments below) 
       this.Content = ToText(content);
     }
     else
@@ -78,6 +81,19 @@ internal class AzureSearchDocument : IDisposable
     this.Roles = content.Roles?.Select(role => role.Id.ToString()).ToList() ?? [];
 
     this.IsSecure = !IsPublic(content.Site, content.Roles ?? []);
+  }
+
+  private Boolean IsAzureFile(ContentMetaData content, List<string> azureFileSystemProviders)
+  {
+    if (content.Scope != Nucleus.Abstractions.Models.FileSystem.File.URN)
+    {
+      // if the resource is not a file, it can't be stored in Azure Blob Storage
+      return false;
+    }
+    else
+    {
+      return azureFileSystemProviders.Any(provider => content.RawUri?.StartsWith(provider, StringComparison.OrdinalIgnoreCase) == true);
+    }
   }
 
   public string? ToText(ContentMetaData metaData)
@@ -315,7 +331,7 @@ internal class AzureSearchDocument : IDisposable
   {
     foreach (Role role in roles)
     {
-      if (role == site.AnonymousUsersRole || role == site.AllUsersRole)
+      if (role.Equals(site.AnonymousUsersRole) || role.Equals(site.AllUsersRole))
       {
         return true;
       }

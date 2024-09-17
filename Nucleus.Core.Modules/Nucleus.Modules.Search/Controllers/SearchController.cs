@@ -4,12 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Search;
 using Nucleus.Extensions;
 using Nucleus.Extensions.Authorization;
+using Nucleus.Extensions.Logging;
 
 namespace Nucleus.Modules.Search.Controllers;
 
@@ -21,19 +23,22 @@ public class SearchController : Controller
   private IPageModuleManager PageModuleManager { get; }
   private IUserManager UserManager { get; }
   private IEnumerable<ISearchProvider> SearchProviders { get; }
+  private ILogger<SearchController> Logger { get; }
 
-  public SearchController(Context Context, IPageManager pageManager, IPageModuleManager pageModuleManager, IUserManager userManager, IEnumerable<ISearchProvider> searchProviders)
+  public SearchController(Context Context, IPageManager pageManager, IPageModuleManager pageModuleManager, IUserManager userManager, IEnumerable<ISearchProvider> searchProviders, ILogger<SearchController> logger)
   {
     this.Context = Context;
     this.PageManager = pageManager;
     this.PageModuleManager = pageModuleManager;
     this.UserManager = userManager;
     this.SearchProviders = searchProviders;
+    this.Logger = logger;
   }
 
   [HttpGet]
   public async Task<ActionResult> Index(string search)
   {
+    ModelState.Clear();
     return View("Viewer", await BuildViewModel(new() { SearchTerm = search }));
   }
 
@@ -275,13 +280,30 @@ public class SearchController : Controller
 
         if (viewModel.MaximumSuggestions == 0)
         {
-          viewModel.SearchResults = new() { Total = 0 };
+          viewModel.SearchResults = null;
         }
         else
         {
           try
           {
             viewModel.SearchResults = await searchProvider.Suggest(await BuildSearchQuery(viewModel));
+          }
+          catch (InvalidOperationException ex)
+          {
+            this.Logger?.LogWarning(ex.Message);
+
+            if (User.IsSiteAdmin(this.Context.Site))
+            {
+              viewModel.SearchResults = new()
+              {
+                Total = 1,
+                Results = new List<SearchResult>() { new() { Title = ex.Message } }
+              };
+            }
+            else
+            {
+              viewModel.SearchResults = null;
+            }
           }
           catch (NotImplementedException)
           {
@@ -342,7 +364,7 @@ public class SearchController : Controller
     return searchProvider;
   }
 
-  private void GetSearchCapabilities(ViewModels.Viewer viewModel, ISearchProvider searchProvider) 
+  private void GetSearchCapabilities(ViewModels.Viewer viewModel, ISearchProvider searchProvider)
   {
     Abstractions.Search.ISearchProviderCapabilities searchProviderCapabilities;
     searchProviderCapabilities = searchProvider?.GetCapabilities() ?? new Abstractions.Search.DefaultSearchProviderCapabilities();

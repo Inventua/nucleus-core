@@ -12,7 +12,7 @@
 
     function _attachSuggestionsEventHandlers()
     {
-      /* Close suggestions when mouse is clicked elsewhere */
+      /* close suggestions when mouse is clicked elsewhere */
       jQuery(document).on('click', '', function ()
       {
         jQuery(selectorPrefix + '.suggestions-result').removeClass('show');
@@ -21,12 +21,13 @@
       /* get updated search suggestions */
       jQuery(selectorPrefix + '.search-term').on('input', function (event)
       {
-        /* wait half a second before submitting the request, so that if the user is typing, we don't send multiple unwanted requests */
+        /* clear any previous countdowns */
         if (suggestionsTimeout !== -1)
         {
           window.clearTimeout(suggestionsTimeout);
         }
 
+        /* wait half a second before submitting the request, so that if the user is typing, we don't send multiple unwanted requests */
         suggestionsTimeout = window.setTimeout(function (form) { form.submit(); }, 500, jQuery(this).parents('form').first());
         return false;
       });
@@ -49,7 +50,7 @@
 
         data.target.find(selectorPrefix + '.suggestions-result li').on('click', function (event)
         {
-          let textbox = jQuery(this).parents('form').find(selectorPrefix + '.search-term');
+          let textbox = jQuery(this).parents('form').first().find(selectorPrefix + '.search-term');
           textbox.val(jQuery(this).attr('title'));
           _doSearch(this);
         });
@@ -64,7 +65,7 @@
         window.clearTimeout(suggestionsTimeout);
       }
 
-      let form = jQuery(element).parents('form');
+      let form = jQuery(element).parents('form').first();
       if (typeof form.attr('data-resultsurl') !== 'undefined' && form.attr('data-resultsurl') !== '')
       {
         window.location = form.attr('data-resultsurl') + '?search=' + form.find(selectorPrefix + '.search-term').val();
@@ -82,8 +83,7 @@
       {
         if (event.keyCode === 13)
         {
-          _doSearch(this);
-          return false;
+          return _doSearch(this);
         }
       });
 

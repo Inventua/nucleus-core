@@ -2,15 +2,15 @@
 @using Nucleus.Abstractions
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
-@Html.TextBoxFor(model => model.SearchTerm, new { @id = "", @class = "search-term align-middle", @type = "search", @autocomplete = "off", @placeholder=@Model.Settings.Prompt, @aria_label = "Enter search term." })
-@if (Model.Settings.DisplayMode != Nucleus.Modules.Search.ViewModels.Settings.DisplayModes.Minimal)
+@Html.TextBoxFor(model => model.SearchTerm, new { @id = "", @class = "search-term align-middle", @type = "search", @autocomplete = "off", @placeholder=@Model.Prompt, @aria_label = "Enter search term." })
+@if (Model.DisplayMode != Nucleus.Modules.Search.ViewModels.Settings.DisplayModes.Minimal)
 {
   @if (!String.IsNullOrEmpty(Model.ResultsUrl))
   {
-    <button type="button" class="btn btn-primary@(Model.Settings.DisplayMode == Nucleus.Modules.Search.ViewModels.Settings.DisplayModes.Compact ? " btn-sm": "")" onclick="window.location = jQuery(this).parents('form').attr('data-resultsurl') + '?search=' + jQuery(this).siblings('.search-term').val();">@Model.Settings.SearchButtonCaption</button>
+    <button type="button" class="btn btn-primary@(Model.DisplayMode == Nucleus.Modules.Search.ViewModels.Settings.DisplayModes.Compact ? " btn-sm": "")" onclick="window.location = jQuery(this).parents('form').attr('data-resultsurl') + '?search=' + jQuery(this).siblings('.search-term').val();">@Model.SearchButtonCaption</button>
   }
   else
   {
-    <button type="submit" class="btn btn-primary@(Model.Settings.DisplayMode == Nucleus.Modules.Search.ViewModels.Settings.DisplayModes.Compact ? " btn-sm": "")" formaction="@Url.NucleusAction("Index", "Search", "Search")" data-target="form.parent()">@Model.Settings.SearchButtonCaption</button>
+    <button type="submit" class="btn btn-primary@(Model.DisplayMode == Nucleus.Modules.Search.ViewModels.Settings.DisplayModes.Compact ? " btn-sm": "")" formaction="@Url.NucleusAction("Index", "Search", "Search")" data-target="form.parent()">@Model.SearchButtonCaption</button>
   }
 }

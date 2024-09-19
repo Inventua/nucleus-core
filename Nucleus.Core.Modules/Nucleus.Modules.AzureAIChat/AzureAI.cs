@@ -2,14 +2,12 @@
 using System.ClientModel;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Azure;
 using Azure.AI.OpenAI;
 using Azure.AI.OpenAI.Chat;
-using MICAS.Mobile.Service.Services;
 using Nucleus.Abstractions.Models;
 using Nucleus.Extensions;
 using Nucleus.Modules.AzureAIChat.Models;

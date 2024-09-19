@@ -1,0 +1,45 @@
+<package id="caddea6d-8333-4bc0-b4b2-0e3790b22b33" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
+  <name>Bing Custom Search</name>
+  <version>1.0.0.0</version>
+  <publisher name="Inventua " url="https://www.inventua.com/nucleus/" email="support@inventua.com" />
+  <description>
+		The Bing Custom Search extension provides a search provider that retrieves search results using the Bing custom search service.
+	</description>
+  <compatibility minVersion="2.0.0.1" maxVersion="*" />
+  <components>
+    <component folderName="BingCustomSearch" optional="false">
+      <controlPanelExtensionDefinition id="a5af24c3-0152-4513-9039-e3293791fb37">
+        <friendlyName>Bing Custom Search Settings</friendlyName>
+        <helpUrl>https://www.nucleus-cms.com/other-extensions/bing-custom-search/</helpUrl>
+        <description>Configure Bing Custom Search settings.</description>
+        <controllerName>BingCustomSearchSettingsController</controllerName>
+        <extensionName>BingCustomSearch</extensionName>
+        <scope>Site</scope>
+        <editAction>Settings</editAction>
+        <icon><![CDATA[&#xf02f;]]></icon>
+      </controlPanelExtensionDefinition>
+      <file name="readme.txt" />
+      <!-- 
+        when the project property GenerateEmbeddedFilesManifest=true and your static resources Build Action=Embedded resource, static resource
+        files do not need to be included in package.xml (this file) 
+      -->
+      <!--<file name="viewer.css" />
+			<file name="settings.css" />-->
+      <folder name="bin">
+        <file name="Nucleus.Extensions.BingCustomSearch.dll" />
+        <!--<file name="Microsoft.Rest.ClientRuntime.Azure.dll" />
+        <file name="Microsoft.Rest.ClientRuntime.dll" />-->
+        <!--<file name="Microsoft.Azure.CognitiveServices.Search.CustomSearch.dll" />-->
+        <!--<file name="Microsoft.Bing.Search.CustomWebSearch.dll" />-->
+      </folder>
+      <!-- 
+        when the project property RazorCompileOnBuild=true view (.cshtml) files do not need to be included in package.xml (this file) 
+      -->
+      <!--<folder name="Views">
+				<file name="_ViewImports.cshtml" />
+				<file name="Viewer.cshtml" />
+				<file name="Settings.cshtml" />
+			</folder>-->
+    </component>
+  </components>
+</package>

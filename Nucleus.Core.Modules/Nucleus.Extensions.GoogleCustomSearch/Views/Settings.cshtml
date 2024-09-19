@@ -10,11 +10,11 @@
   <fieldset role="group" aria-labelledby="heading" class="flex-grow-1">
 		<h2 class="nucleus-control-panel-heading">Settings</h2>
 		<div class="nucleus-flex-fields">
-      <SettingsControl caption="API Key" helptext="To get your API key, visit the Custom Search JSON API Guide (https://developers.google.com/custom-search/v1/introduction) and click on 'Get a Key'.">
-        @Html.PasswordFor(model => model.ApiKey, new { value = (Model.IsApiKeySet ? Nucleus.Extensions.GoogleCustomSearch.ViewModels.Settings.DUMMY_API_KEY : "") })
-      </SettingsControl>
       <SettingsControl caption="Programmable Search Engine ID" helptext="Visit the Programmable Search Engine (https://programmablesearchengine.google.com/controlpanel/all) and enter your search engine details to create your ID.">
         @Html.TextBoxFor(model => model.SearchEngineId)
+      </SettingsControl>
+      <SettingsControl caption="API Key" helptext="To get your API key, visit the Custom Search JSON API Guide (https://developers.google.com/custom-search/v1/introduction) and click on 'Get a Key'.">
+        @Html.PasswordFor(model => model.ApiKey, new { value = (Model.IsApiKeySet ? Nucleus.Extensions.GoogleCustomSearch.ViewModels.Settings.DUMMY_API_KEY : "") })
       </SettingsControl>
 		</div>
 

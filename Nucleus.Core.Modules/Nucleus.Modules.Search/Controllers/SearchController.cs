@@ -4,12 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Search;
 using Nucleus.Extensions;
 using Nucleus.Extensions.Authorization;
+using Nucleus.Extensions.Logging;
 
 namespace Nucleus.Modules.Search.Controllers;
 
@@ -21,43 +23,22 @@ public class SearchController : Controller
   private IPageModuleManager PageModuleManager { get; }
   private IUserManager UserManager { get; }
   private IEnumerable<ISearchProvider> SearchProviders { get; }
+  private ILogger<SearchController> Logger { get; }
 
-  private const string MODULESETTING_SEARCHPROVIDER = "search:search-provider";
-  private const string MODULESETTING_DISPLAY_MODE = "search:display-mode";
-  private const string MODULESETTING_RESULTS_PAGE = "search:results-page";
-  private const string MODULESETTING_SEARCH_CAPTION = "search:search-caption";
-  private const string MODULESETTING_SEARCH_PROMPT = "search:search-prompt";
-  private const string MODULESETTING_SEARCH_BUTTON_CAPTION = "search:search-button-caption";
-  private const string MODULESETTING_INCLUDE_FILES = "search:include-files";
-
-  private const string MODULESETTING_SHOW_URL = "search:show-url";
-  private const string MODULESETTING_SHOW_SUMMARY = "search:show-summary";
-  private const string MODULESETTING_SHOW_CATEGORIES = "search:show-categories";
-  private const string MODULESETTING_SHOW_PUBLISHEDDATE = "search:show-publisheddate";
-
-  private const string MODULESETTING_INCLUDE_URL_TEXT_FRAGMENT = "search:include-text-fragment";
-
-  private const string MODULESETTING_SHOW_TYPE = "search:show-type";
-  private const string MODULESETTING_SHOW_SIZE = "search:show-size";
-  private const string MODULESETTING_SHOW_SCORE = "search:show-score";
-  private const string MODULESETTING_SHOW_SCORE_ASSESSMENT = "search:show-score-assessment";
-
-  private const string MODULESETTING_INCLUDE_SCOPES = "search:include-scopes";
-  private const string MODULESETTING_MAXIMUM_SUGGESTIONS = "search:maximum-suggestions";
-  private const string MODULESETTING_SEARCH_MODE = "search:search-mode";
-
-  public SearchController(Context Context, IPageManager pageManager, IPageModuleManager pageModuleManager, IUserManager userManager, IEnumerable<ISearchProvider> searchProviders)
+  public SearchController(Context Context, IPageManager pageManager, IPageModuleManager pageModuleManager, IUserManager userManager, IEnumerable<ISearchProvider> searchProviders, ILogger<SearchController> logger)
   {
     this.Context = Context;
     this.PageManager = pageManager;
     this.PageModuleManager = pageModuleManager;
     this.UserManager = userManager;
     this.SearchProviders = searchProviders;
+    this.Logger = logger;
   }
 
   [HttpGet]
   public async Task<ActionResult> Index(string search)
   {
+    ModelState.Clear();
     return View("Viewer", await BuildViewModel(new() { SearchTerm = search }));
   }
 
@@ -119,30 +100,7 @@ public class SearchController : Controller
   {
     if (viewModel.MaximumSuggestions > 100) viewModel.MaximumSuggestions = 100;
 
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_SEARCHPROVIDER, viewModel.SearchProvider);
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_RESULTS_PAGE, viewModel.ResultsPageId);
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_DISPLAY_MODE, viewModel.DisplayMode);
-
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_SEARCH_CAPTION, viewModel.SearchCaption);
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_SEARCH_PROMPT, viewModel.Prompt);
-
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_SEARCH_BUTTON_CAPTION, viewModel.SearchButtonCaption);
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_INCLUDE_FILES, viewModel.IncludeFiles);
-
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_URL, viewModel.ShowUrl);
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_SUMMARY, viewModel.ShowSummary);
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_CATEGORIES, viewModel.ShowCategories);
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_PUBLISHEDDATE, viewModel.ShowPublishDate);
-   this.Context.Module.ModuleSettings.Set (MODULESETTING_INCLUDE_URL_TEXT_FRAGMENT, viewModel.IncludeUrlTextFragment);
-
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_TYPE, viewModel.ShowType);
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_SIZE, viewModel.ShowSize);
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_SCORE, viewModel.ShowScore);
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_SCORE_ASSESSMENT, viewModel.ShowScoreAssessment);
-
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_INCLUDE_SCOPES, viewModel.IncludeScopes);
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_MAXIMUM_SUGGESTIONS, viewModel.MaximumSuggestions);
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_SEARCH_MODE, viewModel.SearchMode);
+    viewModel.SetSettings(this.Context.Module);
 
     await this.PageModuleManager.SaveSettings(this.Context.Page, this.Context.Module);
 
@@ -156,78 +114,21 @@ public class SearchController : Controller
       viewModel = new();
     }
 
-    GetSettings(viewModel.Settings);
+    viewModel.ModuleId = this.Context.Module.Id;
+    viewModel.GetSettings(this.Context.Module);
 
     Page resultsPage = null;
-    Guid resultsPageId = this.Context.Module.ModuleSettings.Get(MODULESETTING_RESULTS_PAGE, Guid.Empty);
+    Guid resultsPageId = viewModel.ResultsPageId;  //this.Context.Module.ModuleSettings.Get(MODULESETTING_RESULTS_PAGE, Guid.Empty);
 
     if (resultsPageId != Guid.Empty)
     {
       resultsPage = await this.PageManager.Get(resultsPageId);
     }
+    viewModel.ResultsUrl = $"~{resultsPage?.DefaultPageRoute()?.Path ?? this.Context.Page.DefaultPageRoute().Path}";
 
-    if (resultsPage != null)
-    {
-      viewModel.ResultsUrl = "~" + resultsPage.DefaultPageRoute().Path;
-    }
-    else
-    {
-      viewModel.ResultsUrl = "";// "~" + this.Context.Page.DefaultPageRoute().Path;
-    }
+    ISearchProvider searchProvider = GetSelectedSearchProvider(viewModel.SearchProvider); //.Settings);
 
-
-    ISearchProvider searchProvider = GetSelectedSearchProvider(viewModel.Settings);      
-    viewModel.Settings.SearchProviderCapabilities = searchProvider.GetCapabilities();
-
-    // override unsupported settings
-    if (viewModel.Settings.SearchProviderCapabilities.MaximumSuggestions < viewModel.Settings.MaximumSuggestions)
-    {
-      viewModel.Settings.MaximumSuggestions = viewModel.Settings.SearchProviderCapabilities.MaximumSuggestions;
-    }
-
-    foreach (int pageSize in viewModel.PagingSettings.PageSizes.ToList())
-    {
-      if (viewModel.Settings.SearchProviderCapabilities.MaximumPageSize < pageSize)
-      {
-        viewModel.PagingSettings.PageSizes.Remove(pageSize);
-      }
-    }
-
-    if (!viewModel.Settings.SearchProviderCapabilities.CanReportPublishedDate)
-    {
-      viewModel.Settings.ShowPublishDate = false;
-    }
-
-    if (!viewModel.Settings.SearchProviderCapabilities.CanReportCategories)
-    {
-      viewModel.Settings.ShowCategories = false;
-    }
-
-    if (!viewModel.Settings.SearchProviderCapabilities.CanReportType)
-    {
-      viewModel.Settings.ShowType = false;
-    }
-
-    if (!viewModel.Settings.SearchProviderCapabilities.CanReportScore)
-    {
-      viewModel.Settings.ShowScore = false;
-      viewModel.Settings.ShowScoreAssessment = false;
-    }
-
-    if (!viewModel.Settings.SearchProviderCapabilities.CanReportSize)
-    {
-      viewModel.Settings.ShowSize = false;
-    }
-
-    if (!viewModel.Settings.SearchProviderCapabilities.CanReportType)
-    {
-      viewModel.Settings.ShowType = false;
-    }
-
-    if (!viewModel.Settings.SearchProviderCapabilities.CanReportMatchedTerms)
-    {
-      viewModel.Settings.IncludeUrlTextFragment = false;
-    }
+    GetSearchCapabilities(viewModel, searchProvider);
 
     if (!String.IsNullOrEmpty(viewModel.SearchTerm))
     {
@@ -237,7 +138,7 @@ public class SearchController : Controller
       }
 
       SearchResults results = await searchProvider.Search(await BuildSearchQuery(viewModel));
-      
+
       viewModel.PagingSettings.TotalCount = Convert.ToInt32(results.Total);
       viewModel.SearchResults = results;
     }
@@ -251,11 +152,11 @@ public class SearchController : Controller
     {
       Site = this.Context.Site,
       SearchTerm = viewModel.SearchTerm,
-      StrictSearchTerms = viewModel.Settings.SearchMode == ViewModels.Settings.SearchModes.All,
+      StrictSearchTerms = viewModel.SearchMode == ViewModels.Settings.SearchModes.All,
       PagingSettings = new()
       {
         CurrentPageIndex = 1,
-        PageSize = viewModel.Settings.MaximumSuggestions
+        PageSize = viewModel.MaximumSuggestions
       }
     };
 
@@ -276,7 +177,7 @@ public class SearchController : Controller
 
     searchQuery.Roles = roles;
 
-    if (!viewModel.Settings.IncludeFiles)
+    if (!viewModel.IncludeFiles)
     {
       searchQuery.ExcludedScopes.Add(Abstractions.Models.FileSystem.File.URN);
     }
@@ -284,11 +185,11 @@ public class SearchController : Controller
     // folders are never included in a standard search
     searchQuery.ExcludedScopes.Add(Abstractions.Models.FileSystem.Folder.URN);
 
-    if (!String.IsNullOrEmpty(viewModel.Settings.IncludeScopes))
+    if (!String.IsNullOrEmpty(viewModel.IncludeScopes))
     {
       // allow \n delimiter when the included scopes are entered in the settings page and ';' delimiter for when the Html Helper
       // or tag helper is being used.
-      searchQuery.IncludedScopes = viewModel.Settings.IncludeScopes.Split(new char[] { '\n', ';' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+      searchQuery.IncludedScopes = viewModel.IncludeScopes.Split(new char[] { '\n', ';' }, StringSplitOptions.RemoveEmptyEntries).ToList();
     }
 
     return searchQuery;
@@ -300,7 +201,7 @@ public class SearchController : Controller
     {
       Site = this.Context.Site,
       SearchTerm = viewModel.SearchTerm,
-      StrictSearchTerms = viewModel.Settings.SearchMode == ViewModels.Settings.SearchModes.All,
+      StrictSearchTerms = viewModel.SearchMode == ViewModels.Settings.SearchModes.All,
       PagingSettings = viewModel.PagingSettings
     };
 
@@ -321,7 +222,7 @@ public class SearchController : Controller
 
     searchQuery.Roles = roles;
 
-    if (!viewModel.Settings.IncludeFiles)
+    if (!viewModel.IncludeFiles)
     {
       searchQuery.ExcludedScopes.Add(Abstractions.Models.FileSystem.File.URN);
     }
@@ -329,11 +230,11 @@ public class SearchController : Controller
     // folders are never included in a standard search
     searchQuery.ExcludedScopes.Add(Abstractions.Models.FileSystem.Folder.URN);
 
-    if (!String.IsNullOrEmpty(viewModel.Settings.IncludeScopes))
+    if (!String.IsNullOrEmpty(viewModel.IncludeScopes))
     {
       // allow \n delimiter when the included scopes are entered in the settings page and ';' delimiter for when the Html Helper
       // or tag helper is being used.
-      searchQuery.IncludedScopes = viewModel.Settings.IncludeScopes.Split(new char[] { '\n', ';' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+      searchQuery.IncludedScopes = viewModel.IncludeScopes.Split(new char[] { '\n', ';' }, StringSplitOptions.RemoveEmptyEntries).ToList();
     }
 
     return searchQuery;
@@ -350,7 +251,7 @@ public class SearchController : Controller
 
     if (this.Context.Module != null)
     {
-      GetSettings(viewModel.Settings);
+      viewModel.GetSettings(this.Context.Module);
     }
 
     if (!String.IsNullOrEmpty(viewModel.SearchTerm))
@@ -363,7 +264,7 @@ public class SearchController : Controller
         }
         else
         {
-          searchProvider = this.SearchProviders.Where(provider => provider.GetType().FullName.Equals(viewModel.Settings.SearchProvider)).FirstOrDefault();
+          searchProvider = this.SearchProviders.Where(provider => provider.GetType().FullName.Equals(viewModel.SearchProvider)).FirstOrDefault();
         }
       }
 
@@ -375,17 +276,34 @@ public class SearchController : Controller
       }
       else
       {
-        if (viewModel.Settings.MaximumSuggestions > 100) viewModel.Settings.MaximumSuggestions = 100;
+        if (viewModel.MaximumSuggestions > 100) viewModel.MaximumSuggestions = 100;
 
-        if (viewModel.Settings.MaximumSuggestions == 0)
+        if (viewModel.MaximumSuggestions == 0)
         {
-          viewModel.SearchResults = new() { Total = 0 };
+          viewModel.SearchResults = null;
         }
         else
         {
           try
           {
             viewModel.SearchResults = await searchProvider.Suggest(await BuildSearchQuery(viewModel));
+          }
+          catch (InvalidOperationException ex)
+          {
+            this.Logger?.LogWarning(ex.Message);
+
+            if (User.IsSiteAdmin(this.Context.Site))
+            {
+              viewModel.SearchResults = new()
+              {
+                Total = 1,
+                Results = new List<SearchResult>() { new() { Title = ex.Message } }
+              };
+            }
+            else
+            {
+              viewModel.SearchResults = null;
+            }
           }
           catch (NotImplementedException)
           {
@@ -403,7 +321,7 @@ public class SearchController : Controller
     if (viewModel == null)
     {
       viewModel = new();
-      GetSettings(viewModel);
+      viewModel.GetSettings(this.Context.Module);
     }
 
     viewModel.PageMenu = await this.PageManager.GetAdminMenu(this.Context.Site, null, this.ControllerContext.HttpContext.User, 1);
@@ -412,19 +330,19 @@ public class SearchController : Controller
       .OrderBy(provider => provider.Name)
       .ToList();
 
-    viewModel.SearchProviderCapabilities = GetSelectedSearchProvider(viewModel)?.GetCapabilities() ?? new Abstractions.Search.DefaultSearchProviderCapabilities();
+    viewModel.SearchProviderCapabilities = GetSelectedSearchProvider(viewModel.SearchProvider)?.GetCapabilities() ?? new Abstractions.Search.DefaultSearchProviderCapabilities();
 
     return viewModel;
   }
 
-  private ISearchProvider GetSelectedSearchProvider(ViewModels.Settings viewModel)
+  private ISearchProvider GetSelectedSearchProvider(string selectedSearchProvider) //ViewModels.Viewer viewModel)
   {
     ISearchProvider searchProvider = null;
-    if (!String.IsNullOrEmpty(viewModel.SearchProvider))
+    if (!String.IsNullOrEmpty(selectedSearchProvider))
     {
       // use selected
       searchProvider = this.SearchProviders
-        .Where(provider => provider.GetType().FullName.Equals(viewModel.SearchProvider))
+        .Where(provider => provider.GetType().FullName.Equals(selectedSearchProvider))
         .FirstOrDefault();
     }
     else
@@ -446,34 +364,58 @@ public class SearchController : Controller
     return searchProvider;
   }
 
-  private void GetSettings(ViewModels.Settings settings)
+  private void GetSearchCapabilities(ViewModels.Viewer viewModel, ISearchProvider searchProvider)
   {
-    settings.SearchProvider = this.Context.Module.ModuleSettings.Get(MODULESETTING_SEARCHPROVIDER, "");
-    settings.ResultsPageId = this.Context.Module.ModuleSettings.Get(MODULESETTING_RESULTS_PAGE, Guid.Empty);
-    settings.DisplayMode = this.Context.Module.ModuleSettings.Get(MODULESETTING_DISPLAY_MODE, ViewModels.Settings.DisplayModes.Full);
-    settings.SearchCaption = this.Context.Module.ModuleSettings.Get(MODULESETTING_SEARCH_CAPTION, "Search Term");
-    settings.Prompt = this.Context.Module.ModuleSettings.Get(MODULESETTING_SEARCH_PROMPT, Nucleus.Modules.Search.ViewModels.Settings.PROMPT_DEFAULT);
-    settings.SearchButtonCaption = this.Context.Module.ModuleSettings.Get(MODULESETTING_SEARCH_BUTTON_CAPTION, "Search");
-    settings.IncludeFiles = this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_FILES, true);
+    Abstractions.Search.ISearchProviderCapabilities searchProviderCapabilities;
+    searchProviderCapabilities = searchProvider?.GetCapabilities() ?? new Abstractions.Search.DefaultSearchProviderCapabilities();
 
-    settings.ShowUrl = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_URL, false);
-    settings.ShowSummary = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SUMMARY, true);
-    settings.ShowCategories = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_CATEGORIES, true);
-    settings.ShowPublishDate = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_PUBLISHEDDATE, true);
-
-    settings.ShowType = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_TYPE, true);
-    settings.ShowSize = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SIZE, true);
-    settings.ShowScore = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SCORE, true);
-    settings.ShowScoreAssessment = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SCORE_ASSESSMENT, true);
-    settings.IncludeUrlTextFragment = this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_URL_TEXT_FRAGMENT, true);
-
-    settings.IncludeScopes = this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_SCOPES, "");
-    settings.MaximumSuggestions = this.Context.Module.ModuleSettings.Get(MODULESETTING_MAXIMUM_SUGGESTIONS, 5);
-    settings.SearchMode = this.Context.Module.ModuleSettings.Get(MODULESETTING_SEARCH_MODE, ViewModels.Settings.SearchModes.Any);
-
-    if (String.IsNullOrWhiteSpace(settings.SearchButtonCaption))
+    // override unsupported settings
+    if (searchProviderCapabilities.MaximumSuggestions < viewModel.MaximumSuggestions)
     {
-      settings.SearchButtonCaption = "Search";
+      viewModel.MaximumSuggestions = searchProviderCapabilities.MaximumSuggestions;
+    }
+
+    foreach (int pageSize in viewModel.PagingSettings.PageSizes.ToList())
+    {
+      if (searchProviderCapabilities.MaximumPageSize < pageSize)
+      {
+        viewModel.PagingSettings.PageSizes.Remove(pageSize);
+      }
+    }
+    if (!searchProviderCapabilities.CanReportPublishedDate)
+    {
+      viewModel.ShowPublishDate = false;
+    }
+
+    if (!searchProviderCapabilities.CanReportCategories)
+    {
+      viewModel.ShowCategories = false;
+    }
+
+    if (!searchProviderCapabilities.CanReportType)
+    {
+      viewModel.ShowType = false;
+    }
+
+    if (!searchProviderCapabilities.CanReportScore)
+    {
+      viewModel.ShowScore = false;
+      viewModel.ShowScoreAssessment = false;
+    }
+
+    if (!searchProviderCapabilities.CanReportSize)
+    {
+      viewModel.ShowSize = false;
+    }
+
+    if (!searchProviderCapabilities.CanReportType)
+    {
+      viewModel.ShowType = false;
+    }
+
+    if (!searchProviderCapabilities.CanReportMatchedTerms)
+    {
+      viewModel.IncludeUrlTextFragment = false;
     }
   }
 
@@ -492,7 +434,6 @@ public class SearchController : Controller
     {
       return displayNameAttribute.DisplayName;
     }
-
   }
 
 }

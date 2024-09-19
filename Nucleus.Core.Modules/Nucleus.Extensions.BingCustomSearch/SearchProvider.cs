@@ -9,12 +9,6 @@ using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Search;
 using Nucleus.Extensions.BingCustomSearch.Models;
 
-//using Microsoft.Azure.CognitiveServices.Search.CustomSearch.Models;
-//using Microsoft.Bing.CustomSearch;
-//using Microsoft.Bing.CustomSearch.Models;
-//using Microsoft.Azure.CognitiveServices.Search.CustomSearch;
-
-
 namespace Nucleus.Extensions.BingCustomSearch;
 
 [DisplayName("Bing Custom Search Provider")]
@@ -37,7 +31,7 @@ public class SearchProvider : ISearchProvider
       CanReportCategories = false,
       CanReportScore = false,
       CanReportSize = false,
-      MaximumSuggestions = 8,
+      MaximumSuggestions = 0,
       CanReportPublishedDate = false,
       CanReportType = false,
       CanFilterByScope = false,
@@ -56,48 +50,18 @@ public class SearchProvider : ISearchProvider
     Models.Settings settings = new();
     settings.GetSettings(query.Site);
 
-    Models.BingCustomSearchResponse response = await GetBingSearchResponse(query, settings);
+    Models.BingCustomSearchResponse response = await BingApi.GetBingSearchResponse(this.HttpClientFactory, query, settings);
         
     return new()
     {
       Results = ToSearchResults(query.Site, response) ?? new List<SearchResult>(),
-      Total = response.WebPages.TotalEstimatedMatches ?? (long?)response.WebPages?.Value?.Count ?? (long)0
+      Total = response.WebPages?.TotalEstimatedMatches ?? (long?)response.WebPages?.Value?.Count ?? (long)0
     };
-  }
-
-  
-  private async Task<BingCustomSearchResponse> GetBingSearchResponse(SearchQuery query, Models.Settings settings)
-  {
-    HttpClient httpClient = this.HttpClientFactory.CreateClient();
-
-    string url = $"{Settings.SEARCH_BASE_URI}?q={query.SearchTerm}&customconfig={settings.ConfigurationId}&count={query.PagingSettings.PageSize}&offset={query.PagingSettings.FirstRowIndex}&safeSearch={settings.SafeSearch}&textDecorations=true&textFormat=HTML";
-
-    HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
-    requestMessage.Headers.Add("Ocp-Apim-Subscription-Key", settings.GetApiKey(query.Site));
-
-    HttpResponseMessage response = await httpClient.SendAsync(requestMessage);
-
-    response.EnsureSuccessStatusCode();
-
-    BingCustomSearchResponse searchResponse = await System.Text.Json.JsonSerializer.DeserializeAsync<BingCustomSearchResponse>(await response.Content.ReadAsStreamAsync());
-
-    return searchResponse;   
   }
 
   private IEnumerable<SearchResult> ToSearchResults(Site site, BingCustomSearchResponse response)
   {
     return response.WebPages?.Value?.Select(result => ToSearchResult(site, result)).ToList();
-
-    //List<SearchResult> results = new();
-
-
-    //foreach (WebPage result in response.WebPages.Value)
-    //{
-    //  results.Add(await ToSearchResult(site, result));
-    //}
-
-
-    //return results;
   }
 
   private SearchResult ToSearchResult(Site site, WebPage result)
@@ -112,48 +76,38 @@ public class SearchProvider : ISearchProvider
     };
   }
 
-
-  public async Task<SearchResults> Suggest(SearchQuery query)
+  public Task<SearchResults> Suggest(SearchQuery query)
   {
-    if (query.Site == null)
+    // the Bing Custom search provider does not support search suggestions. The documentation indicates that it works, but 
+    // the endpoint always returns "Autosuggest is not yet configured for this instance. Changes may take up to 24 hours to reflect",
+    // even though we have enabled at https://www.customsearch.ai/
+    return Task.FromResult(new SearchResults()
     {
-      throw new ArgumentException($"The site property is required.", nameof(query.Site));
-    }
+      Total = 0
+    });
 
-    Models.Settings settings = new();
-    settings.GetSettings(query.Site);
+    //if (query.Site == null)
+    //{
+    //  throw new ArgumentException($"The site property is required.", nameof(query.Site));
+    //}
 
-    Models.BingCustomSuggestions suggestions = await GetBingSuggestions(query, settings);
+    //Models.Settings settings = new();
+    //settings.GetSettings(query.Site);
 
-    return new SearchResults()
-    {
-      Results = ToSuggestionResults(query.Site, suggestions),
-      Total = (long?)suggestions.SuggestionGroups?.SearchSuggestions?.Count ?? (long)0
-    };
+    //Models.BingCustomSuggestions suggestions = await BingApi.GetBingSuggestions(this.HttpClientFactory, query, settings);
+
+    //IEnumerable<SearchResult> results = ToSuggestionResults(query.Site, suggestions)?.Take(query.PagingSettings.PageSize);
+
+    //return new SearchResults()
+    //{
+    //  Results = results,
+    //  Total = (long?)results?.Count() ?? 0
+    //};
   }
-
-  private async Task<BingCustomSuggestions> GetBingSuggestions(SearchQuery query, Models.Settings settings)
-  {
-    HttpClient httpClient = this.HttpClientFactory.CreateClient();
-
-    string url = $"{Settings.SUGGEST_BASE_URI}?q={query.SearchTerm}&customconfig={settings.ConfigurationId}&count={query.PagingSettings.PageSize}&offset={query.PagingSettings.FirstRowIndex}&safeSearch={settings.SafeSearch}&textDecorations=true&textFormat=HTML";
-
-    HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
-    requestMessage.Headers.Add("Ocp-Apim-Subscription-Key", settings.GetApiKey(query.Site));
-
-    HttpResponseMessage response = await httpClient.SendAsync(requestMessage);
-
-    response.EnsureSuccessStatusCode();
-
-    BingCustomSuggestions suggestions = await System.Text.Json.JsonSerializer.DeserializeAsync<BingCustomSuggestions>(await response.Content.ReadAsStreamAsync());
-
-    return suggestions;
-  }
-
 
   private IEnumerable<SearchResult> ToSuggestionResults(Site site, BingCustomSuggestions suggestions)
   {
-    return suggestions.SuggestionGroups?.SearchSuggestions?.Select(result => ToSuggestionResult(site, result)).ToList();
+    return suggestions.SuggestionGroups?.SelectMany(group => group.SearchSuggestions)?.Select(result => ToSuggestionResult(site, result)).ToList();
   }
 
   private SearchResult ToSuggestionResult(Site site, SearchAction searchAction)
@@ -161,8 +115,7 @@ public class SearchProvider : ISearchProvider
     return new SearchResult()
     {
       Site = site,
-      Title = searchAction.DisplayText,
-      ContentType = searchAction.SearchKind
+      Title = searchAction.DisplayText
     };
   }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace Nucleus.Extensions.BingCustomSearch.Models;
@@ -33,11 +29,4 @@ public class WebPage
 
   [JsonPropertyName("snippet")]
   public string Snippet { get; set; }
-  //public OpenGraphImage Thumbnail { get; set; }
 }
-
-//public class OpenGraphImage
-//{
-//  public int Width { get; set; }
-//  public int Height { get; set; }
-//}

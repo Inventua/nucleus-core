@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace Nucleus.Extensions.BingCustomSearch.Models;
@@ -10,16 +6,16 @@ namespace Nucleus.Extensions.BingCustomSearch.Models;
 public class BingCustomSuggestions
 {
   [JsonPropertyName("suggestionGroups")]
-  public SuggestionGroups SuggestionGroups { get; set; }
+  public List<SuggestionGroup> SuggestionGroups { get; set; }
 }
 
-public class SuggestionGroups
+public class SuggestionGroup
 {
   [JsonPropertyName("name")]
   public string Name { get; set; }
 
   [JsonPropertyName("searchSuggestions")]
-  public IList<SearchAction> SearchSuggestions { get; set; }
+  public List<SearchAction> SearchSuggestions { get; set; }
 }
 
 public class SearchAction

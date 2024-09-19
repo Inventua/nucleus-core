@@ -36,8 +36,10 @@ public class AzureAIChatViewerController : Controller
 
     Models.Settings settings = new();
     settings.GetSettings(this.Context.Site, this.Context.Module);
-    
-    if (viewModel.History.Count > settings.OpenAIChatHistoryCount)
+
+    viewModel.History = viewModel.History.Where(history => history != null).ToList();
+
+    while (viewModel.History.Count > settings.OpenAIChatHistoryCount)
     {
       viewModel.History.Remove(viewModel.History.First());
     }
@@ -45,12 +47,12 @@ public class AzureAIChatViewerController : Controller
     AzureAI engine = new(this.Context.Site, settings);
     Models.ChatItem response = await engine.Ask(viewModel.Question, viewModel.History);
 
-    viewModel.History.Add(response);
-    if (!response.IsError)
+    if (!response.IsError == true)
     {
       viewModel.Question = "";
     }   
 
+    viewModel.History.Add(response);
     return View("_Answer", viewModel);
   } 
 

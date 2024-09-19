@@ -42,6 +42,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <None Remove="viewer.js" />
     <None Remove="Views\_Answer.cshtml" />
   </ItemGroup>
 
@@ -63,6 +64,15 @@
 
     <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="Sharp.MICASAgent.Abstractions">
+	    <HintPath>..\..\..\..\Client Projects\Sharp Nucleus Agent\Sharp.MICASAgent\Sharp.MICASAgent.Services\bin\Release\net6.0\Sharp.MICASAgent.Abstractions.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Sharp.MICASAgent.Services">
+	    <HintPath>..\..\..\..\Client Projects\Sharp Nucleus Agent\Sharp.MICASAgent\Sharp.MICASAgent.Services\bin\Release\net6.0\Sharp.MICASAgent.Services.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

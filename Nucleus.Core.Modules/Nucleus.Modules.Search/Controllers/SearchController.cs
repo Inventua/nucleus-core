@@ -124,8 +124,9 @@ public class SearchController : Controller
     {
       resultsPage = await this.PageManager.Get(resultsPageId);
     }
-    viewModel.ResultsUrl = $"~{resultsPage?.DefaultPageRoute()?.Path ?? this.Context.Page.DefaultPageRoute().Path}";
-
+    
+    viewModel.ResultsUrl = resultsPage==null ? "" : "~" + resultsPage.DefaultPageRoute().Path;
+    
     ISearchProvider searchProvider = GetSelectedSearchProvider(viewModel.SearchProvider); //.Settings);
 
     GetSearchCapabilities(viewModel, searchProvider);

@@ -100,6 +100,7 @@ namespace Nucleus.Modules.Documents
 					Site = site,
 					Title = (!String.IsNullOrEmpty(module.Title) ? module.Title : !String.IsNullOrEmpty(page.Title) ? page.Title : page.Name) + (!String.IsNullOrEmpty(document.Title) ? " - " + document.Title : ""),
 					Url =  $"{pageUrl}#_{document.Id}",
+          Summary = document.Description,
 					PublishedDate = document.File.DateChanged.HasValue ? document.File.DateChanged : document.File.DateAdded,
 					SourceId = document.Id,
 					Scope = Models.Document.URN,

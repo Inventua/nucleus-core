@@ -261,6 +261,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Extensions.BingCust
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Modules.AzureAIChat", "Nucleus.Core.Modules\Nucleus.Modules.AzureAIChat\Nucleus.Modules.AzureAIChat.csproj", "{12707DD2-E78C-4DBA-BA4D-AA90F8E35F97}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Extensions.TypeSense", "Nucleus.Core.Modules\Nucleus.Extensions.TypeSense\Nucleus.Extensions.TypeSense.csproj", "{C05D6C09-4836-4CF3-B34F-4E8C8C7B4A57}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -471,6 +473,10 @@ Global
 		{12707DD2-E78C-4DBA-BA4D-AA90F8E35F97}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12707DD2-E78C-4DBA-BA4D-AA90F8E35F97}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12707DD2-E78C-4DBA-BA4D-AA90F8E35F97}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C05D6C09-4836-4CF3-B34F-4E8C8C7B4A57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C05D6C09-4836-4CF3-B34F-4E8C8C7B4A57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C05D6C09-4836-4CF3-B34F-4E8C8C7B4A57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C05D6C09-4836-4CF3-B34F-4E8C8C7B4A57}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -524,6 +530,7 @@ Global
 		{EF0450DF-4946-42C8-9E8C-42549DB3F89F} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
 		{74D4A93C-374A-4043-8532-09E9E71F04ED} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
 		{12707DD2-E78C-4DBA-BA4D-AA90F8E35F97} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
+		{C05D6C09-4836-4CF3-B34F-4E8C8C7B4A57} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D84CD364-9C8E-400E-84AA-45562061ED44}

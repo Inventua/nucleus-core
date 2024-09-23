@@ -1,0 +1,78 @@
+﻿@model Nucleus.Extensions.TypeSense.ViewModels.Settings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+<div class="nucleus-editor-panel">
+  <h2 class="nucleus-control-panel-heading">Typesense Search Settings</h2>
+  @Html.AddStyle("~!/../settings.css")
+  @using (Html.BeginNucleusForm("Settings", "TypeSense", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+  {
+    <fieldset role="group" aria-label="Settings" class="flex-1">
+      <div class="nucleus-flex-fields">
+        <SettingsControl caption="Typesense Server Url" helptext="Enter the URL for your Typesense service.">
+          @Html.TextBoxFor(model => model.ServerUrl)
+        </SettingsControl>
+
+        <SettingsControl caption="Index Name" helptext="Enter the index name to use for this site. The index will be created automatically.">
+          @Html.TextBoxFor(model => model.IndexName)
+        </SettingsControl>
+      </div>
+
+      <div class="nucleus-flex-fields">
+        <SettingsControl caption="Api Key" helptext="Enter your Typesense Api Key.">
+          @Html.PasswordFor(model => model.ApiKey, new { @value = Model.ApiKey })
+        </SettingsControl>
+      </div>
+
+      <SettingsControl caption="Attachments Size Limit (mb)" helptext="Enter maximum file size to submit to the Typesense server for indexing. A value of zero specifies no limit.">
+        @Html.TextBoxFor(model => model.AttachmentMaxSize, new { @type = "number", @class = "attachments-size-limit" })
+      </SettingsControl>
+
+      <div class="w-75">
+        <SettingsControl caption="Indexing Pause (seconds)" helptext="Specifies the pause time (in seconds) between indexing operations.  In some environments (particularly Azure), indexing requests which are sent in rapid succession can exhaust available server resources (In Azure, SNAT ports).  This setting causes the search feed to pause between requests, which gives the server time to release unused resources.  The default value is 1.">
+          @Html.RangeFor(model => model.IndexingPause, 0, 15, 0.5)
+        </SettingsControl>
+      </div>
+
+
+      @* <h3>Boost</h3>
+    <div class="w-75">
+    <SettingsControl caption="Title" helptext="Title boost.  The default value is 1.">
+    @Html.RangeFor(model => model.Boost.Title, 0.5, 5, 0.5)
+    </SettingsControl>
+    <SettingsControl caption="Summary" helptext="Summary boost.  The default value is 1.">
+    @Html.RangeFor(model => model.Boost.Summary, 0.5, 5, 0.5)
+    </SettingsControl>
+    <SettingsControl caption="Categories" helptext="Categories boost.  The default value is 1.">
+    @Html.RangeFor(model => model.Boost.Categories, 0.5, 5, 0.5)
+    </SettingsControl>
+    <SettingsControl caption="Keywords" helptext="Keywords boost.  The default value is 1.">
+    @Html.RangeFor(model => model.Boost.Keywords, 0.5, 5, 0.5)
+    </SettingsControl>
+    <SettingsControl caption="Content" helptext="Content boost.  The default value is 1.  For web pages, the page content and meta-data is the search content.  For files, the file content is the search content.">
+    @Html.RangeFor(model => model.Boost.Content, 0.5, 5, 0.5)
+    </SettingsControl>
+
+    <SettingsControl caption="Attachment Title" helptext="Attachment Title boost.  The default value is 1.">
+    @Html.RangeFor(model => model.Boost.AttachmentTitle, 0.5, 5, 0.5)
+    </SettingsControl>
+    <SettingsControl caption="Attachment Name" helptext="Attachment Name (file name) boost.  The default value is 1.">
+    @Html.RangeFor(model => model.Boost.AttachmentName, 0.5, 5, 0.5)
+    </SettingsControl>
+    <SettingsControl caption="Attachment Author" helptext="Attachment Author boost.  The default value is 1.">
+    @Html.RangeFor(model => model.Boost.AttachmentAuthor, 0.5, 5, 0.5)
+    </SettingsControl>
+    <SettingsControl caption="Attachment Keywords" helptext="Attachment keywords boost.  The default value is 1.">
+    @Html.RangeFor(model => model.Boost.AttachmentKeywords, 0.5, 5, 0.5)
+    </SettingsControl>
+    </div>*@
+    </fieldset>
+
+    <div class="nucleus-form-buttonrow">
+      @Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "TypeSenseSettings", "TypeSense"), new { })
+      @Html.SubmitButton("", "Get Index Count", @Url.NucleusAction("GetIndexCount", "TypeSenseSettings", "TypeSense"), new { })
+      @Html.SubmitButton("", "Clear Index", @Url.NucleusAction("ClearIndex", "TypeSenseSettings", "TypeSense"), new { @class = "btn btn-danger", @data_confirm = "This will delete the selected Typesense index, and then automatically re-create it.  Do you want to continue?" })
+    </div>
+  }
+</div>

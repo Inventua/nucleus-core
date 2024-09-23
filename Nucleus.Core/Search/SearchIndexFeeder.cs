@@ -1,23 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions;
+using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.TaskScheduler;
-using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Search;
-using Microsoft.Extensions.Logging;
-using Nucleus.Extensions.Logging;
 using Nucleus.Core.Logging;
 using Nucleus.Extensions;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using Nucleus.Core.DataProviders;
-using Nucleus.Data.Common;
-using DocumentFormat.OpenXml.Drawing.Diagrams;
-using System.Linq.Expressions;
+using Nucleus.Extensions.Logging;
 
 namespace Nucleus.Core.Search
 {
@@ -82,7 +76,7 @@ namespace Nucleus.Core.Search
             }
             else
             {
-              this.Logger?.LogInformation("Search index provider {providername} did not connect using the settings for site '{site}', and will not receive data.", searchIndexManager.GetType().FullName, fullSite.Name);
+              this.Logger?.LogWarning("Search index provider {providername} did not connect using the settings for site '{site}', and will not receive data.", searchIndexManager.GetType().FullName, fullSite.Name);
             }
           }
           catch (Exception e)

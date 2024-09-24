@@ -40,6 +40,14 @@ public partial class TypeSenseSearchProvider : ISearchProvider
     this.Logger = logger;
   }
 
+  public ISearchProviderCapabilities GetCapabilities()
+  {
+    return new DefaultSearchProviderCapabilities()
+    {
+      MaximumSuggestions = 0
+    };
+  }
+
   public async Task<SearchResults> Search(SearchQuery query)
   {
     if (query.Site == null)
@@ -116,13 +124,12 @@ public partial class TypeSenseSearchProvider : ISearchProvider
     {
       Score = score, //double.Parse( result.TextMatchInfo?.Score ?? "0"),
 
-      //MatchedTerms = result.Highlights?
-      //  .SelectMany(highlight => highlight.Value)
-      //  .SelectMany(highlightValue => ExtractHighlightedTerms(highlightValue))
-      //  .Where(value => !String.IsNullOrEmpty(value))
-      //  // https://developer.mozilla.org/en-US/docs/Web/URI/Fragment/Text_fragments: Matches are case-insensitive.
-      //  .Distinct(StringComparer.OrdinalIgnoreCase)
-      //  .ToList(),
+      MatchedTerms = result.Highlights?
+        .SelectMany(highlight => ExtractHighlightedTerms(highlight.Snippet))
+        .Where(value => !String.IsNullOrEmpty(value))
+        // https://developer.mozilla.org/en-US/docs/Web/URI/Fragment/Text_fragments: Matches are case-insensitive.
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .ToList(),
 
       Site = site,
       Url = result.Document.Url,
@@ -142,17 +149,20 @@ public partial class TypeSenseSearchProvider : ISearchProvider
     };
   }
 
-  private static List<string> ExtractHighlightedTerms(string highlightedValue)
+  private static List<string> ExtractHighlightedTerms(string? highlightedValue)
   {
     List<string> results = [];
 
-    System.Text.RegularExpressions.MatchCollection matches = EXTRACT_HIGHLIGHTED_TERMS_REGEX().Matches(highlightedValue);
-    foreach (System.Text.RegularExpressions.Match match in matches.Cast<Match>())
+    if (!string.IsNullOrEmpty(highlightedValue))
     {
-      if (match.Success)
+      System.Text.RegularExpressions.MatchCollection matches = EXTRACT_HIGHLIGHTED_TERMS_REGEX().Matches(highlightedValue);
+      foreach (System.Text.RegularExpressions.Match match in matches.Cast<Match>())
       {
+        if (match.Success)
         {
-          results.Add(match.Groups["term"].Value);
+          {
+            results.Add(match.Groups["term"].Value);
+          }
         }
       }
     }
@@ -160,38 +170,36 @@ public partial class TypeSenseSearchProvider : ISearchProvider
     return results;
   }
 
-  public async Task<SearchResults> Suggest(SearchQuery query)
+  public Task<SearchResults> Suggest(SearchQuery query)
   {
-    if (query.Site == null)
+    return Task.FromResult(new SearchResults()
     {
-      throw new InvalidOperationException($"The {nameof(query.Site)} property is required.");
-    }
+      Results = [],
+      Total = 0
+    });
+    //if (query.Site == null)
+    //{
+    //  throw new InvalidOperationException($"The {nameof(query.Site)} property is required.");
+    //}
 
-    Models.Settings settings = new(query.Site);
+    //Models.Settings settings = new(query.Site);
 
-    if (String.IsNullOrEmpty(settings.ServerUrl))
-    {
-      throw new InvalidOperationException($"The Elastic search server url is not set for site '{query.Site.Name}'.");
-    }
+    //if (String.IsNullOrEmpty(settings.ServerUrl))
+    //{
+    //  throw new InvalidOperationException($"The Elastic search server url is not set for site '{query.Site.Name}'.");
+    //}
 
-    if (String.IsNullOrEmpty(settings.IndexName))
-    {
-      throw new InvalidOperationException($"The Elastic search index name is not set for site '{query.Site.Name}'.");
-    }
+    //if (String.IsNullOrEmpty(settings.IndexName))
+    //{
+    //  throw new InvalidOperationException($"The Elastic search index name is not set for site '{query.Site.Name}'.");
+    //}
 
     //if (query.Boost == null)
     //{
     //  query.Boost = settings.Boost;
     //}
 
-    TypeSenseRequest request = CreateRequest(query.Site, settings);
-
-    //todo
-    return new SearchResults()
-    {
-      Results = [],
-      Total = 0
-    };
+    //TypeSenseRequest request = CreateRequest(query.Site, settings);
 
     //Response<SuggestResults<TypeSenseDocument>> result = await request.Suggest(query);
 

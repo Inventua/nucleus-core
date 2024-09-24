@@ -69,22 +69,14 @@ public partial class TypeSenseSearchProvider : ISearchProvider
 
     SearchResult<TypeSenseDocument> response = await request.Search(query);
 
-    double maxScore = 0;
-    Hit<TypeSenseDocument>? first = response.Hits.FirstOrDefault();
-    if (first != null && first.TextMatchInfo != null)
-    {
-      if (!double.TryParse(first.TextMatchInfo.Score, out maxScore))
-      {
-        maxScore = 0;
-      }
-    }
+    IEnumerable<SearchResult> results = await ToSearchResults(query.Site, response);
 
     return new SearchResults()
     {
-      Results = await ToSearchResults(query.Site, response),
+      Results = results,
       Answers = [],//await ToSemanticResults(query.Site, response),
       Total = response.Found,
-      MaxScore = maxScore
+      MaxScore = results.FirstOrDefault()?.Score ?? 0
     };
   }
 
@@ -109,9 +101,20 @@ public partial class TypeSenseSearchProvider : ISearchProvider
 
   private async Task<SearchResult> ToSearchResult(Site site, Hit<TypeSenseDocument> result)
   {
+    // https://threads.typesense.org/2J3b99d
+    // TODO: Next version of Typesense is meant to have an improved "displayable" score
+
+    // this does not work very well
+    var score =
+      ((result.TextMatchInfo?.FieldsMatched ?? 1) * 1.2) + 
+      ((result.TextMatchInfo?.TokensMatched ?? 1) * 1.3) 
+      + (result.VectorDistance ?? 0) * 0.4;
+
+    //result.TextMatchInfo.TokensMatched
+
     return new SearchResult()
     {
-      Score = double.Parse( result.TextMatchInfo?.Score ?? "0"),
+      Score = score, //double.Parse( result.TextMatchInfo?.Score ?? "0"),
 
       //MatchedTerms = result.Highlights?
       //  .SelectMany(highlight => highlight.Value)

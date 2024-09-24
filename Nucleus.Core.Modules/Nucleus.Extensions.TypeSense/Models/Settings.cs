@@ -67,7 +67,7 @@ public class Settings
       }
     }
 
-
+  // https://typesense.org/docs/guide/ranking-and-relevance.html#boosting-burying-sets-of-records
     //this.Boost.Title = GetSetting(site, SITESETTING_BOOST_TITLE, this.Boost.Title);
     //this.Boost.Summary = GetSetting(site, SITESETTING_BOOST_SUMMARY, this.Boost.Summary);
     //this.Boost.Categories = GetSetting(site, SITESETTING_BOOST_CATEGORIES, this.Boost.Categories);

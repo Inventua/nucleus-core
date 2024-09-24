@@ -8,6 +8,7 @@ using Nucleus.Abstractions.Search;
 using Microsoft.Extensions.Options;
 using System.Linq.Expressions;
 using Newtonsoft.Json.Linq;
+using DocumentFormat.OpenXml.Bibliography;
 
 namespace Nucleus.Extensions.TypeSense;
 
@@ -24,6 +25,10 @@ internal class TypeSenseRequest
   private Typesense.ITypesenseClient _client { get; set; }
 
   public string DebugInformation { get; internal set; }
+
+  internal static readonly char[] TOKEN_SPLIT_CHARS = [' ', ',', ';', ':', '<', '>', '.', '!', '#', '_', '\t', '\n', '\r'];
+  internal const int TOKENS_PER_PAGE = 2500;
+  internal const int BATCH_SIZE = 10;
 
   public TypeSenseRequest(System.Net.Http.IHttpClientFactory httpClientFactory, Uri uri, string indexName, string apiKey)
     : this(httpClientFactory, uri, indexName, apiKey, TimeSpan.Zero) { }
@@ -102,21 +107,23 @@ internal class TypeSenseRequest
         new Field(CamelCase(nameof(TypeSenseDocument.ParentId)), FieldType.String, false, true),
         new Field(CamelCase(nameof(TypeSenseDocument.SiteId)), FieldType.String, false),
         new Field(CamelCase(nameof(TypeSenseDocument.Url)), FieldType.String, false),
+        
         new Field(CamelCase(nameof(TypeSenseDocument.PageNumber)), FieldType.Int32, false, true),
         new Field(CamelCase(nameof(TypeSenseDocument.Title)), FieldType.String, false, true),
-        new Field(CamelCase(nameof(TypeSenseDocument.TitleVector)), FieldType.FloatArray, false, true)
-        {
-          Embed = new([CamelCase(nameof(TypeSenseDocument.Title))],new("ts/gte-large") )
-        },
-        new Field(CamelCase(nameof(TypeSenseDocument.Content)), FieldType.String, false, true),
-        new Field(CamelCase(nameof(TypeSenseDocument.ContentVector)), FieldType.FloatArray, false, true)
-        {
-          Embed = new([CamelCase(nameof(TypeSenseDocument.Content))], new("ts/gte-large") )
-        },
+        new Field(CamelCase(nameof(TypeSenseDocument.Content)), FieldType.String, false, true),        
         new Field(CamelCase(nameof(TypeSenseDocument.Summary)), FieldType.String, false, true),
-        new Field(CamelCase(nameof(TypeSenseDocument.SummaryVector)), FieldType.FloatArray, false, true)
+
+        new Field(CamelCase(nameof(TypeSenseDocument.Embeddings)), FieldType.FloatArray, false, true)
         {
-          Embed = new([CamelCase(nameof(TypeSenseDocument.Summary))], new("ts/gte-large") )
+          Embed = new
+          (
+            [
+              CamelCase(nameof(TypeSenseDocument.Title)),
+              CamelCase(nameof(TypeSenseDocument.Summary)),
+              CamelCase(nameof(TypeSenseDocument.Content))
+            ], 
+            new("ts/gte-large") 
+          )
         },
 
         new Field(CamelCase(nameof(TypeSenseDocument.Categories)), FieldType.StringArray, false, true),
@@ -136,6 +143,7 @@ internal class TypeSenseRequest
     try
     {
       CollectionResponse createCollectionResponse = await client.CreateCollection(schema);
+            
       return true;
     }
     catch (Exception ex)
@@ -186,26 +194,91 @@ internal class TypeSenseRequest
     return await client.RetrieveCollection(this.IndexName);
   }
 
-  public async Task<List<ImportResponse>> IndexContent(IEnumerable<TypeSenseDocument> contents)
+  public async Task IndexContent(List<TypeSenseDocument> contents)
   {
-    ITypesenseClient client = await GetClient();
-
-    List<ImportResponse> indexResponse = await client.ImportDocuments<TypeSenseDocument>(this.IndexName, contents, contents.Count(), ImportType.Upsert);
-
-    foreach (ImportResponse response in indexResponse)
+    // break large content into chunks
+    foreach (TypeSenseDocument content in contents.ToList())
     {
-      if (!response.Success)
+      if (!String.IsNullOrEmpty(content.Content))
       {
-        throw new InvalidOperationException(response.Error);
+        // try to fit into the token limit.  
+
+        string[] tokens = content.Content.Split(TOKEN_SPLIT_CHARS, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        int pages = (int)Math.Floor((decimal)tokens.Length / TOKENS_PER_PAGE) + 1;
+        string[] tokenizedContent = content.Content.Split(TOKEN_SPLIT_CHARS, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        // if the content has more than TOKENS_PER_PAGE tokens, create additional chunks
+        if (tokenizedContent.Length > TOKENS_PER_PAGE)
+        {
+          for (int page = 0; page < pages; page++)
+          {
+            string vectorContent = string.Join(' ', tokenizedContent.Skip(page * TOKENS_PER_PAGE).Take(TOKENS_PER_PAGE));
+
+            TypeSenseDocument pagedDocument = new();
+
+            pagedDocument.Id += $"{content.Id}_pages_{page + 1}";
+            pagedDocument.Title += $" [{page}]";
+            pagedDocument.ParentId = content.Id;
+            pagedDocument.PageNumber = page + 1;
+
+            CopyMetaData(content, pagedDocument);
+            pagedDocument.Content = vectorContent;
+
+            contents.Add(pagedDocument);
+          }
+        }
       }
     }
 
-    if (this.IndexingPause > TimeSpan.Zero)
+    ITypesenseClient client = await GetClient();
+
+    IEnumerable<TypeSenseDocument[]> batchChunks = contents.Chunk(BATCH_SIZE);
+
+    foreach (TypeSenseDocument[] chunk in batchChunks)
     {
-      await Task.Delay(this.IndexingPause);
+      List<ImportResponse> indexResponse = await client.ImportDocuments<TypeSenseDocument>(this.IndexName, chunk, chunk.Length, ImportType.Upsert);
+
+      foreach (ImportResponse response in indexResponse)
+      {
+        if (!response.Success)
+        {
+          throw new InvalidOperationException(response.Error);
+        }
+      }
+
+      if (this.IndexingPause > TimeSpan.Zero)
+      {
+        await Task.Delay(this.IndexingPause);
+      }
     }
 
-    return indexResponse;
+    return;
+  }
+
+  private static void CopyMetaData(TypeSenseDocument source, TypeSenseDocument target)
+  {
+    target.SiteId = source.SiteId;
+    target.Url = source.Url;
+
+    target.Title = source.Title;
+
+    if (string.IsNullOrEmpty(target.Summary))
+    {
+      target.Summary = source.Summary;
+    }
+
+    target.Size = source.Size;
+    target.ContentType = source.ContentType;
+    target.Categories = source.Categories;
+    target.Keywords = source.Keywords;
+    
+    target.PublishedDate = source.PublishedDate;
+    target.Scope = source.Scope;
+    target.SourceId = source.SourceId;
+    target.Type = source.Type;
+
+    target.IsSecure = source.IsSecure;
+    target.Roles = source.Roles;
   }
 
   public async Task<TypeSenseDocument> RemoveContent(string id)
@@ -223,8 +296,6 @@ internal class TypeSenseRequest
   public async Task<SearchResult<TypeSenseDocument>> Search(SearchQuery query)
   {
     ITypesenseClient client = await GetClient();
-    SearchParameters searchParameters;
-
 
     if (query.SearchTerm == string.Empty)
     {
@@ -232,10 +303,10 @@ internal class TypeSenseRequest
     }
     else
     {
-      searchParameters = new(query.SearchTerm)
+      SearchParameters searchParameters = new(query.SearchTerm)
       {
         HighlightStartTag = "<em>",
-        HighlightEndTag = "</em>",
+        HighlightEndTag = "</em>", 
         // IncludeTotalCount = true,
         HighlightFields = BuildList(BuildHighlightFields(query)),
         IncludeFields = BuildList(BuildSelectFields()),
@@ -243,13 +314,14 @@ internal class TypeSenseRequest
         Page = query.PagingSettings.CurrentPageIndex,
         QueryBy = BuildList(BuildSearchFields()),
         FilterBy = BuildFilter($"{BuildSiteFilter(query)}", $"{BuildRolesFilter(query)}", $"{BuildScopeFilter(query)}", $"{BuildArgsFilter(query)}", $"{BuildPageNumberFilter(query)}"),
+        TextMatchType = "max_score",
         SortBy = "_text_match:desc"
       };
+
+      SearchResult<TypeSenseDocument> response = await client.Search<TypeSenseDocument>(this.IndexName, searchParameters);
+   
+      return ReplaceHighlights(response);
     }
-
-    SearchResult<TypeSenseDocument> response = await client.Search<TypeSenseDocument>(this.IndexName, searchParameters);
-
-    return ReplaceHighlights(response);
   }
 
   private SearchResult<TypeSenseDocument> ReplaceHighlights(SearchResult<TypeSenseDocument> response)
@@ -301,16 +373,16 @@ internal class TypeSenseRequest
 
   private static List<string> BuildSearchFields()
   {
+    // order is important: a field earlier in the list of query_by fields is considered more relevant than a document matched
+    // on a field later in the list
     return
     [
       CamelCase(nameof(TypeSenseDocument.Title)),
+      CamelCase(nameof(TypeSenseDocument.Embeddings)),
       CamelCase(nameof(TypeSenseDocument.Summary)),
-      CamelCase(nameof(TypeSenseDocument.Content)),
       CamelCase(nameof(TypeSenseDocument.Keywords)),
       CamelCase(nameof(TypeSenseDocument.Categories)),
-      CamelCase(nameof(TypeSenseDocument.TitleVector))//,
-      //CamelCase(nameof(TypeSenseDocument.ContentVector)),
-      //CamelCase(nameof(TypeSenseDocument.SummaryVector))
+      CamelCase(nameof(TypeSenseDocument.Content))
     ];
   }
 
@@ -390,7 +462,7 @@ internal class TypeSenseRequest
     {
       // Id.ToString is required here, SearchFilter.Create cannot handle Guids
       string roles = $"{String.Join(",", query.Roles.Select(role => role.Id.ToString()))}";
-      return $"{CamelCase(nameof(TypeSenseDocument.Roles))}:[{roles}] || {CamelCase(nameof(TypeSenseDocument.IsSecure))}:!=true)";
+      return $"({CamelCase(nameof(TypeSenseDocument.Roles))}:[{roles}] || {CamelCase(nameof(TypeSenseDocument.IsSecure))}:!=true)";
     }
     else
     {
@@ -415,7 +487,7 @@ internal class TypeSenseRequest
 
       if (!String.IsNullOrEmpty(result))
       {
-        result = $"({result} and {result2})";
+        result = $"({result} && {result2})";
       }
       else
       {

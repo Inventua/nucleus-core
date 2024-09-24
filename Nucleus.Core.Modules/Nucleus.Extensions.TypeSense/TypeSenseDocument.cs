@@ -158,11 +158,6 @@ internal class TypeSenseDocument : IDisposable
   public string? Title { get; set; } = "";
 
   /// <summary>
-  /// This field supports vector search, if populated by TypeSense search skill sets
-  /// </summary>
-  public Single[]? TitleVector { get; set; }
-
-  /// <summary>
   /// Short summary for the resource.
   /// </summary>
   /// <remarks>
@@ -170,11 +165,6 @@ internal class TypeSenseDocument : IDisposable
   /// a summary.
   /// </remarks>
   public string? Summary { get; set; }
-
-  /// <summary>
-  /// This field supports vector search, if populated by TypeSense search skill sets
-  /// </summary>
-  public Single[]? SummaryVector { get; set; }
 
   /// <summary>
   /// URN of the entity which was used to create this search entry.
@@ -199,9 +189,9 @@ internal class TypeSenseDocument : IDisposable
   public string? Content { get; set; }
 
   /// <summary>
-  /// This field supports vector search, if populated by TypeSense search skill sets
+  /// This field supports vector search, if populated
   /// </summary>
-  public Single[]? ContentVector { get; set; }
+  public Single[]? Embeddings { get; set; }
 
   /// <summary>
   /// Search entry MIME type.

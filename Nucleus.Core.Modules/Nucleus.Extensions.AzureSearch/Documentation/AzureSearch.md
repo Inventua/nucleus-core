@@ -5,8 +5,9 @@ The Azure Search extension provides a search index manager and a search provider
 [Azure Search](https://learn.microsoft.com/en-us/azure/search/search-what-is-azure-search) service to use the Azure Search provider.  
 > 2. Azure Search can only extract content from files (like PDFs, Word documents and other formats) which are stored in an 
 [Azure Blob Storage](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction) service. If you want to extract content from files 
-for inclusion in the search index and are not using Azure Storage, you should choose another search provider, like [Elastic Search](/other-extensions/elastic-search/). If you just want 
-to index file meta-data, along with your site content, you can use Azure Search, but you won't get results when searching terms from within your file's contents.
+for inclusion in the search index and are not using Azure Storage, you should choose another search provider, like [Elastic Search](/other-extensions/elastic-search/) or
+[Typesense](/other-extensions/typesense-search). If you just want to index file meta-data, along with your site content, you can use Azure Search without 
+storing your files in Azure Blob Storage, but you won't get results when searching terms from within your file's contents.
 
 ### How it works
 

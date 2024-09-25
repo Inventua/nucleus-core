@@ -2,13 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Typesense;
-using Nucleus.Abstractions.Models;
-using Nucleus.Abstractions.Search;
 using Microsoft.Extensions.Options;
-using System.Linq.Expressions;
-using Newtonsoft.Json.Linq;
-using DocumentFormat.OpenXml.Bibliography;
+using Nucleus.Abstractions.Search;
+using Typesense;
 
 namespace Nucleus.Extensions.TypeSense;
 
@@ -27,8 +23,8 @@ internal class TypeSenseRequest
   public string DebugInformation { get; internal set; }
 
   internal static readonly char[] TOKEN_SPLIT_CHARS = [' ', ',', ';', ':', '<', '>', '.', '!', '#', '_', '\t', '\n', '\r'];
-  internal const int TOKENS_PER_PAGE = 2500;
-  internal const int BATCH_SIZE = 10;
+  internal const int TOKENS_PER_CHUNK = 512;  // the token limit for gte-large is 512
+  internal const int IMPORT_BATCH_SIZE = 10;
 
   public TypeSenseRequest(System.Net.Http.IHttpClientFactory httpClientFactory, Uri uri, string indexName, string apiKey)
     : this(httpClientFactory, uri, indexName, apiKey, TimeSpan.Zero) { }
@@ -65,16 +61,14 @@ internal class TypeSenseRequest
 
     List<Typesense.Setup.Node> nodes = [new(this.Uri.Host, this.Uri.Port.ToString(), this.Uri.Scheme)];
     Typesense.Setup.Config config = new(nodes, this.ApiKey);
-    //config.JsonSerializerOptions = new() 
-    //{ 
-    //   DefaultIgnoreCondition= System.Text.Json.Serialization.JsonIgnoreCondition.Never,
-    //  PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.
-    //};
 
     IOptions<Typesense.Setup.Config> options = Options.Create(config);
 
-    ITypesenseClient client = new TypesenseClient(options, this.HttpClientFactory.CreateClient(nameof(TypeSenseRequest)));
-
+    System.Net.Http.HttpClient httpClient = this.HttpClientFactory.CreateClient(nameof(TypeSenseRequest));
+    httpClient.Timeout = TimeSpan.FromSeconds(180);
+    
+    ITypesenseClient client = new TypesenseClient(options, httpClient);
+    
     pingResponse = (await client.RetrieveHealth()).Ok;
     if (pingResponse)
     {
@@ -141,7 +135,7 @@ internal class TypeSenseRequest
       });
 
     try
-    {
+    {      
       CollectionResponse createCollectionResponse = await client.CreateCollection(schema);
             
       return true;
@@ -204,15 +198,15 @@ internal class TypeSenseRequest
         // try to fit into the token limit.  
 
         string[] tokens = content.Content.Split(TOKEN_SPLIT_CHARS, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        int pages = (int)Math.Floor((decimal)tokens.Length / TOKENS_PER_PAGE) + 1;
+        int pages = (int)Math.Floor((decimal)tokens.Length / TOKENS_PER_CHUNK) + 1;
         string[] tokenizedContent = content.Content.Split(TOKEN_SPLIT_CHARS, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
         // if the content has more than TOKENS_PER_PAGE tokens, create additional chunks
-        if (tokenizedContent.Length > TOKENS_PER_PAGE)
+        if (tokenizedContent.Length > TOKENS_PER_CHUNK)
         {
           for (int page = 0; page < pages; page++)
           {
-            string vectorContent = string.Join(' ', tokenizedContent.Skip(page * TOKENS_PER_PAGE).Take(TOKENS_PER_PAGE));
+            string vectorContent = string.Join(' ', tokenizedContent.Skip(page * TOKENS_PER_CHUNK).Take(TOKENS_PER_CHUNK));
 
             TypeSenseDocument pagedDocument = new();
 
@@ -232,7 +226,7 @@ internal class TypeSenseRequest
 
     ITypesenseClient client = await GetClient();
 
-    IEnumerable<TypeSenseDocument[]> batchChunks = contents.Chunk(BATCH_SIZE);
+    IEnumerable<TypeSenseDocument[]> batchChunks = contents.Chunk(IMPORT_BATCH_SIZE);
 
     foreach (TypeSenseDocument[] chunk in batchChunks)
     {

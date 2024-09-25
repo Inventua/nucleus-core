@@ -306,13 +306,13 @@ internal class TypeSenseRequest
       SearchParameters searchParameters = new(query.SearchTerm)
       {
         HighlightStartTag = "<em>",
-        HighlightEndTag = "</em>", 
-        // IncludeTotalCount = true,
+        HighlightEndTag = "</em>",
         HighlightFields = BuildList(BuildHighlightFields(query)),
         IncludeFields = BuildList(BuildSelectFields()),
         PerPage = query.PagingSettings.PageSize,
         Page = query.PagingSettings.CurrentPageIndex,
         QueryBy = BuildList(BuildSearchFields()),
+        QueryByWeights = BuildFieldWeights(query),
         FilterBy = BuildFilter($"{BuildSiteFilter(query)}", $"{BuildRolesFilter(query)}", $"{BuildScopeFilter(query)}", $"{BuildArgsFilter(query)}", $"{BuildPageNumberFilter(query)}"),
         TextMatchType = "max_score",
         SortBy = "_text_match:desc"
@@ -323,6 +323,37 @@ internal class TypeSenseRequest
       return ReplaceHighlights(response);
     }
   }
+
+  public async Task<SearchResult<TypeSenseDocument>> Suggest(SearchQuery query)
+  {
+    ITypesenseClient client = await GetClient();
+
+    if (query.SearchTerm == string.Empty)
+    {
+      throw new ApplicationException("No search term");
+    }
+    else
+    {
+      SearchParameters searchParameters = new(query.SearchTerm + "*")
+      {
+        HighlightStartTag = "",
+        HighlightEndTag = "", 
+        IncludeFields = BuildList(BuildSelectFields()),
+        PerPage = query.PagingSettings.PageSize,
+        Page = query.PagingSettings.CurrentPageIndex,
+        QueryBy = BuildList(BuildSearchFields()),
+        QueryByWeights = BuildFieldWeights(query),
+        FilterBy = BuildFilter($"{BuildSiteFilter(query)}", $"{BuildRolesFilter(query)}", $"{BuildScopeFilter(query)}", $"{BuildArgsFilter(query)}", $"{BuildPageNumberFilter(query)}"),
+        TextMatchType = "max_score",
+        SortBy = "_text_match:desc"
+      };
+
+      SearchResult<TypeSenseDocument> response = await client.Search<TypeSenseDocument>(this.IndexName, searchParameters);
+
+      return ReplaceHighlights(response);
+    }
+  }
+
 
   private SearchResult<TypeSenseDocument> ReplaceHighlights(SearchResult<TypeSenseDocument> response)
   {
@@ -386,6 +417,13 @@ internal class TypeSenseRequest
     ];
   }
 
+
+  private static string BuildFieldWeights(SearchQuery query)
+  {
+    // these MUST be in the same order as the fields returned by BuildSearchFields
+    return $"{query.Boost.Title},4,{query.Boost.Summary},{query.Boost.Keywords},{query.Boost.Categories},{query.Boost.Content}";
+  }
+
   private static List<string> BuildSuggesterFields()
   {
     return
@@ -398,9 +436,11 @@ internal class TypeSenseRequest
   {
     return
     [
+      CamelCase(nameof(TypeSenseDocument.Id)),
       CamelCase(nameof(TypeSenseDocument.SiteId)),
       CamelCase(nameof(TypeSenseDocument.Url)),
       CamelCase(nameof(TypeSenseDocument.Title)),
+      CamelCase(nameof(TypeSenseDocument.PageNumber)),
       CamelCase(nameof(TypeSenseDocument.Summary)),
       CamelCase(nameof(TypeSenseDocument.Scope)),
       CamelCase(nameof(TypeSenseDocument.Type)),
@@ -423,18 +463,6 @@ internal class TypeSenseRequest
       CamelCase(nameof(TypeSenseDocument.Content))
     ];
   }
-
-
-  // from: https://learn.microsoft.com/en-us/azure/search/hybrid-search-overview
-  // Explicit sort orders override relevanced-ranked results, so if you want similarity and BM25 relevance, omit
-  // sorting in your query."
-  ////private List<string> BuildOrderBy(SearchQuery query)
-  ////{
-  ////  return
-  ////  [
-  ////    "search.score() desc"
-  ////  ];
-  ////}
 
   private static string BuildSiteFilter(SearchQuery query)
   {

@@ -12,6 +12,14 @@ public class Settings
   internal const string SITESETTING_ATTACHMENT_MAXSIZE = "typesense:attachment-maxsize";
   internal const string SITESETTING_INDEXING_PAUSE = "typesense:indexing-pause";
 
+  internal const string SITESETTING_TIKA_SERVER_URL = "typesense:tika-server-url";
+
+  internal const string SITESETTING_BOOST_TITLE = "typesense:boost-title";
+  internal const string SITESETTING_BOOST_SUMMARY = "typesense:boost-summary";
+  internal const string SITESETTING_BOOST_CATEGORIES = "typesense:boost-categories";
+  internal const string SITESETTING_BOOST_KEYWORDS = "typesense:boost-keywords";
+  internal const string SITESETTING_BOOST_CONTENT = "typesense:boost-content";
+
   public string ServerUrl { get; set; }
 
   public string IndexName { get; set; }
@@ -24,7 +32,9 @@ public class Settings
 
   public double IndexingPause { get; set; } = 1;
 
-  //public Nucleus.Abstractions.Search.SearchQuery.BoostSettings Boost { get; set; } = new();
+  public string TikaServerUrl { get; set; }
+
+  public Nucleus.Abstractions.Search.SearchQuery.BoostSettings Boost { get; set; } = new();
 
   // This constructor is used by model binding
   public Settings() { }
@@ -67,17 +77,18 @@ public class Settings
       }
     }
 
-  // https://typesense.org/docs/guide/ranking-and-relevance.html#boosting-burying-sets-of-records
-    //this.Boost.Title = GetSetting(site, SITESETTING_BOOST_TITLE, this.Boost.Title);
-    //this.Boost.Summary = GetSetting(site, SITESETTING_BOOST_SUMMARY, this.Boost.Summary);
-    //this.Boost.Categories = GetSetting(site, SITESETTING_BOOST_CATEGORIES, this.Boost.Categories);
-    //this.Boost.Keywords = GetSetting(site, SITESETTING_BOOST_KEYWORDS, this.Boost.Keywords);
-    //this.Boost.Content = GetSetting(site, SITESETTING_BOOST_CONTENT, this.Boost.Content);
+    if (site.SiteSettings.TryGetValue(SITESETTING_TIKA_SERVER_URL, out string tikaServerUrl))
+    {
+      this.TikaServerUrl = tikaServerUrl;
+    }
 
-    //this.Boost.AttachmentAuthor = GetSetting(site, SITESETTING_BOOST_ATTACHMENT_AUTHOR, this.Boost.AttachmentAuthor);
-    //this.Boost.AttachmentKeywords = GetSetting(site, SITESETTING_BOOST_ATTACHMENT_KEYWORDS, this.Boost.AttachmentKeywords);
-    //this.Boost.AttachmentName = GetSetting(site, SITESETTING_BOOST_ATTACHMENT_NAME, this.Boost.AttachmentName);
-    //this.Boost.AttachmentTitle = GetSetting(site, SITESETTING_BOOST_ATTACHMENT_TITLE, this.Boost.AttachmentTitle);
+
+    this.Boost.Title = GetSetting(site, SITESETTING_BOOST_TITLE, this.Boost.Title);
+    this.Boost.Summary = GetSetting(site, SITESETTING_BOOST_SUMMARY, this.Boost.Summary);
+    this.Boost.Categories = GetSetting(site, SITESETTING_BOOST_CATEGORIES, this.Boost.Categories);
+    this.Boost.Keywords = GetSetting(site, SITESETTING_BOOST_KEYWORDS, this.Boost.Keywords);
+    this.Boost.Content = GetSetting(site, SITESETTING_BOOST_CONTENT, this.Boost.Content);
+
   }
 
   public void SaveSettings(Site site, string apiKey)
@@ -100,18 +111,13 @@ public class Settings
 
     site.SiteSettings.TrySetValue(SITESETTING_INDEXER_NAME, this.IndexerName);
 
+    site.SiteSettings.TrySetValue(SITESETTING_TIKA_SERVER_URL, this.TikaServerUrl);
 
-    //site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_TITLE, this.Boost.Title);
-    //site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_SUMMARY, this.Boost.Summary);
-    //site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_CATEGORIES, this.Boost.Categories);
-    //site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_KEYWORDS, this.Boost.Keywords);
-    //site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_CONTENT, this.Boost.Content);
-
-    //site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_ATTACHMENT_AUTHOR, this.Boost.AttachmentAuthor);
-    //site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_ATTACHMENT_KEYWORDS, this.Boost.AttachmentKeywords);
-    //site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_ATTACHMENT_NAME, this.Boost.AttachmentName);
-    //site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_ATTACHMENT_TITLE, this.Boost.AttachmentTitle);
-
+    site.SiteSettings.TrySetValue(SITESETTING_BOOST_TITLE, this.Boost.Title);
+    site.SiteSettings.TrySetValue(SITESETTING_BOOST_SUMMARY, this.Boost.Summary);
+    site.SiteSettings.TrySetValue(SITESETTING_BOOST_CATEGORIES, this.Boost.Categories);
+    site.SiteSettings.TrySetValue(SITESETTING_BOOST_KEYWORDS, this.Boost.Keywords);
+    site.SiteSettings.TrySetValue(SITESETTING_BOOST_CONTENT, this.Boost.Content);
   }
 
   private double GetSetting(Site site, string key, double defaultValue)

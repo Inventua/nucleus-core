@@ -25,6 +25,10 @@
         </SettingsControl>
       </div>
 
+      <SettingsControl caption="Tika Server Url" helptext="Enter the URL for your Tika service. If specified, Tika will be used to extract file contents.">
+        @Html.TextBoxFor(model => model.TikaServerUrl)
+      </SettingsControl>
+
       <SettingsControl caption="Attachments Size Limit (mb)" helptext="Enter maximum file size to submit to the Typesense server for indexing. A value of zero specifies no limit.">
         @Html.TextBoxFor(model => model.AttachmentMaxSize, new { @type = "number", @class = "attachments-size-limit" })
       </SettingsControl>
@@ -35,38 +39,23 @@
         </SettingsControl>
       </div>
 
-
-      @* <h3>Boost</h3>
-    <div class="w-75">
-    <SettingsControl caption="Title" helptext="Title boost.  The default value is 1.">
-    @Html.RangeFor(model => model.Boost.Title, 0.5, 5, 0.5)
-    </SettingsControl>
-    <SettingsControl caption="Summary" helptext="Summary boost.  The default value is 1.">
-    @Html.RangeFor(model => model.Boost.Summary, 0.5, 5, 0.5)
-    </SettingsControl>
-    <SettingsControl caption="Categories" helptext="Categories boost.  The default value is 1.">
-    @Html.RangeFor(model => model.Boost.Categories, 0.5, 5, 0.5)
-    </SettingsControl>
-    <SettingsControl caption="Keywords" helptext="Keywords boost.  The default value is 1.">
-    @Html.RangeFor(model => model.Boost.Keywords, 0.5, 5, 0.5)
-    </SettingsControl>
-    <SettingsControl caption="Content" helptext="Content boost.  The default value is 1.  For web pages, the page content and meta-data is the search content.  For files, the file content is the search content.">
-    @Html.RangeFor(model => model.Boost.Content, 0.5, 5, 0.5)
-    </SettingsControl>
-
-    <SettingsControl caption="Attachment Title" helptext="Attachment Title boost.  The default value is 1.">
-    @Html.RangeFor(model => model.Boost.AttachmentTitle, 0.5, 5, 0.5)
-    </SettingsControl>
-    <SettingsControl caption="Attachment Name" helptext="Attachment Name (file name) boost.  The default value is 1.">
-    @Html.RangeFor(model => model.Boost.AttachmentName, 0.5, 5, 0.5)
-    </SettingsControl>
-    <SettingsControl caption="Attachment Author" helptext="Attachment Author boost.  The default value is 1.">
-    @Html.RangeFor(model => model.Boost.AttachmentAuthor, 0.5, 5, 0.5)
-    </SettingsControl>
-    <SettingsControl caption="Attachment Keywords" helptext="Attachment keywords boost.  The default value is 1.">
-    @Html.RangeFor(model => model.Boost.AttachmentKeywords, 0.5, 5, 0.5)
-    </SettingsControl>
-    </div>*@
+      <h3>Boost</h3>
+      <div class="w-75">
+        <SettingsControl caption="Title" helptext="Title boost.  The default value is 1.">
+          @Html.RangeFor(model => model.Boost.Title, 1, 5, 1)
+        </SettingsControl>
+        <SettingsControl caption="Summary" helptext="Summary boost.  The default value is 1.">
+          @Html.RangeFor(model => model.Boost.Summary, 1, 5, 1)
+        </SettingsControl>
+        <SettingsControl caption="Categories" helptext="Categories boost.  The default value is 1.">
+          @Html.RangeFor(model => model.Boost.Categories, 1, 5, 1)
+        </SettingsControl>
+        <SettingsControl caption="Keywords" helptext="Keywords boost.  The default value is 1.">
+          @Html.RangeFor(model => model.Boost.Keywords, 1, 5, 1)
+        </SettingsControl>
+        <SettingsControl caption="Content" helptext="Content boost.  The default value is 1. For web pages, the page content and meta-data is the search content.  For files, the file content is the search content.">
+          @Html.RangeFor(model => model.Boost.Content, 1, 5, 1)
+        </SettingsControl>
     </fieldset>
 
     <div class="nucleus-form-buttonrow">

@@ -22,8 +22,7 @@ namespace Nucleus.Extensions.TypeSense;
 internal class TypeSenseDocument : IDisposable
 {
   private bool disposedValue;
-  private readonly string[] HtmlElements = ["div", "span", "p", "h1", "h2", "h3", "h4", "h5", "h6", ""];
-
+ 
   /// <summary>
   /// Constructor used by deserialization.
   /// </summary>
@@ -47,11 +46,9 @@ internal class TypeSenseDocument : IDisposable
 
     this.ContentType = content.ContentType;
     this.Type = content.Type;
-        
-    // set content if the content size is:
-    // - less than "max size"
-    // - Can be convered to text by ToText(). ToText can return null if the content type can't be converted to text
-    this.Content = ToText(content);
+      
+    // Moved to caller
+    //this.Content = ToText(content);
    
     if (content.PublishedDate.HasValue)
     {
@@ -70,50 +67,7 @@ internal class TypeSenseDocument : IDisposable
     this.IsSecure = !IsPublic(content.Site, content.Roles ?? []);
   }
 
-  public string? ToText(ContentMetaData metaData)
-  {
-    switch (metaData.ContentType)
-    {
-      case "text/html":
-        HtmlAgilityPack.HtmlDocument htmlContent = new();
-        htmlContent.LoadHtml(System.Text.Encoding.UTF8.GetString(metaData.Content));
-
-        return ConvertHtmlToPlainText(new StringBuilder(), htmlContent.DocumentNode).ToString();
-
-      case "text/plain":
-      case "text/csv":
-      case "text/markdown":
-        return System.Text.Encoding.UTF8.GetString(metaData.Content);
-
-      default:
-        // TypeSense search cannot process file content from a feed, the search service must be set up with "Indexers" that run in the TypeSense Cloud
-        // to collect and parse file content.
-        return null;
-    }
-  }
-
-  private StringBuilder ConvertHtmlToPlainText(StringBuilder builder, HtmlNode node)
-  {
-    foreach (HtmlNode subnode in node.ChildNodes)
-    {
-      if (subnode.NodeType == HtmlNodeType.Text && HtmlElements.Contains(node.Name, StringComparer.OrdinalIgnoreCase))
-      {
-        // Append the text of the current node to the StringBuilder
-        if (!String.IsNullOrWhiteSpace(subnode.InnerText))
-        {
-          builder.AppendLine(System.Web.HttpUtility.HtmlDecode(subnode.InnerText.Trim()));
-        }
-      }
-      else if (subnode.NodeType == HtmlNodeType.Element)
-      {
-        // Recursively convert the child nodes to plain text
-        ConvertHtmlToPlainText(builder, subnode);
-      }
-    }
-
-    return builder;
-  }
-
+  
   public static string GenerateId(ContentMetaData content)
   {
     string key = content.Url;

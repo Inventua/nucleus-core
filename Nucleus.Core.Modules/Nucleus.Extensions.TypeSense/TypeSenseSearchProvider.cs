@@ -40,13 +40,13 @@ public partial class TypeSenseSearchProvider : ISearchProvider
     this.Logger = logger;
   }
 
-  public ISearchProviderCapabilities GetCapabilities()
-  {
-    return new DefaultSearchProviderCapabilities()
-    {
-      MaximumSuggestions = 0
-    };
-  }
+  //public ISearchProviderCapabilities GetCapabilities()
+  //{
+  //  return new DefaultSearchProviderCapabilities()
+  //  {
+  //    MaximumSuggestions = 0
+  //  };
+  //}
 
   public async Task<SearchResults> Search(SearchQuery query)
   {
@@ -70,10 +70,10 @@ public partial class TypeSenseSearchProvider : ISearchProvider
 
     TypeSenseRequest request = CreateRequest(query.Site, settings);
 
-    //if (query.Boost == null)
-    //{
-    //  query.Boost = settings.Boost;
-    //}
+    if (query.Boost == null)
+    {
+      query.Boost = settings.Boost;
+    }
 
     SearchResult<TypeSenseDocument> response = await request.Search(query);
 
@@ -82,7 +82,7 @@ public partial class TypeSenseSearchProvider : ISearchProvider
     return new SearchResults()
     {
       Results = results,
-      Answers = [],//await ToSemanticResults(query.Site, response),
+      Answers = [],
       Total = response.Found,
       MaxScore = results.FirstOrDefault()?.Score ?? 0
     };
@@ -170,44 +170,48 @@ public partial class TypeSenseSearchProvider : ISearchProvider
     return results;
   }
 
-  public Task<SearchResults> Suggest(SearchQuery query)
+  public async Task<SearchResults> Suggest(SearchQuery query)
   {
-    return Task.FromResult(new SearchResults()
+    //return Task.FromResult(new SearchResults()
+    //{
+    //  Results = [],
+    //  Total = 0
+    //});
+    if (query.Site == null)
     {
-      Results = [],
-      Total = 0
-    });
-    //if (query.Site == null)
-    //{
-    //  throw new InvalidOperationException($"The {nameof(query.Site)} property is required.");
-    //}
+      throw new InvalidOperationException($"The {nameof(query.Site)} property is required.");
+    }
 
-    //Models.Settings settings = new(query.Site);
+    Models.Settings settings = new(query.Site);
 
-    //if (String.IsNullOrEmpty(settings.ServerUrl))
-    //{
-    //  throw new InvalidOperationException($"The Elastic search server url is not set for site '{query.Site.Name}'.");
-    //}
+    if (String.IsNullOrEmpty(settings.ServerUrl))
+    {
+      throw new InvalidOperationException($"The Typesense search server url is not set for site '{query.Site.Name}'.");
+    }
 
-    //if (String.IsNullOrEmpty(settings.IndexName))
-    //{
-    //  throw new InvalidOperationException($"The Elastic search index name is not set for site '{query.Site.Name}'.");
-    //}
+    if (String.IsNullOrEmpty(settings.IndexName))
+    {
+      throw new InvalidOperationException($"The Typesense search index name is not set for site '{query.Site.Name}'.");
+    }
 
-    //if (query.Boost == null)
-    //{
-    //  query.Boost = settings.Boost;
-    //}
+    if (query.Boost == null)
+    {
+      query.Boost = settings.Boost;
+    }
 
-    //TypeSenseRequest request = CreateRequest(query.Site, settings);
+    TypeSenseRequest request = CreateRequest(query.Site, settings);
 
-    //Response<SuggestResults<TypeSenseDocument>> result = await request.Suggest(query);
+    SearchResult<TypeSenseDocument> response = await request.Suggest(query);
 
-    //return new SearchResults()
-    //{
-    //  Results = await ToSearchResults(query.Site, result),
-    //  Total = result.Value.Results.Count
-    //};
+    IEnumerable<SearchResult> results = await ToSearchResults(query.Site, response);
+
+    return new SearchResults()
+    {
+      Results = results,
+      Answers = [],
+      Total = response.Found,
+      MaxScore = results.FirstOrDefault()?.Score ?? 0
+    };
   }
 
   private TypeSenseRequest CreateRequest(Site site, Models.Settings settings)

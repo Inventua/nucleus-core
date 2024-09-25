@@ -10,6 +10,13 @@
     let suggestionsTimeout = -1;
     let selectorPrefix = '';
 
+    function _showSearchTerm()
+    {      
+      let url = new URL(location);
+      url.searchParams.set("search", jQuery(selectorPrefix + '.search-term').val());
+      window.history.replaceState({}, '', url);      
+    }
+
     function _attachSuggestionsEventHandlers()
     {
       /* close suggestions when mouse is clicked elsewhere */
@@ -37,20 +44,34 @@
     {
       if (typeof (data.target) !== 'undefined' && data.target.hasClass('search-suggestions'))
       {
-        /*  If suggestions list overflows the right-hand side of the page, move it back to align to the right of the page */
-        data.target.css(selectorPrefix + 'margin-left', '');
+        // position the suggestions drop-down below the search term text box
+        try
+        {           
+          var element = jQuery(selectorPrefix + ' .search-term');
+          if (element.length !== 0)
+          {
+            data.target.css('left', element.offset().left);
+          }
+        }
+        catch (error)
+        {
+          console.error(error);
+        }
+
+        /*  if the suggestions list overflows the right-hand side of the page, move it back to align to the right of the page */
+        data.target.css('margin-left', '');
         let overflowpx = jQuery(window).width() - (data.target.offset().left + data.target.outerWidth(true));
 
         if (overflowpx < 0)
         {
-          data.target.css(selectorPrefix + 'margin-left', overflowpx);
+          data.target.css('margin-left', overflowpx);
         }
 
         data.target.collapse('show');
 
-        data.target.find(selectorPrefix + '.suggestions-result li').on('click', function (event)
+        data.target.find('.suggestions-result li').on('click', function (event)
         {
-          let textbox = jQuery(this).parents('form').first().find(selectorPrefix + '.search-term');
+          let textbox = jQuery(this).parents('form').first().find('.search-term');
           textbox.val(jQuery(this).attr('title'));
           _doSearch(this);
         });
@@ -69,9 +90,12 @@
       if (typeof form.attr('data-resultsurl') !== 'undefined' && form.attr('data-resultsurl') !== '')
       {
         window.location = form.attr('data-resultsurl') + '?search=' + form.find(selectorPrefix + '.search-term').val();
-        return false;
       }
-      return true;
+      else
+      {
+        form.find('button[type=submit').trigger('click');
+      }
+      return false;
     }
 
     return this.each(function ()
@@ -96,7 +120,14 @@
 
       jQuery(Page).on("ready", function (event, data)
       {
-        _showSearchSuggestions(event, data);
+        if (jQuery(data.target).is('.search-suggestions'))
+        {
+          _showSearchSuggestions(event, data);
+        }
+        else
+        {
+          _showSearchTerm();
+        }
       });
     });
   }

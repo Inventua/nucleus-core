@@ -70,7 +70,7 @@
           </tr>
           <tr>
             <th scope="row">Memory Used</th>
-            <td>@Model.MemoryUsedPercentage.ToString("0.00")%</td>
+            <td>@Model.MemoryUsedPercentage.ToString("0.00")% [@(((long?)Model.MemoryUsedBytes).FormatFileSize())]</td>
           </tr>
         </tbody>
       </table>

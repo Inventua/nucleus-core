@@ -15,6 +15,16 @@
   box-shadow: none;
 }
 
+.azure-ai-chat .answers p
+{
+  margin: 0;
+}
+
+.azure-ai-chat .answers li
+{
+  list-style-type: disc;
+}
+
 .azure-ai-chat .answers .citation-reference
 {
   display: inline-block;
@@ -29,4 +39,31 @@
 {
   /* undo bootstrap/ios styling for search text box */
   outline-style: none;
+}
+
+.azure-ai-chat .answer-intents
+{
+  margin: 0.5rem 0;
+  padding: 0;
+  font-size: 0.85rem;
+  color: #555;
+  font-style: italic;
+}
+
+.azure-ai-chat .answer-intents li
+{
+  padding: 0;
+  display: inline-block;
+  list-style-type: none;
+}
+
+.azure-ai-chat .answer-intents li:not(:last-child)::after
+{
+  content: ', ';
+}
+
+.azure-ai-chat .conclusion
+{
+  margin: 0.5rem 0;
+  font-weight: bold;
 }

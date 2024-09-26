@@ -5,27 +5,40 @@
 @using Nucleus.Modules.AzureAIChat.ViewModels
 @if (Model.History.Count > 0)
 {
-  var historyIndex = Model.History.Count - 1;
-  <div class="alert @(Model.History[historyIndex].IsError ? "alert-warning" : "alert-success") alert-dismissible p-2 fade show">
-    <h3><span>> </span>@Model.History[historyIndex].Question</h3>
+  var answer = Model.History.Last();
+  <div class="alert @(answer.IsError == true ? "alert-warning" : "alert-success") alert-dismissible p-2 fade show">
+    <h3><span>> </span>@answer.Question</h3>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 
-    @Html.HiddenFor(model => Model.History[historyIndex].Question)
-    @Html.HiddenFor(model => Model.History[historyIndex].IsError, new {@class = "is-error" })
+    <ul class="answer-intents">
+    @foreach(var intent in answer.Intents)
+    {
+      <li>@intent</li>
+    }
+    </ul>
+
+    @for (int historyIndex = 0; historyIndex < Model.History.Count; historyIndex++)
+    {
+      @if (Model.History[historyIndex].IsError != true)
+      {
+        @Html.HiddenFor(model => Model.History[historyIndex].Question, new { @class = "history-question" })
+        @Html.HiddenFor(model => Model.History[historyIndex].Answer, new { @class = "history-answer" })
+      }
+    }
 
     <div class="mb-1 small">
       <div>
-        @Model.History[historyIndex].DateTime?.ToLocalTime().ToString("G")
+        @answer.DateTime?.ToLocalTime().ToString("G")
       </div>
       <div>
-        @Html.Raw(Model.History[historyIndex].Answer)
+        @Html.Raw(answer.Answer)
       </div>
     </div>
 
-    @if (Model.History[historyIndex].Citations != null)
+    @if (answer.Citations != null)
     {
       <ol>
-        @foreach (var citation in Model.History[historyIndex].Citations.Select((Value, Index) => new { Index, Value }))
+        @foreach (var citation in answer.Citations.Select((Value, Index) => new { Index, Value }))
         {
           <li>
             <a href="@citation.Value.Url" target="_blank">

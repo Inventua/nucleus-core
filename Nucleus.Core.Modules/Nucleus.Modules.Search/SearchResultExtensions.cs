@@ -28,6 +28,7 @@ public static class SearchResultExtensions
 
   public static string GetTitleText(this SearchResult searchResult)
   {
+    if (String.IsNullOrEmpty(searchResult.Title)) return "";
     // remove <em> and </em> tags from the title.
     return System.Text.RegularExpressions.Regex.Replace(searchResult.Title, "<[^>]*>", "");        
   }

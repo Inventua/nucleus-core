@@ -3,7 +3,8 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Modules.AzureAIChat.ViewModels
-@Html.AddStyle("~!/../viewer.css")
+@Html.AddStyle("~#/viewer.css")
+@Html.AddScript("~#/viewer.js")
 
 @using (Html.BeginNucleusForm("Chat", "AzureAIChatViewer", "AzureAIChat", FormMethod.Post, new { @enctype = "multipart/form-data", @class = "azure-ai-chat" }))
 {
@@ -19,28 +20,3 @@
   <div class="next-answer" />
 }
 
-<script>
-  jQuery('.azure-ai-chat .btn-clear').on('click', function () 
-  { 
-    jQuery(this).parents('.azure-ai-chat')
-      .first()
-      .find('.answers')
-      .html('');
-  });
-
-  jQuery('.azure-ai-chat').on('success', function (target, data, url, event, status, request)
-  {
-    var newContent = jQuery(this).find('.next-answer');
-
-    if (newContent.find('.alert-warning').length === 0)
-    {
-      jQuery(this).find('.chat-question')
-      .val('')
-      .focus();
-    }
-
-    jQuery(this).find('.answers').prepend(newContent.children());
-
-
-  });
-</script>

@@ -61,7 +61,7 @@ internal partial class AzureSearchRequest
 
   // this list is from https://learn.microsoft.com/en-us/azure/search/cognitive-search-skill-document-extraction#supported-document-formats
   // we set the indexer "included extensions" so that Azure Search doesn't try to run the skill set for documents which won't have content, to avoid warnings
-  private static readonly string[] INDEXER_EXTENSIONS = [".csv", ".eml", ".epub", ".gz", ".html", ".json", ".kml", ".docx", ".doc", ".docm", ".xlsx", ".xls", ".xlsm", ".pptx", ".ppt", ".pptm", ".msg", ".xml", ".odt", ".ods", ".odp", ".pdf", ".rtf", ".xml", ".zip"];
+  private static readonly string[] INDEXER_EXTENSIONS = [".txt", ".csv", ".eml", ".epub", ".gz", ".html", ".json", ".kml", ".docx", ".doc", ".docm", ".xlsx", ".xls", ".xlsm", ".pptx", ".ppt", ".pptm", ".msg", ".xml", ".odt", ".ods", ".odp", ".pdf", ".rtf", ".xml", ".zip"];
 
   public AzureSearchRequest(Uri uri, string apiKey, string indexName, string indexerName, string semanticRankingConfigurationName, Boolean useVectorSearch, string azureOpenAIEndpoint, string azureOpenAIApiKey, string azureOpenAIDeploymentName, ILogger logger)
       : this(uri, apiKey, indexName, indexerName, semanticRankingConfigurationName, useVectorSearch, azureOpenAIEndpoint, azureOpenAIApiKey, azureOpenAIDeploymentName, TimeSpan.Zero, logger) { }

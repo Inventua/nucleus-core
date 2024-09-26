@@ -1,15 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Azure.Core;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Search;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Extensions.Configuration;
-using System.Reflection.Metadata.Ecma335;
-using Microsoft.AspNetCore.Http;
+using Nucleus.Extensions.Logging;
 
 namespace Nucleus.Extensions.AzureSearch;
 

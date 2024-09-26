@@ -28,6 +28,7 @@ public class SystemIndex
   public string EnvironmentName { get; set; }
   public double CpuUsedPercentage { get; set; }
   public double MemoryUsedPercentage { get; set; }
+  public ulong MemoryUsedBytes { get; set; }
 
   public LogSettingsViewModel LogSettings { get; set; } = new() { HasLoggingConfiguration = true };
 

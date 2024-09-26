@@ -391,6 +391,7 @@ public class SystemController : Controller
       StartTime = System.Diagnostics.Process.GetCurrentProcess().StartTime.ToUniversalTime(),
       CpuUsedPercentage = resourceUtilization.CpuUsedPercentage,
       MemoryUsedPercentage = resourceUtilization.MemoryUsedPercentage,
+      MemoryUsedBytes = resourceUtilization.MemoryUsedInBytes,
       Uptime = FormatUptime(uptime)
     };
 

@@ -84,21 +84,21 @@
     });
 
     // position the suggestions drop-down below the search term text box
-    try
-    {
-      jQuery('._@Model.ModuleId .search-suggestions').each(function (index)
-      {
-        var element = jQuery(this).parents('section').find('._@Model.ModuleId .search-term');
-        if (element.length !== 0)
-        {
-          jQuery(this).css('left', element.offset().left);
-        }
-      });
-    }
-    catch (error)
-    {
-      console.error(error);
-    }
+    // try
+    // {
+    //   jQuery('._@Model.ModuleId .search-suggestions').each(function (index)
+    //   {
+    //     var element = jQuery(this).parents('section').find('._@Model.ModuleId .search-term');
+    //     if (element.length !== 0)
+    //     {
+    //       jQuery(this).css('left', element.offset().left);
+    //     }
+    //   });
+    // }
+    // catch (error)
+    // {
+    //   console.error(error);
+    // }
 
     @if (!String.IsNullOrEmpty(Model.SearchTerm) && Model.SearchResults != null)
       {

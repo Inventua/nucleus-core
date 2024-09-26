@@ -14,7 +14,9 @@ public class ChatItem
 
   public string Answer { get; set; }
 
-  public Boolean IsError { get; set; }
+  public Boolean? IsError { get; set; }
 
-  public List<AzureChatCitation> Citations { get; set; } = []; 
+  public List<AzureChatCitation> Citations { get; set; } = [];
+
+  public List<string> Intents { get; set; } = [];
 }

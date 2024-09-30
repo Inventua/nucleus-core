@@ -80,3 +80,21 @@ must create and enable the scheduled task in the `Settings/Scheduler` control pa
 
 ![Search Feed Scheduled Task](Typesense-task.png)
 
+
+## Supported Capabilities
+The Typesense Search provider supports all of the capabilities of the Nucleus [Search Module](/documentation/modules/search/) except for 
+result score display. A future update to Typesense may provide this capability.
+
+{.table-sm}
+| Capability                   | Supported?                                                                           |
+|------------------------------|--------------------------------------------------------------------------------------|
+| Search Suggestions           | Yes                                                |
+| Filter By Scope              | Yes                                                |
+| Maximum Page Size            | 250                                                |
+| Meta-data Display            |                                                    |
+| - Categories                 | Yes                                                |
+| - Result Score               | No                                                 |
+| - Size                       | Yes                                                |
+| - Published Date             | Yes                                                |
+| - Resource Type              | Yes                                                |
+| - Matched Terms Highlighting | Yes                                                |

@@ -96,3 +96,20 @@ content when the Azure Search indexer runs. Most built-in skill sets use Azure A
 > *Note:* Make sure to check pricing for Azure services before enabling them. Microsoft charges extra for 
 [semantic ranking (pricing)](https://learn.microsoft.com/en-us/azure/search/semantic-search-overview#availability-and-pricing) and
 [AI services (pricing)](https://azure.microsoft.com/en-au/pricing/details/cognitive-services/) in addition to your Azure Search service. 
+
+## Supported Capabilities
+The Azure Search provider supports all of the capabilities of the Nucleus [Search Module](/documentation/modules/search/).
+
+{.table-sm}
+| Capability                   | Supported?                                                                           |
+|------------------------------|--------------------------------------------------------------------------------------|
+| Search Suggestions           | Yes                                                |
+| Filter By Scope              | Yes                                                |
+| Maximum Page Size            | 250                                                |
+| Meta-data Display            |                                                    |
+| - Categories                 | Yes                                                |
+| - Result Score               | Yes                                                |
+| - Size                       | Yes                                                |
+| - Published Date             | Yes                                                |
+| - Resource Type              | Yes                                                |
+| - Matched Terms Highlighting | Yes                                                |

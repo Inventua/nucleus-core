@@ -48,6 +48,7 @@ namespace Nucleus.Extensions
 							.UseAdvancedExtensions()
 							.UsePipeTables()
 							.UseAutoIdentifiers()
+              .UseFootnotes()
 							.UseGridTables()
 							.UseBootstrap()
 							.UseGenericAttributes()

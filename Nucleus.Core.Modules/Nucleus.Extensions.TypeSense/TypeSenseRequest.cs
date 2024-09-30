@@ -200,18 +200,19 @@ internal class TypeSenseRequest
         string[] tokens = content.Content.Split(TOKEN_SPLIT_CHARS, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         int pages = (int)Math.Floor((decimal)tokens.Length / TOKENS_PER_CHUNK) + 1;
         string[] tokenizedContent = content.Content.Split(TOKEN_SPLIT_CHARS, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        List<string[]> chunks = tokenizedContent.Chunk(TOKENS_PER_CHUNK).ToList();
 
         // if the content has more than TOKENS_PER_PAGE tokens, create additional chunks
         if (tokenizedContent.Length > TOKENS_PER_CHUNK)
         {
           for (int page = 0; page < pages; page++)
           {
-            string vectorContent = string.Join(' ', tokenizedContent.Skip(page * TOKENS_PER_CHUNK).Take(TOKENS_PER_CHUNK));
+            string vectorContent = string.Join(' ', chunks[page]); //string.Join(' ', tokenizedContent.Skip(page * TOKENS_PER_CHUNK).Take(TOKENS_PER_CHUNK));
 
             TypeSenseDocument pagedDocument = new();
 
             pagedDocument.Id += $"{content.Id}_pages_{page + 1}";
-            pagedDocument.Title += $" [{page}]";
+            pagedDocument.Title += $" [{page + 1}]";
             pagedDocument.ParentId = content.Id;
             pagedDocument.PageNumber = page + 1;
 
@@ -307,7 +308,7 @@ internal class TypeSenseRequest
         Page = query.PagingSettings.CurrentPageIndex,
         QueryBy = BuildList(BuildSearchFields()),
         QueryByWeights = BuildFieldWeights(query),
-        FilterBy = BuildFilter($"{BuildSiteFilter(query)}", $"{BuildRolesFilter(query)}", $"{BuildScopeFilter(query)}", $"{BuildArgsFilter(query)}", $"{BuildPageNumberFilter(query)}"),
+        FilterBy = BuildFilter($"{BuildSiteFilter(query)}", $"{BuildRolesFilter(query)}", $"{BuildScopeFilter(query)}", $"{BuildArgsFilter(query)}"),
         TextMatchType = "max_score",
         SortBy = "_text_match:desc"
       };
@@ -337,7 +338,7 @@ internal class TypeSenseRequest
         Page = query.PagingSettings.CurrentPageIndex,
         QueryBy = BuildList(BuildSearchFields()),
         QueryByWeights = BuildFieldWeights(query),
-        FilterBy = BuildFilter($"{BuildSiteFilter(query)}", $"{BuildRolesFilter(query)}", $"{BuildScopeFilter(query)}", $"{BuildArgsFilter(query)}", $"{BuildPageNumberFilter(query)}"),
+        FilterBy = BuildFilter($"{BuildSiteFilter(query)}", $"{BuildRolesFilter(query)}", $"{BuildScopeFilter(query)}", $"{BuildArgsFilter(query)}"),
         TextMatchType = "max_score",
         SortBy = "_text_match:desc"
       };
@@ -472,11 +473,11 @@ internal class TypeSenseRequest
     return $"{CamelCase(nameof(TypeSenseDocument.ParentId))}:={$"{parentId}"}";
   }
 
-  private static string BuildPageNumberFilter(SearchQuery query)
-  {
-    // We exclude "page 0" from search results, because it is a repeat of the main document (index entry)
-    return $"{CamelCase(nameof(TypeSenseDocument.PageNumber))}:!=1";
-  }
+  //private static string BuildPageNumberFilter(SearchQuery query)
+  //{
+  //  // We exclude "page 0" from search results, because it is a repeat of the main document (index entry)
+  //  return $"{CamelCase(nameof(TypeSenseDocument.PageNumber))}:!=1";
+  //}
 
   private static string BuildRolesFilter(SearchQuery query)
   {

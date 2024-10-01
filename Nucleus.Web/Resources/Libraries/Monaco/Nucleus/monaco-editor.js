@@ -29,11 +29,12 @@ var require = { paths: { vs: 'Resources/Libraries/Monaco/0.50.0/min/vs' } };
       this._monacoEditor = monaco.editor.create(value,
         {
           value: [jQuery(config.linkedElement).val()].join('\n'),
-          language: 'razor',
+          language: conf.language,
           automaticLayout: true,
           lineNumbersWidth: 3,
           useShadowDOM: true,
-          minimap: { enabled: false },
+          wordWrap: 'on',
+          minimap: { enabled: false }
         });
 
       if (typeof conf.linkedElement !== 'undefined')
@@ -63,7 +64,7 @@ var require = { paths: { vs: 'Resources/Libraries/Monaco/0.50.0/min/vs' } };
         window.monaco_completionItemProviderInstance.dispose()
       }
 
-      window.monaco_completionItemProviderInstance = monaco.languages.registerCompletionItemProvider("razor", {
+      window.monaco_completionItemProviderInstance = monaco.languages.registerCompletionItemProvider(conf.language, {
         triggerCharacters: ['.'],
         provideCompletionItems: function (model, position)
         {          

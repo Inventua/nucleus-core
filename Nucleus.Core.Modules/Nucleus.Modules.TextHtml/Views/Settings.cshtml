@@ -1,6 +1,7 @@
 ﻿@model Nucleus.Modules.TextHtml.ViewModels.Settings
 @addTagHelper "*, Nucleus.ViewFeatures"
 @using Nucleus.ViewFeatures.HtmlHelpers
+@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_MONACO_EDITOR)
 <h1 class="nucleus-modal-caption">Text/Html Content</h1>
 @using (Html.BeginNucleusForm("Save", "TextHtml", FormMethod.Post, null))
 {

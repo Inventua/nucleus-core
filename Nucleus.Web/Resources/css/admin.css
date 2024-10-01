@@ -61,6 +61,12 @@ body
   gap: 2px;
 }
 
+
+.nucleus-adminpage .monaco-editor
+{ 
+  position: absolute !important; 
+}
+
 /*  styles for elements within an admin page or settings editor popup */
 #nucleus-control-panel-heading, .modal-content h5.modal-title
 {
@@ -1278,6 +1284,7 @@ ul.nucleus-control-panel-items button
 {
   width: 8rem;
 }
+
 
 /*  Responsive UI  */
 @media screen and (max-width: 980px)

@@ -1067,10 +1067,13 @@ public class FileSystemManager : IFileSystemManager
 	{
 		if (item == null) return null;
 		item.Path = RemoveSiteHomeDirectory(site, item.Path);
-		if (item.Parent != null)
+    item.Name = RemoveSiteHomeDirectory(site, item.Name);
+
+    if (item.Parent != null)
 		{
 			item.Parent.Path = RemoveSiteHomeDirectory(site, item.Parent.Path);
-		}
+      item.Parent.Name = RemoveSiteHomeDirectory(site, item.Parent.Name);
+    }
 		return item;
 	}
 

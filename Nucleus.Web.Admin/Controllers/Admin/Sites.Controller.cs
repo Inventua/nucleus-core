@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Http;
 using Nucleus.Data.Common;
 using Nucleus.Abstractions.Mail;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.FileProviders;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -331,7 +332,61 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("Editor", await BuildViewModel (viewModel));
 		}
 
-		[HttpPost]
+    [HttpPost]
+    public async Task<ActionResult> CreateSiteCss(ViewModels.Admin.SiteEditor viewModel)
+    { 
+      System.IO.Stream content;
+      
+      IFileInfo defaultCssFile = this.WebHostEnvironment.ContentRootFileProvider.GetFileInfo("Areas\\Admin\\Views\\Sites\\default-site.css");
+      if (defaultCssFile.Exists)
+      {
+        content = defaultCssFile.CreateReadStream();
+      }
+      else
+      {
+        content = new System.IO.MemoryStream();
+        byte[] defaultCss = System.Text.Encoding.UTF8.GetBytes("{\n}");
+        content.Write(defaultCss, 0, defaultCss.Length);
+      }     
+
+      viewModel.SelectedCssFile = await this.FileSystemManager.SaveFile(this.Context.Site, this.FileSystemManager.ListProviders().First().Key, "", "site.css", content, false);
+
+      content.Close();
+
+      //return View("Editor", await BuildViewModel (viewModel));
+      return await EditSiteCss(viewModel);
+    }
+
+    [HttpPost]
+    public async Task<ActionResult> EditSiteCss(ViewModels.Admin.SiteEditor viewModel)
+    {
+      using (System.IO.Stream cssContent = await this.FileSystemManager.GetFileContents(this.Context.Site, viewModel.SelectedCssFile))
+      {
+        System.IO.StreamReader reader = new(cssContent);
+
+        viewModel.CssContent = await reader.ReadToEndAsync();
+      }
+
+      return View("_CssEditor", await BuildViewModel(viewModel));
+    }
+
+    [HttpPost]
+    public async Task<ActionResult> SaveSiteCss(ViewModels.Admin.SiteEditor viewModel)
+    {
+      byte[] editedCss = System.Text.Encoding.UTF8.GetBytes(viewModel.CssContent);
+      System.IO.MemoryStream content = new();
+      content.Write(editedCss, 0, editedCss.Length);
+
+      viewModel.SelectedCssFile = await this.FileSystemManager.RefreshProperties(this.Context.Site, viewModel.SelectedCssFile);
+      viewModel.SelectedCssFile = await this.FileSystemManager.SaveFile(this.Context.Site, viewModel.SelectedCssFile.Provider, viewModel.SelectedCssFile.Parent.Path, viewModel.SelectedCssFile.Name, content, true);
+
+      content.Close();
+
+      return View("Editor", await BuildViewModel(viewModel));
+    }
+
+
+    [HttpPost]
 		public async Task<ActionResult> Save(ViewModels.Admin.SiteEditor viewModel)
 		{
 			Boolean isNew = false;
@@ -521,35 +576,47 @@ namespace Nucleus.Web.Controllers.Admin
 
 			if (viewModel.SelectedCssFile == null)
 			{
-				viewModel.SelectedCssFile = new();
 				if (site.SiteSettings.TryGetValue(Site.SiteFilesKeys.CSSFILE_FILEID, out Guid cssFileId))
 				{
-					viewModel.SelectedCssFile.Id = cssFileId;
+          if (cssFileId != Guid.Empty)
+          {
+            viewModel.SelectedCssFile = new()
+            {
+              Id = cssFileId
+            };
+          }
 				}
 			}
 
 			if (viewModel.SelectedIconFile == null)
 			{
-				viewModel.SelectedIconFile = new();
 				if (site.SiteSettings.TryGetValue(Site.SiteFilesKeys.FAVICON_FILEID, out Guid iconFileId))
 				{
-					viewModel.SelectedIconFile.Id = iconFileId;
+          if (iconFileId != Guid.Empty)
+          {
+            viewModel.SelectedIconFile = new()
+            {
+              Id = iconFileId
+            };
+          }
 				}
 			}
 
 			if (viewModel.SelectedLogoFile == null)
 			{
-				viewModel.SelectedLogoFile = new();
 				if (site.SiteSettings.TryGetValue(Site.SiteFilesKeys.LOGO_FILEID, out Guid logoFileId))
 				{
-					viewModel.SelectedLogoFile.Id = logoFileId;
+          if (logoFileId != Guid.Empty)
+          {
+            viewModel.SelectedLogoFile = new()
+            {
+              Id = logoFileId
+            };
+          }
 				}
 			}
 
 			return await BuildViewModel(viewModel);
-		}
-
-
-   
+		}   
   }
 }

@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Areas\Admin\Views\Sites\default-site.css" />
+  </ItemGroup>
+
+  <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
     
@@ -23,6 +27,7 @@
     
   <ItemGroup>
     <EmbeddedResource Include="Areas\Admin\Views\ScheduledTasks\ScheduledTasks.js" />
+    <EmbeddedResource Include="Areas\Admin\Views\Sites\default-site.css" />
   </ItemGroup>
   
   <ItemGroup>

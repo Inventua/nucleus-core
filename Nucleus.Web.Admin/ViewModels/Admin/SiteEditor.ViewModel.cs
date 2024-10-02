@@ -43,5 +43,8 @@ namespace Nucleus.Web.ViewModels.Admin
 		public Nucleus.Abstractions.Models.FileSystem.File SelectedLogoFile { get; set; }
 		public Nucleus.Abstractions.Models.FileSystem.File SelectedCssFile { get; set; }
 
-	}
+    public string CssContent { get; set; }
+
+
+  }
 }

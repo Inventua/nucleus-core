@@ -113,7 +113,7 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <param name="value"></param>
 		/// <returns></returns>
 		public static string Parse(string value)
-		{
+		{      
 			return Environment.ExpandEnvironmentVariables(value)
 					.Replace("{DataFolder}", DataFolder)
 					.Replace("{WebRootFolder}", GetWebRootFolder());
@@ -203,7 +203,7 @@ namespace Nucleus.Abstractions.Models.Configuration
 		private static string DataFolder { get; set; }
 
 		/// <summary>
-		/// Sets the data folder to a default value if its current value is empty, after replacing environment variables.
+		/// Sets the data folder to a default value if its current value is empty.
 		/// </summary>
 		/// <param name="ensureExists">Specifies whether to ensure that the path exists by creating the folder if it does not already exist.</param>
 		public string SetDefaultDataFolder(Boolean ensureExists)
@@ -221,7 +221,7 @@ namespace Nucleus.Abstractions.Models.Configuration
 		}
 
     /// <summary>
-    /// Sets the data folder to the specified value, after replacing environment variables.
+    /// Sets the data folder to the specified value.
     /// </summary>
     /// <param name="value">Data folder path</param>
     /// <param name="ensureExists">Specifies whether to ensure that the path exists by creating the folder if it does not already exist.</param>

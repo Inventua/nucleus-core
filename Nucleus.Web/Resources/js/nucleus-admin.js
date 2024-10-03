@@ -192,6 +192,5 @@ function _handleContentLoaded(e, args)
   args.target.find('.nucleus-btn-close-results').off('click.closeResults');
   args.target.find('.nucleus-btn-close-results').on('click.closeResults', function (event) { jQuery(this).parents('.nucleus-search-results').hide(); });
 
-  if (jQuery().HtmlEditor) { args.target.find('.HtmlEditorControl').HtmlEditor({ isAdminMode: true }); }
-
+  if (jQuery().HtmlEditor) { args.target.find('.HtmlEditorControl').HtmlEditor({ isAdminMode: true }); }  
 }

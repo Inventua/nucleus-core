@@ -126,6 +126,15 @@ public class MultiContentController : Controller
     return View("Editor", await BuildEditorViewModel(viewModel, id));
   }
 
+  [HttpPost]
+  public ActionResult ChangeFormat(ViewModels.Editor viewModel, string format)
+  {
+    viewModel.Content.ConvertTo(format);
+    this.ModelState.Clear();
+
+    return View("Editor", viewModel);
+  }
+
   [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
   [HttpPost]
   public async Task<ActionResult> SaveContent(ViewModels.Editor viewModel)

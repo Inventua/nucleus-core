@@ -7,7 +7,7 @@
     The Text/HTML module renders HTML or text content.  You can set formatting, bold/italic, insert links to other web sites, page 
     links and image links, and add lists. 
   </description>
-  <compatibility minVersion="2.0.0.0" maxVersion="2.*" />
+  <compatibility minVersion="2.0.0.1" maxVersion="2.*" />
   <components>
     <component folderName="TextHtml" optional="false">
       <moduleDefinition id="b516d8dd-c793-4776-be33-902eb704bef6">

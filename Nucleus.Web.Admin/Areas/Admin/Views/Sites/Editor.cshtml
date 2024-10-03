@@ -87,7 +87,7 @@
 						<div class="nucleus-flex-fields nucleus-fileselector">
 							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.SelectedCssFile, PropertyName = "SelectedCssFile", SelectAnotherActionName = "SelectAnotherCssFile", Pattern = "(.css)" })
 							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { folder = Model.SelectedCssFile?.Parent, actionName = "UploadCssFile", controlName = "CssFile", filter = ".css" })
-              @if (Model.SelectedCssFile == null)
+              @if (Model.SelectedCssFile == null || Model.SelectedCssFile.Id == Guid.Empty)
               {
                 <button type="submit" class="btn btn-success btn-sm" formaction="@Url.AreaAction("CreateSiteCss", "Sites", "Admin")">Create</button>
               }

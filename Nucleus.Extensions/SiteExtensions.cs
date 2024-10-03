@@ -178,7 +178,7 @@ public static class SiteExtensions
       System.Uri uri = await fileSystemManager.GetFileDirectUrl(site, file);
       if (uri != null)
       {
-        return uri.AbsoluteUri;
+        return uri.AbsoluteUri + $"?d={file.DateModified.ToBinary()}";
       }
       else
       {
@@ -187,7 +187,7 @@ public static class SiteExtensions
     }
     else
     {
-      return $"~/{Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH_PREFIX}/{FileExtensions.EncodeFileId(file.Id)}";
+      return $"~/{Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH_PREFIX}/{FileExtensions.EncodeFileId(file.Id)}?d={file.DateModified.ToBinary()}";
     }
   }
 

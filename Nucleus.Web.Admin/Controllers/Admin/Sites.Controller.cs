@@ -347,14 +347,14 @@ namespace Nucleus.Web.Controllers.Admin
         content = new System.IO.MemoryStream();
         byte[] defaultCss = System.Text.Encoding.UTF8.GetBytes("{\n}");
         content.Write(defaultCss, 0, defaultCss.Length);
-      }     
+      }
 
-      viewModel.SelectedCssFile = await this.FileSystemManager.SaveFile(this.Context.Site, this.FileSystemManager.ListProviders().First().Key, "", "site.css", content, false);
+      viewModel.SelectedCssFile.Parent = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedCssFile.Parent.Id);
+      viewModel.SelectedCssFile = await this.FileSystemManager.SaveFile(this.Context.Site, viewModel.SelectedCssFile.Provider, viewModel.SelectedCssFile.Parent.Path ?? "", "site.css", content, false);
 
       content.Close();
 
-      //return View("Editor", await BuildViewModel (viewModel));
-      return await EditSiteCss(viewModel);
+      return View("Editor", await BuildViewModel (viewModel));      
     }
 
     [HttpPost]
@@ -366,6 +366,8 @@ namespace Nucleus.Web.Controllers.Admin
 
         viewModel.CssContent = await reader.ReadToEndAsync();
       }
+
+      ModelState.Clear();
 
       return View("_CssEditor", await BuildViewModel(viewModel));
     }

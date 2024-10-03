@@ -51,6 +51,7 @@
           if (element.length !== 0)
           {
             data.target.css('left', element.offset().left);
+            data.target.css('max-width', element.width() * 1.4);
           }
         }
         catch (error)

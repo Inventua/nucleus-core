@@ -1200,6 +1200,15 @@ ul.nucleus-control-panel-items button
   grid-template-columns: repeat(3, 1fr);
 }
 
+#system-logs .view-log-entry, #task-logs .view-log-entry
+{
+  position: absolute;
+  right: 3rem;
+  top: 0.25rem;
+  transition: 0.2s all; 
+  padding: .25rem 0.5rem;
+}
+
 #system-logs .nucleus-copy-button, #task-logs .nucleus-copy-button
 {
   position: absolute;
@@ -1207,6 +1216,11 @@ ul.nucleus-control-panel-items button
   top: 0.25rem;
   transition: 0.2s all; 
   padding: .25rem 0.5rem;
+}
+
+#log-entry-dialog .nucleus-copy-button
+{
+  top: 5rem;
 }
 
 #system-logs .nucleus-copy-button:hover, #task-logs .nucleus-copy-button:hover
@@ -1219,47 +1233,93 @@ ul.nucleus-control-panel-items button
   color: #bbb;
 }
 
-.nucleus-log-level
+.LogContent table .nucleus-log-level
 {
   display: block;
   padding: 0 0.25rem;
   width: 7.5rem;
 }
 
-.nucleus-log-level-warning
+.LogContent table .nucleus-log-level-warning
 {
   background-color: #ffc107 !important;
   border-radius: 4px;
 }
 
-.nucleus-log-level-error
+.LogContent table .nucleus-log-level-error
 {
   background-color: #dc3545 !important;
   color: white;
   border-radius: 4px;
 }
 
-.nucleus-log-category, .nucleus-log-ipaddress, .nucleus-log-requestpath
+.LogContent table .nucleus-log-category, .LogContent table .nucleus-log-ipaddress, .LogContent table .nucleus-log-requestpath
 {
   color: #888;  
 }
 
-.nucleus-log-ipaddress, .nucleus-log-requestpath
+.LogContent table .nucleus-log-ipaddress, .LogContent table .nucleus-log-requestpath
 {
-  margin-right: 1.5rem;
+  /*margin-right: 1.5rem;*/
   font-size: 0.85rem; 
 }
 
-.nucleus-log-ipaddress span, .nucleus-log-requestpath span
+/*.nucleus-log-ipaddress span, .nucleus-log-requestpath span
 {
   color: black;
+}*/
+
+
+.nucleus-log-ipaddress:before
+{
+content: 'Remote Address: ';
 }
 
-.nucleus-log-message
+.nucleus-log-requestpath:before
+{
+content: 'Request Path: ';
+}
+
+.LogContent table .nucleus-log-message
 {
   max-height: 8rem;
   text-overflow: ellipsis;
   overflow: auto;
+}
+
+.modal-body .nucleus-log-level:before
+{
+  content: 'Level: ';
+}
+
+.modal-body .nucleus-log-category:before
+{
+  content: 'Category: ';
+}
+
+.nucleus-log-ipaddress:before, .nucleus-log-requestpath:before, .modal-body .nucleus-log-level:before, .modal-body .nucleus-log-category:before
+{
+  color: #444;  
+  min-width: 9rem;
+  display: inline-block;
+  font-size: 0.85rem;
+}
+
+.modal-body .nucleus-log-date
+{
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.modal-body .nucleus-log-message
+{
+  flex: 1;
+  overflow: auto;
+  background-color: #f2f2f2;
+  padding: 0.25rem;
+  margin-top: 0.25rem;
+  font-family: monospace;
+  font-size: 0.9rem;
 }
 
 .user-filter-options

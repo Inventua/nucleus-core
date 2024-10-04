@@ -168,6 +168,7 @@
                   {
                     @($"{Model.Files[fileCount].Width} x {Model.Files[fileCount].Height}")
                   }
+                  <div class="file-url d-none">@Url.GetAbsoluteUri(Url.FileLink(Model.Files[fileCount]))</div>
                 </td>
               </tr>
             }
@@ -183,6 +184,8 @@
 <script>
   jQuery(function ()
   {
+    Page.AttachCopyButton('.file-url', null, null, 'Copy Url to Clipboard');
+
     if ('@Model.SelectedFileId' !== '@Guid.Empty')
     {
       var selectedFileElement = jQuery('.selected-file');

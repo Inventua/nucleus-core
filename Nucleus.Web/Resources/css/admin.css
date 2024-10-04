@@ -1176,6 +1176,11 @@ ul.nucleus-control-panel-items button
     width: 10rem;
   }
 
+  .nucleus-adminpage .nucleus-file-system-table .nucleus-copy-button
+  {
+   float: right;
+  }
+
 #system-logs .log-options, #task-logs .log-options
 {
   width: 42rem;

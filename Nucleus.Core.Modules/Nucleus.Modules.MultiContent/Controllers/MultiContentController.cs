@@ -159,8 +159,15 @@ public class MultiContentController : Controller
   [HttpPost]
   public async Task<ActionResult> UpdateContent(Guid id, string value)
   {
+    // apply inline content edits. The inline editor format is always HTML, so we need to convert the value back to the original content type before saving
     Content content = await this.ContentManager.Get(id);
+    string originalContentType = content.ContentType;
+
     content.Value = value;
+    content.ContentType = "text/html";
+
+    content.ConvertTo(originalContentType);
+
     await this.ContentManager.Save(this.Context.Module, content);
 
     return Ok();

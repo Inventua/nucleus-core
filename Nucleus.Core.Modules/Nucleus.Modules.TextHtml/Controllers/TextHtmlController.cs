@@ -68,8 +68,15 @@ public class TextHtmlController : Controller
   [HttpPost]
   public async Task<ActionResult> UpdateContent(Guid? id, string value)
   {
+    // apply inline content edits. The inline editor format is always HTML, so we need to convert the value back to the original content type before saving
     Content content = id == null ? new Content() { SortOrder = 10 } : await this.ContentManager.Get(id.Value);
+    string originalContentType = content.ContentType;
+
     content.Value = value;
+    content.ContentType = "text/html";
+
+    content.ConvertTo(originalContentType);
+
     await this.ContentManager.Save(this.Context.Module, content);
 
     return Ok();

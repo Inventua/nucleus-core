@@ -31,7 +31,7 @@ public class FileSystemController : Controller
   private IUserManager UserManager { get; }
   private FileSystemProviderFactoryOptions FileSystemOptions { get; }
   private IEnumerable<ISearchProvider> SearchProviders { get; }
-  
+
 
   public FileSystemController(ILogger<FileSystemController> Logger, Context Context, IEnumerable<ISearchProvider> searchProviders, IOptions<FileSystemProviderFactoryOptions> fileSystemOptions, IUserManager userManager, IRoleManager roleManager, IFileSystemManager fileSystemManager)
   {
@@ -63,16 +63,36 @@ public class FileSystemController : Controller
   }
 
   /// <summary>
-		/// Display the selected file's folder, with the file highlighted.
-		/// </summary>		
-		/// <remarks>
-		/// This action checks for a "current folder cookie".
-		/// </remarks>
-		[HttpGet]
+  /// Display the selected file's folder, with the file highlighted.
+  /// </summary>		
+  /// <remarks>
+  /// This action checks for a "current folder cookie".
+  /// </remarks>
+  [HttpGet]
   public async Task<ActionResult> SelectFile(Guid fileId)
   {
     Nucleus.Abstractions.Models.FileSystem.File file = await this.FileSystemManager.GetFile(this.Context.Site, fileId);
     return await Navigate(new(), file.Parent.Id, fileId);
+  }
+
+  /// <summary>
+  /// Display the selected file
+  /// </summary>		
+  /// <remarks>
+  /// This action checks for a "current folder cookie".
+  /// </remarks>
+  [HttpGet]
+  public async Task<ActionResult> ViewFile(Guid id)
+  {
+    Nucleus.Abstractions.Models.FileSystem.File file = await this.FileSystemManager.GetFile(this.Context.Site, id);
+    
+    if (!User.HasViewPermission(this.Context.Site, file.Parent))
+    {
+      return Forbid();
+    }
+
+    ViewModels.Admin.FileSystemViewer viewModel = new() { File = file };
+    return View("_Viewer", viewModel);
   }
 
   /// <summary>
@@ -790,7 +810,7 @@ public class FileSystemController : Controller
     Dictionary<string, SelectListGroup> groups = roleGroups.ToDictionary(name => name, name => new SelectListGroup() { Name = name });
 
     return availableRoles.Select(role => new SelectListItem(role.Name, role.Id.ToString())
-    {      
+    {
       Group = groups.Where(group => role.RoleGroup != null && role.RoleGroup.Name == group.Key).FirstOrDefault().Value
     })
     .OrderBy(selectListItem => selectListItem.Group?.Name);

@@ -12,7 +12,7 @@
   {
     <div class="nucleus-form-buttonrow nucleus-flex-fields top-commandbar mx-1">
       <div class="nucleus-show-progress nucleus-show-progress-inside d-flex gap-1 align-items-center">
-          @Html.DropDownListFor(model => model.SelectedProviderKey, new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name)), "(select)", new { @class = "flex-1 nucleus-default-control providerKey" })        
+        @Html.DropDownListFor(model => model.SelectedProviderKey, new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name)), "(select)", new { @class = "flex-1 nucleus-default-control providerKey" })
       </div>
       <div>
         <RemoveWhiteSpace>
@@ -126,6 +126,7 @@
               <th class="file-modified-date">Modified Date</th>
               <th class="file-size">Size</th>
               <th class="file-dimensions">Dimensions</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -146,12 +147,13 @@
                 <td class="file-modified-date">@Model.Folders[folderCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
                 <td class="file-size" />
                 <td class="file-dimensions" />
+                <td></td>
               </tr>
             }
 
             @for (var fileCount = 0; fileCount < Model.Files.Count; fileCount++)
             {
-              var isRecent = Math.Abs(Model.Files[fileCount].DateModified.Subtract(DateTime.UtcNow).TotalMinutes) < 5;              
+              var isRecent = Math.Abs(Model.Files[fileCount].DateModified.Subtract(DateTime.UtcNow).TotalMinutes) < 5;
               <tr>
                 <td class="@(isRecent ? "fw-bold" : "")@(Model.SelectedFileId == Model.Files[fileCount].Id ? "fw-bold text-primary selected-file" : "")">
                   <label>
@@ -168,7 +170,12 @@
                   {
                     @($"{Model.Files[fileCount].Width} x {Model.Files[fileCount].Height}")
                   }
-                  <div class="file-url d-none">@Url.GetAbsoluteUri(Url.FileLink(Model.Files[fileCount]))</div>
+                </td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="file-url d-none">@Url.GetAbsoluteUri(Url.FileLink(Model.Files[fileCount]))</div>
+                    <a class="float-end nucleus-material-icon btn btn-none ms-auto me-1" title="View" href="@Url.AreaAction("ViewFile", "FileSystem", "Admin", new { @id = Model.Files[fileCount].Id })" data-target="#filesystem-file-viewer">&#xe5d0;</a>
+                  </div>
                 </td>
               </tr>
             }
@@ -179,6 +186,7 @@
   }
 
   <Modal id="filesystem-search-results"></Modal>
+  <Modal id="filesystem-file-viewer"></Modal>
 </div>
 
 <script>

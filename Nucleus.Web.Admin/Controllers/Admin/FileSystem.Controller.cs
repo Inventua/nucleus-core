@@ -1,4 +1,5 @@
 ﻿using System.IO.Compression;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -86,9 +87,21 @@ public class FileSystemController : Controller
   {
     Nucleus.Abstractions.Models.FileSystem.File file = await this.FileSystemManager.GetFile(this.Context.Site, id);
     
+    if (file == null)
+    {
+      return BadRequest();
+    }
+
     if (!User.HasViewPermission(this.Context.Site, file.Parent))
     {
       return Forbid();
+    }
+
+    if (file.Height == null || file.Width == null)
+    {
+      // get image dimensions if they are not already stored. If the ContentType of the file does not indicate that it is an image,
+      // GetImageDimensions() doesn't do anything, so we don't need to check the file type here.
+      await file.GetImageDimensions(this.Context.Site, this.FileSystemManager);
     }
 
     ViewModels.Admin.FileSystemViewer viewModel = new() { File = file };

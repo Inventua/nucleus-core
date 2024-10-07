@@ -126,7 +126,7 @@
               <th class="file-modified-date">Modified Date</th>
               <th class="file-size">Size</th>
               <th class="file-dimensions">Dimensions</th>
-              <th></th>
+              <th class="w-min-fit-content"></th>
             </tr>
           </thead>
           <tbody>
@@ -171,10 +171,10 @@
                     @($"{Model.Files[fileCount].Width} x {Model.Files[fileCount].Height}")
                   }
                 </td>
-                <td>
+                <td class="w-min-fit-content">
                   <div class="d-flex align-items-center">
                     <div class="file-url d-none">@Url.GetAbsoluteUri(Url.FileLink(Model.Files[fileCount]))</div>
-                    <a class="float-end nucleus-material-icon btn btn-none ms-auto me-1" title="View" href="@Url.AreaAction("ViewFile", "FileSystem", "Admin", new { @id = Model.Files[fileCount].Id })" data-target="#filesystem-file-viewer">&#xe5d0;</a>
+                    <a class="float-end nucleus-material-icon btn btn-none ms-1" title="View" href="@Url.AreaAction("ViewFile", "FileSystem", "Admin", new { @id = Model.Files[fileCount].Id })" data-target="#filesystem-file-viewer">&#xe5d0;</a>
                   </div>
                 </td>
               </tr>

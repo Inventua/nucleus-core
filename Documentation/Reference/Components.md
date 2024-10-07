@@ -6,7 +6,7 @@ by Nucleus so that you can easily prepare a list.  Some of the components listed
 Components from Microsoft are not listed here.  Some components may use other third-party components themselves, these are not listed here.  Nucleus 
 uses the [MIT](https://github.com/Inventua/nucleus-core/blob/main/Nucleus.Web/license.txt) license.
 
-This document was updated to include references which are part of Nucleus version 2.0.0.
+This document was updated to include references which are part of Nucleus version 2.1.0.
 
 ## Core
 {.table-0-75-0}
@@ -15,6 +15,8 @@ This document was updated to include references which are part of Nucleus versio
 | [DocumentPartner.ClosedXML](https://github.com/ClosedXML/ClosedXML)	| ClosedXML is a .NET library for reading, manipulating and writing Excel 2007+ (.xlsx, .xlsm) files.	| [MIT](https://github.com/ClosedXML/ClosedXML/blob/develop/LICENSE) |
 | [ExcelNumberFormat](https://github.com/andersnm/ExcelNumberFormat)	| .NET library to parse ECMA-376 number format strings and format values like Excel and other spreadsheet software.	| [MIT](https://github.com/andersnm/ExcelNumberFormat/blob/master/LICENSE) |
 | [Markdig](https://github.com/xoofx/markdig)  |	Markdig is a fast, powerful, CommonMark compliant, extensible Markdown processor for .NET. |	[BSD 2-Clause](https://github.com/xoofx/markdig/blob/master/license.txt) |
+| [ReverseMarkdown](https://github.com/mysticmind/reversemarkdown-net)  |	ReverseMarkdown is a Html to Markdown converter library in C#. |	[MIT](https://github.com/mysticmind/reversemarkdown-net?tab=MIT-1-ov-file#readme) |
+| [HtmlAgilityPack](https://github.com/zzzprojects/html-agility-pack)  |	.NET code library that allows you to parse HTML files. |	[MIT](https://github.com/zzzprojects/html-agility-pack?tab=MIT-1-ov-file#readme) |
 | [Open XML SDK](https://github.com/dotnet/Open-XML-SDK)	| The Open XML SDK provides tools for working with Office Word, Excel, and PowerPoint documents.	| [MIT](https://github.com/dotnet/Open-XML-SDK/blob/main/LICENSE) |
 | [RazorEngineCore](https://github.com/adoconnection/RazorEngineCore)  |	.NET Razor Template Engine. |	[MIT](https://github.com/adoconnection/RazorEngineCore/blob/master/LICENSE) |
 | [SkiaSharp](https://github.com/mono/SkiaSharp)  |	SkiaSharp is a cross-platform 2D graphics API for .NET platforms. |	[MIT](https://github.com/mono/SkiaSharp/blob/main/LICENSE.md) |

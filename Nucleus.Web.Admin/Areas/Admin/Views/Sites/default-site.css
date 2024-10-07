@@ -1,0 +1,42 @@
+﻿:root
+{
+  --nucleus-default-gap-horizontal: 0.75rem;
+  --nucleus-default-gap-vertical: 0.75rem;
+  
+  --font-size-large: 1.25rem;
+  --font-size-small: 0.9rem;
+  --font-size-smallest: 0.8rem;
+  
+  --nucleus-default-border-color: #dee2e6;
+  --nucleus-default-hover-color: #dddddd;
+
+  --nucleus-menu-item-padding: 0.5rem;
+
+  --nucleus-menu-background-color: var(--bs-body-bg);
+  --nucleus-menu-text-color: var(--bs-body-color);
+  --nucleus-menu-hover-background-color: var(--bs-secondary-bg);
+  --nucleus-menu-hover-text-color: var(--bs-body-color);
+
+  --nucleus-submenu-background-color: var(--bs-body-bg);
+  --nucleus-submenu-text-color: var(--bs-body-color);
+  --nucleus-submenu-hover-background-color: var(--bs-secondary-bg);
+  --nucleus-submenu-hover-text-color: var(--bs-body-color);
+
+  --nucleus-submenu-padding: 0.25rem 0.5rem;
+
+  --nucleus-submenu-item-min-width: 10rem;
+  --nucleus-submenu-item-max-width: 25rem;
+  --nucleus-submenu-item-padding: 0.5rem;
+
+  --nucleus-menu-ribbon-dropdown-gap: 0.25rem;
+  --nucleus-submenu-ribbon-dropdown-border: solid 1px var(--nucleus-default-border-color);
+  --nucleus-menu-ribbon-portrait-dropdown-columns: 4;
+
+  --footer-padding: 1rem;
+  --footer-text-color: white;
+  --footer-background-color: #535353;
+  --footer-gap: var(--nucleus-default-gap-horizontal);
+  --footer-margin: 1rem 0 0 0;
+
+  --tab-content-border: 1px solid var(--nucleus-default-border-color);
+}

@@ -1455,6 +1455,22 @@ function _Page()
     if (jQuery().HtmlEditor) { target.find('.HtmlEditorControl').HtmlEditor({ isAdminMode: false }); }
     if (jQuery().ToggleSwitch) { target.find('.ToggleSwitch').ToggleSwitch(); }
     if (jQuery().PageList) { target.find('.nucleus-page-list').PageList(); }
+    if (jQuery().MonacoEditor)
+    {
+      target.find('.MarkdownEditorControl').each(function ()
+      {
+        var textControl = jQuery(this);
+        var markdownEditor = textControl.parent().find('.markdown-editor');
+        if (markdownEditor.length === 0)
+        {
+          markdownEditor = jQuery('<div class="flex-1 border border-1 markdown-editor"></div>');
+          textControl.after(markdownEditor);
+        }
+
+        jQuery(markdownEditor).MonacoEditor({ language: 'markdown', linkedElement: textControl, model: null });
+      });
+      
+    }
 
     Page.EnableEnhancedToolTips(true);
   }
@@ -1486,11 +1502,16 @@ function _Page()
     return match ? match[1] : null;
   }
 
-  function _attachCopyButton(selector, childselector, isBlockElement)
+  function _attachCopyButton(selector, childselector, isBlockElement, title)
   {
     if (typeof isBlockElement === 'undefined' || isBlockElement === null)
     {
       isBlockElement = false;
+    }
+
+    if (typeof title === 'undefined' || title === null)
+    {
+      title = 'Copy to Clipboard';
     }
 
     // Create copy buttons for selected elements
@@ -1499,11 +1520,11 @@ function _Page()
       var copyButton;
       if (isBlockElement)
       {
-        copyButton = jQuery('<button class="nucleus-copy-button nucleus-material-icon btn btn-none d-block ms-auto mb-1 fs-small" type="button" title="Copy to Clipboard">&#xe14d;</button>');
+        copyButton = jQuery('<button class="nucleus-copy-button nucleus-material-icon btn btn-none d-block ms-auto mb-1 fs-small" type="button" title="' + title + '">&#xe14d;</button>');
       }
       else
       {
-        copyButton = jQuery('<button class="nucleus-copy-button nucleus-material-icon btn btn-none ms-1 fs-small" type="button" title="Copy to Clipboard">&#xe14d;</button>');
+        copyButton = jQuery('<button class="nucleus-copy-button nucleus-material-icon btn btn-none ms-1 fs-small" type="button" title="' + title + '">&#xe14d;</button>');
       }
 
       if (typeof childselector !== 'undefined' && childselector !== null)

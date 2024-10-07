@@ -18,7 +18,6 @@
 			<TabItem target="#site-userprofile" caption="User Profile Properties"></TabItem>
 			<TabItem target="#site-sitepages" caption="Site Pages"></TabItem>
 		}
-		@* <TabItem target="#site-mailsettings" caption="Email Settings"></TabItem> *@
 		@if (Model.Site.Id != Guid.Empty)
 		{
 			<TabItem target="#site-mailtemplates" caption="Email Templates"></TabItem>
@@ -88,6 +87,14 @@
 						<div class="nucleus-flex-fields nucleus-fileselector">
 							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.SelectedCssFile, PropertyName = "SelectedCssFile", SelectAnotherActionName = "SelectAnotherCssFile", Pattern = "(.css)" })
 							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { folder = Model.SelectedCssFile?.Parent, actionName = "UploadCssFile", controlName = "CssFile", filter = ".css" })
+              @if (Model.SelectedCssFile == null || Model.SelectedCssFile.Id == Guid.Empty)
+              {
+                <button type="submit" class="btn btn-success btn-sm" formaction="@Url.AreaAction("CreateSiteCss", "Sites", "Admin")">Create</button>
+              }
+              else
+              {
+                <button type="submit" class="btn btn-success btn-sm" formaction="@Url.AreaAction("EditSiteCss", "Sites", "Admin")" data-target="#site-css-editor-dialog">Edit</button>
+              }
 						</div>
 					</SettingsControl>
 
@@ -329,6 +336,7 @@
   
   <Modal id="site-layout-selector-dialog" title="Layout Selector"></Modal>
   <Modal id="site-container-selector-dialog" title="Container Selector"></Modal>
+  <Modal id="site-css-editor-dialog" title="Site CSS"></Modal>
 
 	<div class="nucleus-button-panel">
 		<input type="submit" class="btn btn-primary nucleus-dialogresult" value="Save Changes" formaction="@Url.AreaAction("Save", "Sites", "Admin")" data-target=".nucleus-adminpage" />		
@@ -343,7 +351,10 @@
 			@Html.LinkButton("", "Export Site", @Url.AreaAction("ExportSite", "Sites", "Admin") + "?siteId=" + @Model.Site.Id, new { @class = "btn btn-secondary" });
 		}
 	</div>
+
+  
 }
+
 <script>
 	$(document).ready(function() 
 	{

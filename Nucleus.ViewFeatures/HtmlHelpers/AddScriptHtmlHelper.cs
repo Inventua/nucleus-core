@@ -162,7 +162,7 @@ public static class AddScriptHtmlHelper
         AddWellKnownScript(htmlHelper, WELLKNOWN_NUCLEUS_MONACO_EDITOR, false);
         AddWellKnownScript(htmlHelper, WELLKNOWN_NUCLEUS_MONACO_EDITOR_LOADER, false);
         AddWellKnownScript(htmlHelper, WELLKNOWN_NUCLEUS_MONACO_EDITOR_LOADER_NLS, true);
-        AddWellKnownScript(htmlHelper, WELLKNOWN_NUCLEUS_MONACO_EDITOR_MAIN, true);
+        AddWellKnownScript(htmlHelper, WELLKNOWN_NUCLEUS_MONACO_EDITOR_MAIN, false);
         break;
       case WellKnownScripts.BLAZOR_SERVER:
         AddWellKnownScript(htmlHelper, WELLKNOWN_BLAZOR_SERVER);

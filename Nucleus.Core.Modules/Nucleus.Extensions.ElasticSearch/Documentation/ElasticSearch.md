@@ -73,3 +73,22 @@ must create and enable the scheduled task in the `Settings/Scheduler` control pa
 ![Elastic Search Scheduled Task](elasticsearch-task.png)
 
 See Also: [Setting up Self-Managed Elastic Search on a Azure Virtual Machine running Ubuntu Linux](/news/setting-up-self-managed-elastic-search-on-a-azure-virtual-machine-running-ubuntu-linux-) 
+
+## Supported Capabilities
+The Elastic Search provider supports all of the capabilities of the Nucleus [Search Module](/documentation/modules/search/).
+
+{.table-sm}
+| Capability                   | Supported?                                                                           |
+|------------------------------|--------------------------------------------------------------------------------------|
+| Search Suggestions           | Yes                                                |
+| Filter By Scope              | Yes                                                |
+| Maximum Page Size            | 250                                                |
+| Meta-data Display            |                                                    |
+| - Categories                 | Yes                                                |
+| - Result Score               | Yes                                                |
+| - Size                       | Yes                                                |
+| - Published Date             | Yes                                                |
+| - Resource Type              | Yes                                                |
+| - Matched Terms Highlighting | Yes                                                |
+
+

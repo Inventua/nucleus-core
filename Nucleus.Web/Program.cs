@@ -1,21 +1,19 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.ResourceMonitoring;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Nucleus.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using System.IO;
-using Nucleus.Core.Plugins;
-using Nucleus.Core.Logging;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models.Configuration;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Diagnostics.ResourceMonitoring;
-using Grpc.Core;
+using Nucleus.Core.Logging;
+using Nucleus.Core.Plugins;
+using Nucleus.Extensions.Logging;
 
 namespace Nucleus.Web
 {

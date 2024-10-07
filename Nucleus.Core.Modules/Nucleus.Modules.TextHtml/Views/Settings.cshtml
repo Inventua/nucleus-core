@@ -1,17 +1,32 @@
 ﻿@model Nucleus.Modules.TextHtml.ViewModels.Settings
 @addTagHelper "*, Nucleus.ViewFeatures"
 @using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_MONACO_EDITOR)
 <h1 class="nucleus-modal-caption">Text/Html Content</h1>
-@using (Html.BeginNucleusForm("Save", "TextHtml", FormMethod.Post, null))
+@using (Html.BeginNucleusForm("Change", "TextHtml", FormMethod.Post, null))
 {
 	@Html.HiddenFor(model => model.Content.Id)
   <SettingsControl caption="Title" helptext="Module Title.  This value may be shown on screen.">
     @Html.TextBoxFor(model => model.Title)
   </SettingsControl>
 
-	@Html.TextAreaFor(model => model.Content.Value, 12, 60, new { @class = "HtmlEditorControl" });
+  @Html.TextAreaFor(model => model.Content.Value, 12, 60, new { @class = "flex-1 " + Model.ContentTypeCssClass() })  
+  @Html.HiddenFor(model => model.Content.ContentType)
 
 	<div class="nucleus-form-buttonrow">
-		<input type="submit" value="Save Changes" class="btn btn-primary" />
+    <input type="submit" value="Save Changes" class="btn btn-primary" formaction="@Url.NucleusAction("Save", "TextHtml", "TextHtml")" />
+    
+    <div class="ms-auto dropdown">
+      <a class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        @Model.ContentTypeFriendlyName()
+      </a>
+
+      <ul class="dropdown-menu">
+        <li><button type="submit" formaction="@Url.NucleusAction("ChangeFormat", "TextHtml", "TextHtml", new {format="text/html"})" class="dropdown-item">Html</button></li>
+        <li><button type="submit" formaction="@Url.NucleusAction("ChangeFormat", "TextHtml", "TextHtml", new {format="text/markdown"})" class="dropdown-item">Markdown</button></li>
+        <li><button type="submit" formaction="@Url.NucleusAction("ChangeFormat", "TextHtml", "TextHtml", new {format="text/plain"})" data-confirm="If you convert to plain text, content formatting will be lost. Do you want to proceed?" class="dropdown-item">Plain Text</button></li>
+      </ul>
+    </div>
 	</div>
 }

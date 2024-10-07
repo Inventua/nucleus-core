@@ -67,7 +67,6 @@ public static class CoreServiceExtensions
     return services;
   }
 
-
   /// <summary>
   /// Add and configure Nucleus folder options
   /// </summary>
@@ -168,6 +167,45 @@ public static class CoreServiceExtensions
     services.Configure<T>(configuration.GetSection(key), binderOptions => binderOptions.BindNonPublicProperties = true);
   }
 
+  /// <summary>
+  /// Adds a configuration provider which replaces environment variables in configuration values with environment variable values. The
+  /// environment variable token is expressed in the form: %ENVIRONMENT_VARIABLE_NAME%. This method must be called after adding all other
+  /// configuration providers, so that the configuration values that it contributes take precedence over all others.
+  /// </summary>
+  /// <param name="builder"></param>
+  /// <returns></returns>
+  public static IConfigurationBuilder ExpandEnvironmentVariables(this IConfigurationBuilder builder)
+  {
+    // Load values from previously added configuration sources, replace tokens which represent environment variables with environment
+    // variable vaues. This operation must take place before adding the ExpandEnvironmentVariablesConfigurationSource, otherwise it 
+    // causes infinite recursion & a stack overflow.
+    Dictionary<string, string> settings = new();
+
+    // build configuration settings so we can iterate through them. This has the downside of calling build.Build twice (once here, and
+    // once when the "real" call to populate configuration classes takes place), but has the benefit of working automatically with *all*
+    // settings.
+    IEnumerable<KeyValuePair<string, string>> configurationValues = builder.Build().AsEnumerable().ToList();
+
+    // iterate through all configuration settings, look for tokens which represent environment variables (which match the
+    // pattern %env-variable-name%) and replace the tokens with the environment variable value(s).
+    foreach (KeyValuePair<string, string> keyValue in configurationValues)
+    {
+      if (!String.IsNullOrEmpty(keyValue.Value))
+      {
+        string newValue = Environment.ExpandEnvironmentVariables(keyValue.Value);
+        
+        // if the value has been changed, add it 
+        if (newValue != keyValue.Value)
+        {
+          settings.Add(keyValue.Key, newValue);
+        }
+      }
+    }
+
+    builder.Add(new ExpandEnvironmentVariablesConfigurationSource(settings));
+
+    return builder;
+  }
 
   /// <summary>
   /// Add Blazor and Razor components support (server and webassembly)
@@ -176,7 +214,6 @@ public static class CoreServiceExtensions
   /// <returns></returns>
   public static IServiceCollection AddBlazor(this IServiceCollection services)
   {
-
     services.AddRazorComponents()
       .AddInteractiveServerComponents()
       .AddInteractiveWebAssemblyComponents();

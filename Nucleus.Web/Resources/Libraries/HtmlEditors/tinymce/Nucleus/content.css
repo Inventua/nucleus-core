@@ -41,3 +41,21 @@
 	border: solid 1px black;
 	padding: 2px;
 }
+            
+#tinymce-monaco-editor
+{
+  flex: 1;
+  border: solid 1px #ddd;
+}
+
+#tinymce-monaco-editor .monaco-editor 
+{ 
+  position: absolute !important; 
+}
+
+#tinymce-monaco-editor .monaco-editor .tree 
+{ 
+  position: absolute; 
+  top: 0;
+  height: none;
+}

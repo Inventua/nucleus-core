@@ -6,8 +6,11 @@
 @if (!String.IsNullOrEmpty(Model.UseLayout))
 {
 	Layout = Model.UseLayout;
+  @Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.JQUERY)
+  @Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.BOOTSTRAP)
 }
-@Html.AddStyle("~!/../settings.css")
+@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_MONACO_EDITOR)
+@Html.AddStyle("~#/settings.css")
 <h2 class="nucleus-modal-caption">Article Settings</h2>
 @using (Html.BeginNucleusForm("Editor", "Admin", "Publish", FormMethod.Post, new { @enctype = "multipart/form-data", @data_target = @Model.Standalone ? "form.parent()" : "#ArticleEditor" }))
 {

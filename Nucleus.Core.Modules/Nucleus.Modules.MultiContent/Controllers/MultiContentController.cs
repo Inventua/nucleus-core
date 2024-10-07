@@ -126,6 +126,15 @@ public class MultiContentController : Controller
     return View("Editor", await BuildEditorViewModel(viewModel, id));
   }
 
+  [HttpPost]
+  public ActionResult ChangeFormat(ViewModels.Editor viewModel, string format)
+  {
+    viewModel.Content.ConvertTo(format);
+    this.ModelState.Clear();
+
+    return View("Editor", viewModel);
+  }
+
   [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
   [HttpPost]
   public async Task<ActionResult> SaveContent(ViewModels.Editor viewModel)
@@ -150,8 +159,15 @@ public class MultiContentController : Controller
   [HttpPost]
   public async Task<ActionResult> UpdateContent(Guid id, string value)
   {
+    // apply inline content edits. The inline editor format is always HTML, so we need to convert the value back to the original content type before saving
     Content content = await this.ContentManager.Get(id);
+    string originalContentType = content.ContentType;
+
     content.Value = value;
+    content.ContentType = "text/html";
+
+    content.ConvertTo(originalContentType);
+
     await this.ContentManager.Save(this.Context.Module, content);
 
     return Ok();

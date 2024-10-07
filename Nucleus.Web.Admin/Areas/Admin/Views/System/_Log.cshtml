@@ -15,26 +15,24 @@
         @foreach (var entry in Model.LogContent.Items)
         {
           <tr>
-            <td>@entry.Date.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+            <td><span class="nucleus-log-date">@entry.Date.FormatDate(this.Context.Request.GetUserTimeZone())</span></td>
             <td><span class="nucleus-log-level nucleus-log-level-@entry.Level.ToLower()">@entry.Level</span></td>
             <td class="position-relative pe-4">
               <div class="nucleus-log-category">@entry.Category</div>
 
               @if (!String.IsNullOrEmpty(entry.RequestPath) || !String.IsNullOrEmpty(entry.IpAddress))
               {
-                <div class="d-flex mb-2">
                 @if (!String.IsNullOrEmpty(entry.RequestPath))
                 {
-                  <div class="nucleus-log-requestpath flex-1">Request Path: <span>@entry.RequestPath</span></div>
+                  <div class="nucleus-log-requestpath">@entry.RequestPath</div>
                 }
                 @if (!String.IsNullOrEmpty(entry.IpAddress))
                 {
-                  <div class="nucleus-log-ipaddress">Remote Address: <span>@entry.IpAddress</span></div>
-                }
-                </div>
+                  <div class="nucleus-log-ipaddress">@entry.IpAddress</div>
+                }                
               }
               <div class="nucleus-log-message text-break">@(new Microsoft.AspNetCore.Html.HtmlString(System.Web.HttpUtility.HtmlEncode(entry.Message)))</div>
-
+              <button type="button" class="btn btn-sm btn-none nucleus-material-icon view-log-entry" title="View Full Screen">&#xe5d0;</button>
             </td>
           </tr>
         }
@@ -42,10 +40,31 @@
     </tbody>
   </table>
 </div>
+<Modal id="log-entry-dialog" title="View Log Entry"></Modal>
 
 <script>
   jQuery(document).ready(function ()
   {
     Page.AttachCopyButton('.nucleus-log-message', 'tr');
+
+    jQuery('.view-log-entry').on('click', function ()
+    {
+      var entryContent = jQuery(jQuery(this).parents('tr').first().html().replace('td>', 'div>'));
+      entryContent.find('button').remove();
+      jQuery('#log-entry-dialog').find('.modal-body').html(entryContent.html());
+
+      jQuery('#log-entry-dialog .nucleus-copy-button').remove();
+      Page.AttachCopyButton('#log-entry-dialog .modal-body');
+
+      var modalInstance = bootstrap.Modal.getInstance(document.getElementById('log-entry-dialog'));
+      if (modalInstance === null)
+      {
+        modalInstance = new bootstrap.Modal('#log-entry-dialog');
+      }
+      modalInstance.show();
+    });
   });
+
+
+
 </script>

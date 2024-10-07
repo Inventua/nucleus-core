@@ -4,9 +4,6 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.Extensions
 @using Nucleus.Abstractions.Models
-<style>
-  .monaco-editor { position: absolute !important; }
-</style>
 @using (Html.BeginAreaForm("Refresh", "MailTemplates", "Admin", FormMethod.Post, new { @data_target = ".MailTemplateEditor", @autocomplete = "off" }))
 {
   <fieldset role="group" aria-labelledby="heading">
@@ -43,7 +40,7 @@
 
   <script>
     var _model = @Html.Raw(Model.DataModel);
-    jQuery('#mailtemplate-monaco-editor').MonacoEditor({ linkedElement: '#MailTemplate_Body', model: _model });
+    jQuery('#mailtemplate-monaco-editor').MonacoEditor({ language: 'razor', linkedElement: '#MailTemplate_Body', model: _model });
   </script>
 
 }

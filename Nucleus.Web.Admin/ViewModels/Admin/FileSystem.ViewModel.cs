@@ -6,6 +6,9 @@ using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.Permissions;
 using Nucleus.Abstractions.Models.Paging;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Nucleus.Extensions;
+using Microsoft.AspNetCore.Mvc;
+using Nucleus.ViewFeatures;
 
 namespace Nucleus.Web.ViewModels.Admin
 {
@@ -39,6 +42,5 @@ namespace Nucleus.Web.ViewModels.Admin
 		public Boolean DisableCopy { get; set; }
 
     public string SearchTerm { get; set; }
-
   }
 }

@@ -142,5 +142,11 @@
     "inputFiles": [
       "Shared/Containers/container-styles.css"
     ]
+  },
+  {
+    "outputFileName": "Resources/Libraries/HtmlEditors/tinymce/Nucleus/tinymce.code.min.js",
+    "inputFiles": [
+      "Resources/Libraries/HtmlEditors/tinymce/Nucleus/tinymce.code.js"
+    ]
   }
 ]

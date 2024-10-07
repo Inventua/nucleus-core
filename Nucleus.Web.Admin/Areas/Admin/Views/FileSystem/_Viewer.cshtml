@@ -1,0 +1,11 @@
+﻿@model Nucleus.Web.ViewModels.Admin.FileSystemViewer
+@using Nucleus.Abstractions.Models
+<h1 class="nucleus-modal-caption">@Model.File.Name</h1>
+<div class="d-flex flex-1 overflow-auto">
+  <object class="" type="@Model.File.GetMIMEType(false)" data="@Url.FileLink(Model.File, true)" width="@(Model.File.Width?.ToString() ?? "100%")" height="@(Model.File.Height?.ToString() ?? "auto")">
+    <div class="alert alert-info">
+      <p>Your browser can't display <strong>@Model.File.Name</strong>.</p>
+      <a class="btn btn-primary" href="@Url.FileLink(Model.File)">Download</a>
+    </div>
+  </object>
+</div>

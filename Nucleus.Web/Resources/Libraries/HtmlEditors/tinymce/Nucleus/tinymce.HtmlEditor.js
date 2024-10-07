@@ -14,11 +14,12 @@
 
       if (isAdminMode)
       {
-        plugins = 'code link lists table'
-        toolbar = 'code | undo redo | styles | table | bold italic strikethrough | link pages unlink | images | alignleft aligncenter alignright alignjustify | bullist numlist | hr | removeformat';
+        plugins = 'link lists table'
+        toolbar = 'code_monaco | undo redo | styles | table | bold italic strikethrough | link pages unlink | images | alignleft aligncenter alignright alignjustify | bullist numlist | hr | removeformat';
         external_plugins = {
           pages: '../Nucleus/tinymce.pages.min.js',
-          images: '../Nucleus/tinymce.images.min.js'
+          images: '../Nucleus/tinymce.images.min.js',
+          code_monaco: '../Nucleus/tinymce.code.min.js'
         };
       }
       else

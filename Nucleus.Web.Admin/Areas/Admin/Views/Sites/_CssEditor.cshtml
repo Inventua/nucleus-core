@@ -1,0 +1,16 @@
+﻿@model Nucleus.Web.ViewModels.Admin.SiteEditor
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions
+@using Nucleus.Abstractions.Models
+@using Nucleus.Abstractions.Models.Mail
+@using Nucleus.Core
+@Html.TextAreaFor(model => model.CssContent, 12, 60, new { @class = "CssContentControl" })
+<div id="site-css-editor" class="flex-1 border border-1"></div>
+<div class="nucleus-form-buttonrow">
+  <input type="submit" value="Save Changes" class="btn btn-primary" formaction="@Url.AreaAction("SaveSiteCss", "Sites", "Admin")" />
+</div>
+<script>
+  jQuery('#site-css-editor').MonacoEditor({ language: 'css', linkedElement: '.CssContentControl', model: null });
+</script>

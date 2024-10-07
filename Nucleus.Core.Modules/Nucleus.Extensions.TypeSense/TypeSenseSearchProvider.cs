@@ -40,13 +40,13 @@ public partial class TypeSenseSearchProvider : ISearchProvider
     this.Logger = logger;
   }
 
-  //public ISearchProviderCapabilities GetCapabilities()
-  //{
-  //  return new DefaultSearchProviderCapabilities()
-  //  {
-  //    MaximumSuggestions = 0
-  //  };
-  //}
+  public ISearchProviderCapabilities GetCapabilities()
+  {
+    return new DefaultSearchProviderCapabilities()
+    {
+      CanReportScore = false
+    };
+  }
 
   public async Task<SearchResults> Search(SearchQuery query)
   {
@@ -83,8 +83,8 @@ public partial class TypeSenseSearchProvider : ISearchProvider
     {
       Results = results,
       Answers = [],
-      Total = response.Found,
-      MaxScore = results.FirstOrDefault()?.Score ?? 0
+      Total = response.Found//,
+      //MaxScore = results.FirstOrDefault()?.Score ?? 0
     };
   }
 

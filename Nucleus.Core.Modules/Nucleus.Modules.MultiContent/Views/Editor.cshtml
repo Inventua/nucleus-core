@@ -3,22 +3,34 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
-@Html.AddStyle("~!/../settings.css")
+@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_MONACO_EDITOR)
+@Html.AddStyle("~#/settings.css")
 <h1 class="nucleus-modal-caption">Multi-Content Editor</h1>
 @using (Html.BeginNucleusForm("Edit", "MultiContent", FormMethod.Post, null))
 {
-	@Html.HiddenFor(model => model.Content.Id)
-	@Html.HiddenFor(model => model.Content.SortOrder)
-	
-		<SettingsControl caption="Title" helptext="Title.">
-			@Html.TextBoxFor(model => model.Content.Title)
-		</SettingsControl>
+  @Html.HiddenFor(model => model.Content.Id)
+  @Html.HiddenFor(model => model.Content.SortOrder)
 
-		@Html.TextAreaFor(model => model.Content.Value, 12, 60, new { @class = "HtmlEditorControl" })
-@*<fieldset role="group" aria-label="Multi-Content Editor"></fieldset>*@
+  <SettingsControl caption="Title" helptext="Title.">
+    @Html.TextBoxFor(model => model.Content.Title)
+  </SettingsControl>
 
-	<div class="nucleus-form-buttonrow">
-		<button type="submit" class="btn btn-primary" formaction="@Url.NucleusAction("SaveContent", "MultiContent", "MultiContent")" data-target="#multi-content-contentlist">Save Changes</button>
-    <button type="button" class="btn btn-secondary ms-auto" data-bs-dismiss="modal">Close</button>
-	</div>
+  @Html.TextAreaFor(model => model.Content.Value, 12, 60, new { @class = "flex-1 " + Model.ContentTypeCssClass() })
+  @Html.HiddenFor(model => model.Content.ContentType)
+
+  <div class="nucleus-form-buttonrow">
+    <button type="submit" class="btn btn-primary" formaction="@Url.NucleusAction("SaveContent", "MultiContent", "MultiContent")" data-target="#multi-content-contentlist">Save Changes</button>
+    
+    <div class="ms-auto dropdown">
+      <a class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        @Model.ContentTypeFriendlyName()
+      </a>
+
+      <ul class="dropdown-menu">
+        <li><button type="submit" formaction="@Url.NucleusAction("ChangeFormat", "MultiContent", "MultiContent", new {format="text/html"})" data-target="#ContentEditor" class="dropdown-item">Html</button></li>
+        <li><button type="submit" formaction="@Url.NucleusAction("ChangeFormat", "MultiContent", "MultiContent", new {format="text/markdown"})" data-target="#ContentEditor" class="dropdown-item">Markdown</button></li>
+        <li><button type="submit" formaction="@Url.NucleusAction("ChangeFormat", "MultiContent", "MultiContent", new {format="text/plain"})" data-target="#ContentEditor" data-confirm="If you convert to plain text, content formatting will be lost. Do you want to proceed?" class="dropdown-item">Plain Text</button></li>
+      </ul>
+    </div>
+  </div>  
 }

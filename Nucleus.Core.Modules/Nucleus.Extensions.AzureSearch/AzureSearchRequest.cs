@@ -52,7 +52,7 @@ internal partial class AzureSearchRequest
 
   internal const string SKILL_SET_NAME = "skillset-content-vectorization";
   internal static readonly char[] TOKEN_SPLIT_CHARS = [' ', ',', ';', ':', '<', '>', '.', '!', '#', '_', '\t', '\n', '\r'];
-  internal const int TOKENS_PER_PAGE = 2500;
+  internal const int TOKENS_PER_CHUNK = 2500;
 
   internal const string ID_PAGE_REGEX = ".*_pages_(?<page>[0-9]*)";
 
@@ -566,62 +566,59 @@ internal partial class AzureSearchRequest
         // try to fit into the token limit.  
 
         string[] tokens = content.Content.Split(TOKEN_SPLIT_CHARS, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        int pages = (int)Math.Floor((decimal)tokens.Length / TOKENS_PER_PAGE) + 1;
-        //int page = 0;
+        int pages = (int)Math.Floor((decimal)tokens.Length / TOKENS_PER_CHUNK) + 1;
         string[] tokenizedContent = content.Content.Split(TOKEN_SPLIT_CHARS, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        //string vectorContent = string.Join(' ', tokenizedContent.Skip(page * TOKENS_PER_PAGE).Take(TOKENS_PER_PAGE));
+        List<string[]> chunks = tokenizedContent.Chunk(TOKENS_PER_CHUNK).ToList();
 
-
-        //System.ClientModel.ClientResult<OpenAI.Embeddings.Embedding> contentVectorResponse = await embedddingClient.GenerateEmbeddingAsync(vectorContent);
-        //content.ContentVector = contentVectorResponse.Value.Vector.ToArray();
-
-        for (int page = 0; page < pages; page++)
+        if (tokenizedContent.Length > TOKENS_PER_CHUNK)
         {
-          string vectorContent = string.Join(' ', tokenizedContent.Skip(page * TOKENS_PER_PAGE).Take(TOKENS_PER_PAGE));
-          //string vectorContent = string.Join(' ', content.Content.Split(filter, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Skip(page * TOKENS_PER_PAGE).Take(TOKENS_PER_PAGE));
-
-          AzureSearchDocument pagedDocument = new();
-
-          CopyMetaData(content, pagedDocument);
-          pagedDocument.Content = vectorContent;
-
-          pagedDocument.Id = content.Id;
-          if (page > 0)
+          for (int page = 0; page < pages; page++)
           {
-            pagedDocument.Id += $"_pages_{page}";
-            pagedDocument.Title += $" [{page}]";
-          }
+            string vectorContent = string.Join(' ', chunks[page]);// string.Join(' ', tokenizedContent.Skip(page * TOKENS_PER_CHUNK).Take(TOKENS_PER_CHUNK));
 
-          // only try to generate vectors if the "tokenized" content is not empty
-          if (!string.IsNullOrEmpty(vectorContent))
-          {
-            // only try to generate vectors if the "tokenized and paged" content has been reduced in size enough to fit into the token limit. Some documents may not have enough
-            // delimiter characters to work with our (very) basic tokenization method
-            if (vectorContent.Length < TOKENS_PER_PAGE * 8)
+            AzureSearchDocument pagedDocument = new();
+
+            CopyMetaData(content, pagedDocument);
+            pagedDocument.Content = vectorContent;
+
+            pagedDocument.Id = content.Id;
+
+            pagedDocument.Id += $"_pages_{page + 1}";
+            pagedDocument.Title += $" [{page + 1}]";
+            pagedDocument.ParentId = content.Id;
+            pagedDocument.PageNumber = page + 1;
+
+            // only try to generate vectors if the "tokenized" content is not empty
+            if (!string.IsNullOrEmpty(vectorContent))
             {
-              try
+              // only try to generate vectors if the "tokenized and paged" content has been reduced in size enough to fit into the token limit. Some documents may not have enough
+              // delimiter characters to work with our (very) basic tokenization method
+              if (vectorContent.Length < TOKENS_PER_CHUNK * 8)
               {
-                System.ClientModel.ClientResult<OpenAI.Embeddings.Embedding> contentVectorResponse = await embedddingClient.GenerateEmbeddingAsync(vectorContent);
-                pagedDocument.ContentVector = contentVectorResponse.Value.Vector.ToArray();
-              }
-              catch (System.ClientModel.ClientResultException)
-              {
-                // content is too long (more than 8191 tokens)
-                this.Logger.LogWarning("A vector for content of type '{type}', url '{url}' was not generated because the content could not be tokenized.", content.Type, content.Url);
-              }
+                try
+                {
+                  System.ClientModel.ClientResult<OpenAI.Embeddings.Embedding> contentVectorResponse = await embedddingClient.GenerateEmbeddingAsync(vectorContent);
+                  pagedDocument.ContentVector = contentVectorResponse.Value.Vector.ToArray();
+                }
+                catch (System.ClientModel.ClientResultException)
+                {
+                  // content is too long (more than 8191 tokens)
+                  this.Logger.LogWarning("A vector for content of type '{type}', url '{url}' was not generated because the content could not be tokenized.", content.Type, content.Url);
+                }
 
-              if (pagedDocument.ContentVector != null || page == 0)
-              {
-                batch.Actions.Add(new IndexDocumentsAction<AzureSearchDocument>(IndexActionType.MergeOrUpload, pagedDocument));
+                if (pagedDocument.ContentVector != null || page == 0)
+                {
+                  batch.Actions.Add(new IndexDocumentsAction<AzureSearchDocument>(IndexActionType.MergeOrUpload, pagedDocument));
+                }
+                else
+                {
+                  this.Logger.LogWarning("Skipped saving chunk for content of type '{type}', url '{url}', page {page} because a content vector could not be generated.", content.Type, content.Url, page);
+                }
               }
               else
               {
-                this.Logger.LogWarning("Skipped saving chunk for content of type '{type}', url '{url}', page {page} because a content vector could not be generated.", content.Type, content.Url, page);
+                this.Logger.LogWarning("Skipped saving chunk for content of type '{type}', url '{url}', page {page} because the chunk was too large.", content.Type, content.Url, page);
               }
-            }
-            else
-            {
-              this.Logger.LogWarning("Skipped saving chunk for content of type '{type}', url '{url}', page {page} because the chunk was too large.", content.Type, content.Url, page);
             }
           }
         }
@@ -754,7 +751,7 @@ internal partial class AzureSearchRequest
       QueryType = String.IsNullOrEmpty(this.SemanticConfigurationName) ? SearchQueryType.Simple : SearchQueryType.Semantic,
       SearchMode = query.StrictSearchTerms ? SearchMode.All : SearchMode.Any,
       Size = query.PagingSettings.PageSize,
-      Filter = BuildFilter($"{BuildSiteFilter(query)}", $"{BuildRolesFilter(query)}", $"{BuildScopeFilter(query)}", $"{BuildArgsFilter(query)}", $"{BuildPageNumberFilter(query)}"),
+      Filter = BuildFilter($"{BuildSiteFilter(query)}", $"{BuildRolesFilter(query)}", $"{BuildScopeFilter(query)}", $"{BuildArgsFilter(query)}"),
       Skip = query.PagingSettings.CurrentPageIndex - 1
     };
 
@@ -936,11 +933,11 @@ internal partial class AzureSearchRequest
     return $"{nameof(AzureSearchDocument.ParentId)} eq {SearchFilter.Create($"{parentId}")}";
   }
 
-  private static string BuildPageNumberFilter(SearchQuery query)
-  {
-    // We exclude "page 0" from search results, because it is a repeat of the main document (index entry)
-    return $"{nameof(AzureSearchDocument.PageNumber)} ne 1";
-  }
+  //private static string BuildPageNumberFilter(SearchQuery query)
+  //{
+  //  // We exclude "page 0" from search results, because it is a repeat of the main document (index entry)
+  //  return $"{nameof(AzureSearchDocument.PageNumber)} ne 1";
+  //}
 
   private static string BuildRolesFilter(SearchQuery query)
   {

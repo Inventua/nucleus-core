@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -49,7 +50,7 @@ namespace Nucleus.Web
     {
       this.Environment = env;
 
-      this.Configuration = configuration; // BuildConfiguration(configuration);
+      this.Configuration = configuration; 
     }
 
     private static string GetEnvironmentConfigFile(string defaultFileName, string environmentName)
@@ -112,6 +113,8 @@ namespace Nucleus.Web
 
       configurationBuilder.AddEnvironmentVariables();
       configurationBuilder.AddCommandLine(System.Environment.GetCommandLineArgs());
+
+      configurationBuilder.ExpandEnvironmentVariables();
     }
 
     public void ConfigureServices(IServiceCollection services)

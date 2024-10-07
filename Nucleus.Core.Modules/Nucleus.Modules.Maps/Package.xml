@@ -1,0 +1,45 @@
+﻿<package id="fa397b8f-9ec2-4340-b1a7-638796e9de2f" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
+  <name>Maps</name>
+  <version>1.0.0</version>
+  <publisher name="Inventua" url="https://www.inventua.com" email="support@inventua.com" />
+  <description></description>
+  <compatibility minVersion="2.0.0.0" maxVersion="*" />
+  <components>
+    <component folderName="Maps" optional="false">
+      <moduleDefinition id="fc20b321-1803-429b-8326-e6d0b6b693ef">
+        <friendlyName>Maps</friendlyName>
+        <extension>Maps</extension>
+        <viewController>MapsViewerController</viewController>
+        <settingsController>MapsSettingsController</settingsController>
+        <viewAction>Index</viewAction>
+        <editAction>Settings</editAction>
+      </moduleDefinition>
+      <file name="readme.txt" />
+      <!-- 
+        when the project property GenerateEmbeddedFilesManifest=true and your static resources Build Action=Embedded resource, static resource
+        files do not need to be included in package.xml (this file) 
+      -->
+      <!--<file name="viewer.css" />
+			<file name="settings.css" />-->
+      <folder name="bin">
+        <file name="Nucleus.Modules.Maps.dll" />
+        <file name="Microsoft.Identity.Client.dll" />
+        <file name="Azure.Core.dll" />
+        <file name="Microsoft.Bcl.AsyncInterfaces.dll" />
+        <file name="System.ClientModel.dll" />
+        <file name="Azure.Maps.Common.dll" />
+        <file name="Microsoft.Identity.Client.Extensions.Msal.dll" />
+        <file name="Azure.Maps.Rendering.dll" />
+        <file name="Azure.Identity.dll" />
+      </folder>
+      <!-- 
+        when the project property RazorCompileOnBuild=true view (.cshtml) files do not need to be included in package.xml (this file) 
+      -->
+      <!--<folder name="Views">
+				<file name="_ViewImports.cshtml" />
+				<file name="Viewer.cshtml" />
+				<file name="Settings.cshtml" />
+			</folder>-->
+    </component>
+  </components>
+</package>

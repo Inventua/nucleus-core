@@ -1,0 +1,75 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
+    <RootNamespace>Nucleus.Modules.Maps</RootNamespace>
+    <EnableDefaultContentItems>false</EnableDefaultContentItems>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+    <RazorCompileOnBuild>true</RazorCompileOnBuild>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="**\*.vspscc" />
+    <None Remove="**\*.scc" />
+    <None Remove="*.zip" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="**\*.css" />
+    <EmbeddedResource Include="**\*.js" />
+    <Content Include="**\*.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Views\MapSettings\_AzureMapsSettings.cshtml" />
+    <None Remove="Views\MapViews\AzureMaps.cshtml" />
+    <None Remove="Views\MapViews\GoogleMaps.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="package.xml" />
+    <Content Include="readme.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="package.xml" />
+    <Content Include="readme.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.12.0" />
+    <PackageReference Include="Azure.Maps.Rendering" Version="2.0.0-beta.1" />
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0" />
+    <PackageReference Include="Inventua.Nucleus.Extensions" Version="2.0.0" />
+    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.3.0.0" />
+    <PackageReference Include="Inventua.Nucleus.Data.EntityFramework" Version="1.3.0.0" />
+
+    <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
+  </ItemGroup>
+
+  <!-- 
+  Embed cshtml files in Views\MapViews so we can enumerate them for the settings page and check for them at runtime. 
+  -->
+  <Target Name="MapsModuleEmbedMapViews" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <EmbeddedResource Include="Views\MapViews\*.cshtml" />
+    </ItemGroup>
+  </Target>
+
+  <PropertyGroup Label="Nucleus">
+    <ExtensionFolder>Maps</ExtensionFolder>
+    <Version>1.0.0</Version>
+    <NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
+    <CopyToDefaultSetup>false</CopyToDefaultSetup>
+  </PropertyGroup>
+
+  <Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
+</Project>

@@ -1,0 +1,14 @@
+﻿@model Nucleus.Modules.Maps.Models.GoogleMapSettings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+<h3 class="nucleus-control-panel-heading">Google Settings</h3>
+<div class="nucleus-flex-fields">
+  <SettingsControl caption="Map Type" helptext="Displays the map in different formats.">
+    @Html.DropDownListFor(model => model.MapType, Html.GetEnumSelectList<Nucleus.Modules.Maps.Models.GoogleMapSettings.MapTypes>())
+  </SettingsControl>
+  <SettingsControl caption="Scale" helptext="Improves the legibility by providing a higher resolution map. Accepted values are 1 or 2.">
+    @Html.TextBoxFor(model => model.Scale, new { @type = "number", @inputmode = "integer", @min = "1", @max = "2", @step = "1" })
+  </SettingsControl>
+</div>

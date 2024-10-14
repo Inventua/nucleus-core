@@ -1,0 +1,11 @@
+﻿@model Nucleus.Modules.Maps.Models.AzureMapSettings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+<h3 class="nucleus-control-panel-heading">Azure Settings</h3>
+<div class="nucleus-flex-fields">
+  <SettingsControl caption="Azure Client ID" helptext="Alternative form of authentication by using the Azure Active Directory. This is optional.">
+    @Html.TextBoxFor(model => model.AzureClientId)
+  </SettingsControl>
+</div>

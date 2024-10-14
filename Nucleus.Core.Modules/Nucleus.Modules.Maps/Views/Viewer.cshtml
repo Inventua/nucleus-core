@@ -1,0 +1,3 @@
+﻿@model Nucleus.Modules.Maps.ViewModels.Viewer
+@Html.AddStyle("~#/viewer.css")
+<img src="@Url.NucleusAction("RenderMap", "MapsViewer", "Maps", new { @provider = Model.MapProvider })" />

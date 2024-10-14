@@ -1,0 +1,7 @@
+﻿@model Nucleus.Modules.Maps.ViewModels.Viewer
+@using Nucleus.Extensions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Modules.Maps.MapRenderers
+@Html.AddStyle("~#/viewer.css")
+<img src="@Url.NucleusAction("RenderMap", "MapsViewer", "Maps", new { @provider = Model.MapProvider })" />

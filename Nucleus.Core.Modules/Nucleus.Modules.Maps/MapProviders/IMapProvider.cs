@@ -1,0 +1,15 @@
+﻿using Nucleus.Modules.Maps.MapRenderers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Nucleus.Modules.Maps.MapProviders;
+
+internal interface IMapProvider
+{
+  public abstract Models.Settings GetSettings();
+
+  public abstract IMapRenderer GetRenderer();
+}

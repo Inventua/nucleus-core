@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Linq.Expressions;
 using Microsoft.Extensions.DependencyInjection;
 using Nucleus.Abstractions.Models;
+using Newtonsoft.Json.Linq;
 
 namespace Nucleus.ViewFeatures.HtmlHelpers
 {
@@ -17,24 +18,24 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 	/// </summary>
 	public static class RangeHtmlHelper
 	{
-		/// <summary>
-		/// Renders a Range control.
-		/// </summary>
-		/// <param name="htmlHelper"></param>
-		/// <param name="expression"></param>
-		/// <param name="min"></param>
-		/// <param name="max"></param>
-		/// <param name="step"></param>
-		/// <param name="htmlAttributes"></param>
-		/// <typeparam name="TModel"></typeparam>
-		/// <typeparam name="Guid"></typeparam>
-		/// <returns></returns>
-		public static IHtmlContent RangeFor<TModel, Guid>(this IHtmlHelper<TModel> htmlHelper, Expression<Func<TModel, Guid>> expression, double min, double max, double step, object htmlAttributes)
+    /// <summary>
+    /// Renders a Range control.
+    /// </summary>
+    /// <param name="htmlHelper"></param>
+    /// <param name="expression"></param>
+    /// <param name="min"></param>
+    /// <param name="max"></param>
+    /// <param name="step"></param>
+    /// <param name="htmlAttributes"></param>
+    /// <typeparam name="TModel"></typeparam>
+    /// <typeparam name="TProperty"></typeparam>
+    /// <returns></returns>
+		public static IHtmlContent RangeFor<TModel, TProperty>(this IHtmlHelper<TModel> htmlHelper, Expression<Func<TModel, TProperty>> expression, double min, double max, double step, object htmlAttributes)
 		{
 		
 			ModelExpressionProvider provider = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<ModelExpressionProvider>();
 			ModelExpression modelExpression = provider.CreateModelExpression(htmlHelper.ViewData, expression);
-			double value = modelExpression.Model == null ? 0 : (Double)modelExpression.Model;
+			double value = modelExpression.Model == null ? 0 : Convert.ToDouble(modelExpression.Model);
 			
 			return Nucleus.ViewFeatures.HtmlContent.Range.Build(htmlHelper.ViewContext, htmlHelper.IdFor(expression), htmlHelper.NameFor(expression), min, max, step, value, htmlAttributes);
 		}
@@ -48,9 +49,9 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		/// <param name="max"></param>
 		/// <param name="step"></param>
 		/// <typeparam name="TModel"></typeparam>
-		/// <typeparam name="Guid"></typeparam>
+		/// <typeparam name="TProperty"></typeparam>
 		/// <returns></returns>
-		public static IHtmlContent RangeFor<TModel, Guid>(this IHtmlHelper<TModel> htmlHelper, Expression<Func<TModel, Guid>> expression, double min, double max, double step)
+		public static IHtmlContent RangeFor<TModel, TProperty>(this IHtmlHelper<TModel> htmlHelper, Expression<Func<TModel, TProperty>> expression, double min, double max, double step)
 		{
 
 			ModelExpressionProvider provider = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<ModelExpressionProvider>();

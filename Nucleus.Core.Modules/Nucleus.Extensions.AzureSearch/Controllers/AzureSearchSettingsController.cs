@@ -293,7 +293,6 @@ public class AzureSearchSettingsController : Controller
           viewModel.AzureOpenAIApiKey = "";
           viewModel.AzureOpenAIDeploymentName = "";
 
-          viewModel.SemanticConfigurationName = "";
           viewModel.IndexerName = "";
           viewModel.SemanticConfigurationName = "";
 

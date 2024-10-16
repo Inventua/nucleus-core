@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -422,9 +423,7 @@ public class SearchController : Controller
 
   private string GetFriendlyName(System.Type type)
   {
-    System.ComponentModel.DisplayNameAttribute displayNameAttribute = type.GetCustomAttributes(false)
-      .Where(attr => attr is System.ComponentModel.DisplayNameAttribute)
-      .Select(attr => attr as System.ComponentModel.DisplayNameAttribute)
+    System.ComponentModel.DisplayNameAttribute displayNameAttribute = type.GetCustomAttributes<System.ComponentModel.DisplayNameAttribute>(false)
       .FirstOrDefault();
 
     if (displayNameAttribute == null)

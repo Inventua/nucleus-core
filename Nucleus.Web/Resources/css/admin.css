@@ -1181,6 +1181,14 @@ ul.nucleus-control-panel-items button
    float: right;
   }
 
+#system-database .database-connection-error
+{
+  padding: 0.5rem;
+  border-radius: 4px;
+  background-color: #dc3545 !important;
+  color: white;
+}
+
 #system-logs .log-options, #task-logs .log-options
 {
   width: 42rem;

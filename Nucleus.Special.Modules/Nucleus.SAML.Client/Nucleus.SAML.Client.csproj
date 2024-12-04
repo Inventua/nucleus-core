@@ -59,6 +59,7 @@
   <PropertyGroup Label="Nucleus">
     <ExtensionFolder>SAML Client</ExtensionFolder>
     <Version>2.0.0</Version>
+    <Product>Nucleus</Product>
     <Copyright>(c) Inventua Pty Ptd</Copyright>
     <NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
   </PropertyGroup>

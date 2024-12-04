@@ -72,7 +72,9 @@
 
 	<PropertyGroup Label="Nucleus">
 		<ExtensionFolder>AzureAIChat</ExtensionFolder>
-		<Version>1.0.0.0</Version>
+		<Version>1.0.0</Version>
+    <Copyright>(c) Inventua Pty Ptd</Copyright>
+    <Product>Nucleus</Product>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
     <CopyToDefaultSetup>false</CopyToDefaultSetup>
 	</PropertyGroup>

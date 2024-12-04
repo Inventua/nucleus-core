@@ -58,7 +58,9 @@
 
 	<PropertyGroup Label="Nucleus">
 		<ExtensionFolder>StaticContent</ExtensionFolder>
-		<VersionPrefix>2.0.1</VersionPrefix>
+		<Version>2.0.1</Version>
+    <Product>Nucleus</Product>
+    <Copyright>(c) Inventua Pty Ptd</Copyright>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
 	</PropertyGroup>	
 	

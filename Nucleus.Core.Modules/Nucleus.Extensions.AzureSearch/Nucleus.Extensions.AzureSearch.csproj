@@ -52,8 +52,8 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Azure.AI.OpenAI" Version="2.0.0-beta.3" />
-		<PackageReference Include="Azure.Search.Documents" Version="11.6.0" />
+    <PackageReference Include="Azure.AI.OpenAI" Version="2.1.0-beta.2" />
+    <PackageReference Include="Azure.Search.Documents" Version="11.7.0-beta.1" />
 		<PackageReference Include="Azure.Storage.Blobs" Version="12.21.0" />
 		<PackageReference Include="HtmlAgilityPack" Version="1.11.62" />
 		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0.1-alpha-1.42" />
@@ -61,6 +61,10 @@
 
     <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
 	</ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

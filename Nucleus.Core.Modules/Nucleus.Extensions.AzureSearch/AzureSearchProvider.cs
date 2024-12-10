@@ -44,9 +44,9 @@ public partial class AzureSearchProvider : ISearchProvider
       throw new InvalidOperationException($"The {nameof(query.Site)} property is required.");
     }
 
-    ConfigSettings settings = new(query.Site);
+    AzureSearchSettings settings = new(query.Site);
 
-    if (String.IsNullOrEmpty(settings.ServerUrl))
+    if (String.IsNullOrEmpty(settings.AzureSearchServiceEndpoint))
     {
       throw new InvalidOperationException($"The Azure search server url is not set for site '{query.Site.Name}'.");
     }
@@ -56,14 +56,8 @@ public partial class AzureSearchProvider : ISearchProvider
       throw new InvalidOperationException($"The Azure search index name is not set for site '{query.Site.Name}'.");
     }
 
-
     AzureSearchRequest request = CreateRequest(query.Site, settings);
-
-    if (query.Boost == null)
-    {
-      query.Boost = settings.Boost;
-    }
-
+    
     Response<SearchResults<AzureSearchDocument>> response = await request.Search(query);
 
     return new SearchResults()
@@ -76,7 +70,7 @@ public partial class AzureSearchProvider : ISearchProvider
 
   private async Task<AzureSearchDocument> GetDocumentByKey(Site site, string key)
   {
-    ConfigSettings settings = new(site);
+    AzureSearchSettings settings = new(site);
     AzureSearchRequest request = CreateRequest(site, settings);
     return await request.GetContentByKey(key);
   }
@@ -237,6 +231,8 @@ public partial class AzureSearchProvider : ISearchProvider
       ContentType = result.Document.ContentType,
       PublishedDate = result.Document.PublishedDate,
 
+      IndexedDate = result.Document.IndexingDate,
+
       Size = result.Document.Size,
       Keywords = result.Document.Keywords,
       Categories = await ToCategories(result.Document.Categories),
@@ -269,9 +265,9 @@ public partial class AzureSearchProvider : ISearchProvider
       throw new InvalidOperationException($"The {nameof(query.Site)} property is required.");
     }
 
-    ConfigSettings settings = new(query.Site);
+    AzureSearchSettings settings = new(query.Site);
 
-    if (String.IsNullOrEmpty(settings.ServerUrl))
+    if (String.IsNullOrEmpty(settings.AzureSearchServiceEndpoint))
     {
       throw new InvalidOperationException($"The Elastic search server url is not set for site '{query.Site.Name}'.");
     }
@@ -279,11 +275,6 @@ public partial class AzureSearchProvider : ISearchProvider
     if (String.IsNullOrEmpty(settings.IndexName))
     {
       throw new InvalidOperationException($"The Elastic search index name is not set for site '{query.Site.Name}'.");
-    }
-
-    if (query.Boost == null)
-    {
-      query.Boost = settings.Boost;
     }
 
     AzureSearchRequest request = CreateRequest(query.Site, settings);
@@ -297,19 +288,12 @@ public partial class AzureSearchProvider : ISearchProvider
     };
   }
 
-  private AzureSearchRequest CreateRequest(Site site, ConfigSettings settings)
+  private AzureSearchRequest CreateRequest(Site site, AzureSearchSettings settings)
   {
     return new
     (
-      new System.Uri(settings.ServerUrl),
-      ConfigSettings.DecryptApiKey(site, settings.EncryptedApiKey),
-      settings.IndexName,
-      settings.IndexerName,
-      settings.SemanticConfigurationName,
-      settings.VectorizationEnabled,
-      settings.AzureOpenAIEndpoint,
-      ConfigSettings.DecryptApiKey(site, settings.EncryptedAzureOpenAIApiKey),
-      settings.AzureOpenAIDeploymentName,
+      site,
+      settings,
       this.Logger
     );
   }

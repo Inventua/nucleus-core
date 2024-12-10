@@ -9,7 +9,7 @@
   <components>
     <component folderName="AzureSearch" optional="false">
       <controlPanelExtensionDefinition id="204D31FE-3B6B-47F8-B435-B8470F6462D5">
-        <friendlyName>Azure Search Settings</friendlyName>
+        <friendlyName>Azure Search</friendlyName>
         <helpUrl>https://www.nucleus-cms.com/other-extensions/azure-search/</helpUrl>
         <description>Configure Azure Search settings.</description>
         <controllerName>AzureSearchSettings</controllerName>
@@ -37,6 +37,7 @@
         <file name="Azure.Storage.Blobs.dll" />
         <file name="System.IO.Hashing.dll" />
         <file name="Azure.Storage.Common.dll" />
+        <file name="System.Memory.Data.dll" />
       </folder>
       <!-- 
         when the project property RazorCompileOnBuild=true view (.cshtml) files do not need to be included in package.xml (this file) 

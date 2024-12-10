@@ -6,56 +6,63 @@
 <div class="nucleus-editor-panel">
   <h2 class="nucleus-control-panel-heading">Azure Search Settings</h2>
   @Html.AddStyle("~!/../settings.css")
-  @using (Html.BeginNucleusForm("Settings", "AzureSearch", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+  @using (Html.BeginNucleusForm("Settings", "AzureSearchSettings", FormMethod.Post, new { @enctype = "multipart/form-data", @data_target = ".nucleus-editor-panel.parent()" }))
   {
     <fieldset role="group" aria-label="Settings" class="flex-1">
       <div class="nucleus-flex-fields">
         <SettingsControl caption="Azure Search Server Url" helptext="Enter the URL for your Azure Search service.">
-          @Html.TextBoxFor(model => model.ServerUrl)
+          @Html.TextBoxFor(model => model.AzureSearchServiceEndpoint)
         </SettingsControl>
-
-        <SettingsControl caption="Index Name" helptext="Enter the index name to use for this site. The index will be created automatically.">
-          @Html.TextBoxFor(model => model.IndexName)
-        </SettingsControl>
-      </div>
-
-      <div class="nucleus-flex-fields">
         <SettingsControl caption="Api Key" helptext="Enter your Azure search Api Key.  You can find this value in Azure Portal/Azure Search/Settings/Keys.">
-          @Html.PasswordFor(model => model.ApiKey, new { @value = Model.ApiKey })
+          @Html.PasswordFor(model => model.AzureSearchApiKey, new { @value = Model.AzureSearchApiKey })
+        </SettingsControl>        
+      </div>
+
+      <div class="nucleus-flex-fields">        
+        <SettingsControl caption="Index Name" helptext="Enter the index name to use for this site. The index will be created automatically.">
+          <div class="d-flex gap-1">
+            @Html.DropDownListFor(model => model.IndexName, new SelectList(Model.SearchIndexes), "(none)", new { @class="flex-1", @data_autopostbackevent = "change" })          
+            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#azuresearch-create-index-dialog">Create Index</button>
+          </div>
+        </SettingsControl>
+        
+        <SettingsControl caption="Azure Semantic Ranking Configuration" helptext="Select the Azure Search Semantic Ranking Configuration to use during search. This feature is only available in the Basic and higher Azure pricing tiers.">
+          <div class="d-flex gap-1">
+            @Html.DropDownListFor(model => model.SemanticConfigurationName, new SelectList(Model.Semanticonfigurations), "(not enabled)", new { @class = "flex-1" })
+            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#azuresearch-create-semantic-ranking-dialog">Add Semantic Ranking</button>
+          </div>
         </SettingsControl>
       </div>
 
       <div class="nucleus-flex-fields">
-        <SettingsControl caption="Azure Semantic Ranking Configuration" helptext="Select the Azure Search Semantic Ranking Configuration to use during search. This feature is only available in the Basic and higher Azure pricing tiers.">
-          @Html.DropDownListFor(model => model.SemanticConfigurationName, new SelectList(Model.Semanticonfigurations), "(none)")
-        </SettingsControl>
-
-        <button type="submit" class="btn btn-secondary" data-target=".nucleus-editor-panel.parent()" formaction="@Url.NucleusAction("Settings", "AzureSearchSettings", "AzureSearch")">Refresh</button>
-        <button type="submit" class="btn btn-success" data-target=".nucleus-editor-panel.parent()" data-confirm="This will create a Semantic Ranking Configuration for your index. If you already have a semantic ranking configuration, some settings may be overwritten. Do you want to continue?" formaction="@Url.NucleusAction("AddSemanticRanking", "AzureSearchSettings", "AzureSearch")">Create</button>
+        <button type="submit" class="btn btn-secondary nucleus-show-progress nucleus-show-progress-after" data-target=".nucleus-editor-panel.parent()" formaction="@Url.NucleusAction("Settings", "AzureSearchSettings", "AzureSearch")">Refresh</button>
       </div>
 
       <div class="mb-4">
-        <h3>Vectorization</h3>
-        @Html.HiddenFor(model => model.VectorizationEnabled)
-        @if (Model.VectorizationEnabled)
+        <h3>Vector Search</h3>
+        @Html.HiddenFor(model => model.UseVectorSearch)
+        @if (Model.UseVectorSearch)
         {
-          <div>Vectorization is enabled.</div>
+          <div class="mb-2">Vector search is enabled for this index.</div>
         }
         else
         {
           <div class="alert alert-warning">
+            <p>              
+              To use Vector search, you must first set up a Azure Open AI service and then create a "Model Deployment" for your Azure Open AI service. When you create
+              your deployment, select the 'text-embedding-3-small' model.
+            </p>
             <p>
-              To use Vectorization, you must first set up a Azure Open AI service and then create a "Deployment" for your Azure Open AI service. When you create
-              your deployment, select the 'text-embedding-ada-002' model. This feature is only available in the Basic and higher Azure pricing tiers.
+              This feature is only available in the Basic and higher Azure Search pricing tiers.
             </p>
             <p class="mb-0">
-              Make sure to review Azure Open AI pricing before enabling the service.
+              Make sure to review <a href="https://azure.microsoft.com/en-au/pricing/details/cognitive-services/openai-service/" target="blank">Azure Open AI pricing</a> before enabling the service.
             </p>
           </div>
         }
 
         <SettingsControl caption="Azure Open AI Endpoint" helptext="">
-          @Html.TextBoxFor(model => model.AzureOpenAIEndpoint)
+          @Html.TextBoxFor(model => model.OpenAIServiceSettings.AzureOpenAIEndpoint)
         </SettingsControl>
 
         <div class="nucleus-flex-fields">
@@ -64,67 +71,81 @@
           </SettingsControl>
 
           <SettingsControl caption="Azure Open AI Deployment Name" helptext="">
-            @Html.TextBoxFor(model => model.AzureOpenAIDeploymentName)
+            @Html.TextBoxFor(model => model.OpenAIServiceSettings.AzureOpenAIEmbeddingModelDeploymentName)
           </SettingsControl>
         </div>
 
-        @if (!Model.VectorizationEnabled)
+        @if (!Model.UseVectorSearch)
         {
-          <button type="submit" class="btn btn-success me-auto" data-target=".nucleus-editor-panel.parent()" data-confirm="This will enable vectorization by creating vector fields in your index, and adding vector search profiles, algorithms and vectorizer settings. This will create a Semantic Ranking Configuration for your index. If you already have a semantic ranking configuration, some settings may be overwritten. Do you want to continue? Once enabled, this setting can not be  disabled. Do you want to continue?" formaction="@Url.NucleusAction("AddVectorization", "AzureSearchSettings", "AzureSearch")">Enable Vectorization</button>
+          <button type="submit" class="btn btn-success me-auto" data-target=".nucleus-editor-panel.parent()" data-confirm="This will enable vector search by creating vector fields in your index, and adding vector search profiles, algorithms and vectorizer settings.<br/><br/>The Azure OpenAI service is charged by Microsoft based on usage, please make sure you aware of pricing before enabling this feature.<br/><br/>Once enabled for an index, this setting can not be disabled. Do you want to continue?" formaction="@Url.NucleusAction("AddVectorization", "AzureSearchSettings", "AzureSearch")">Enable Vector Search</button>
         }
       </div>
 
       <div class="nucleus-flex-fields">
-        <SettingsControl caption="Azure Search Indexer" helptext="Select the Azure Search indexer to use during feed.">
-          @Html.DropDownListFor(model => model.IndexerName, new SelectList(Model.Indexers), "(none)")
+        <SettingsControl caption="Attachments Size Limit (mb)" helptext="Enter maximum file size to submit to the Azure search server for indexing. A value of zero specifies no limit.">
+          @Html.TextBoxFor(model => model.AttachmentMaxSize, new { @type = "number", @class = "attachments-size-limit" })
         </SettingsControl>
-        <button type="submit" class="btn btn-secondary" data-target=".nucleus-editor-panel.parent()" formaction="@Url.NucleusAction("Settings", "AzureSearchSettings", "AzureSearch")">Refresh</button>
-        <button type="submit" class="btn btn-success" data-target=".nucleus-editor-panel.parent()" data-confirm="This will create or update a Azure Blob Storage data source and a search indexer. If you already have a data source and/or indexer, some settings may be overwritten. Do you want to continue?" formaction="@Url.NucleusAction("CreateIndexer", "AzureSearchSettings", "AzureSearch")">Create</button>
+
+        <div class="w-75">
+          <SettingsControl caption="Indexing Pause (seconds)" helptext="Specifies the pause time (in seconds) between indexing operations.  In some environments (particularly Azure), indexing requests which are sent in rapid succession can exhaust available server resources (In Azure, SNAT ports).  This setting causes the search feed to pause between requests, which gives the server time to release unused resources.  The default value is 1.">
+            @Html.RangeFor(model => model.IndexingPause, 0, 15, 0.5)
+          </SettingsControl>
+        </div>     
       </div>
 
-      <SettingsControl caption="Attachments Size Limit (mb)" helptext="Enter maximum file size to submit to the Azure search server for indexing. A value of zero specifies no limit.">
-        @Html.TextBoxFor(model => model.AttachmentMaxSize, new { @type = "number", @class = "attachments-size-limit" })
+
+      <h3>Azure Data Sources</h3>
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th>Provider</th>
+            <th>Indexer</th>
+            <th class="nucleus-small-cell"></th>
+          </tr>
+        </thead>
+      @foreach(var dataSource in Model.DataSources)
+      {
+        <tr>
+          <td>@dataSource.FileSystemProviderName</td>
+          <td>@(String.IsNullOrEmpty(dataSource.IndexerName) ? "Not configured" : dataSource.IndexerName)</td>
+          <td class="nucleus-small-cell text-nowrap">
+            @if (String.IsNullOrEmpty(dataSource.IndexerName))
+            {
+              <button type="submit" class="btn btn-success btn-sm ms-auto nucleus-show-progress nucleus-show-progress-before" data-target=".nucleus-editor-panel.parent()" data-confirm="This will create or update a indexing data source and a search indexer for your Azure Blob Storage service. If you already have a data source, indexer or skill set, some settings may be overwritten. Do you want to continue?" formaction="@Url.NucleusAction("CreateIndexer", "AzureSearchSettings", "AzureSearch", new { @key = dataSource.FileSystemProviderKey })">Add Indexer</button>
+            }
+            else
+            {
+              <button type="submit" class="btn btn-danger btn-sm ms-auto" data-target=".nucleus-editor-panel.parent()" data-confirm="Do you want to remove the Azure Search indexer and data source for @(dataSource.FileSystemProviderName)?" formaction="@Url.NucleusAction("RemoveIndexer", "AzureSearchSettings", "AzureSearch", new { @indexerName = dataSource.IndexerName })">Remove Indexer</button>
+            }
+          </td>
+        </tr>
+      }
+
+      </table>
+    </fieldset>
+
+    <Modal id="azuresearch-create-index-dialog" title="Create Index" can-close="true" modal-class="modal-auto-size">
+      <SettingsControl caption="Index Name" helptext="Enter a name for your search index.">
+        @Html.TextBoxFor(model => model.NewIndexName, new { })
+      </SettingsControl>
+      <div class="nucleus-form-buttonrow">
+        <button type="submit" class="btn btn-success me-auto nucleus-show-progress nucleus-show-progress-after" data-target=".nucleus-editor-panel.parent()" formaction="@Url.NucleusAction("CreateIndex", "AzureSearchSettings", "AzureSearch")">Create Index</button>
+      </div>
+    </Modal>
+
+    <Modal id="azuresearch-create-semantic-ranking-dialog" title="Create Semantic Configuration" can-close="true" modal-class="modal-auto-size">
+      <div class="alert alert-info">
+        This will create a Semantic Ranking Configuration for your index. Semantic Ranking is charged by Microsoft based on usage. 
+        <a href="https://azure.microsoft.com/en-au/pricing/details/search/" target="_blank">Azure AI Search pricing</a>.
+      </div>
+      <SettingsControl caption="Semantic Ranking Configuration Name" helptext="Enter a name for your Semantic Ranking Configuration.">
+        @Html.TextBoxFor(model => model.NewSemanticRankingConfigurationName, new { })
       </SettingsControl>
 
-      <div class="w-75">
-        <SettingsControl caption="Indexing Pause (seconds)" helptext="Specifies the pause time (in seconds) between indexing operations.  In some environments (particularly Azure), indexing requests which are sent in rapid succession can exhaust available server resources (In Azure, SNAT ports).  This setting causes the search feed to pause between requests, which gives the server time to release unused resources.  The default value is 1.">
-          @Html.RangeFor(model => model.IndexingPause, 0, 15, 0.5)
-        </SettingsControl>
+      <div class="nucleus-form-buttonrow">
+        <button type="submit" class="btn btn-success me-auto nucleus-show-progress nucleus-show-progress-after" data-target=".nucleus-editor-panel.parent()" formaction="@Url.NucleusAction("AddSemanticRanking", "AzureSearchSettings", "AzureSearch")">Create Semantic Configuration</button>
       </div>
-
-
-      @* <h3>Boost</h3>
-    <div class="w-75">
-    <SettingsControl caption="Title" helptext="Title boost.  The default value is 1.">
-    @Html.RangeFor(model => model.Boost.Title, 0.5, 5, 0.5)
-    </SettingsControl>
-    <SettingsControl caption="Summary" helptext="Summary boost.  The default value is 1.">
-    @Html.RangeFor(model => model.Boost.Summary, 0.5, 5, 0.5)
-    </SettingsControl>
-    <SettingsControl caption="Categories" helptext="Categories boost.  The default value is 1.">
-    @Html.RangeFor(model => model.Boost.Categories, 0.5, 5, 0.5)
-    </SettingsControl>
-    <SettingsControl caption="Keywords" helptext="Keywords boost.  The default value is 1.">
-    @Html.RangeFor(model => model.Boost.Keywords, 0.5, 5, 0.5)
-    </SettingsControl>
-    <SettingsControl caption="Content" helptext="Content boost.  The default value is 1.  For web pages, the page content and meta-data is the search content.  For files, the file content is the search content.">
-    @Html.RangeFor(model => model.Boost.Content, 0.5, 5, 0.5)
-    </SettingsControl>
-
-    <SettingsControl caption="Attachment Title" helptext="Attachment Title boost.  The default value is 1.">
-    @Html.RangeFor(model => model.Boost.AttachmentTitle, 0.5, 5, 0.5)
-    </SettingsControl>
-    <SettingsControl caption="Attachment Name" helptext="Attachment Name (file name) boost.  The default value is 1.">
-    @Html.RangeFor(model => model.Boost.AttachmentName, 0.5, 5, 0.5)
-    </SettingsControl>
-    <SettingsControl caption="Attachment Author" helptext="Attachment Author boost.  The default value is 1.">
-    @Html.RangeFor(model => model.Boost.AttachmentAuthor, 0.5, 5, 0.5)
-    </SettingsControl>
-    <SettingsControl caption="Attachment Keywords" helptext="Attachment keywords boost.  The default value is 1.">
-    @Html.RangeFor(model => model.Boost.AttachmentKeywords, 0.5, 5, 0.5)
-    </SettingsControl>
-    </div>*@
-    </fieldset>
+    </Modal>
 
     <div class="nucleus-form-buttonrow">
       @Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "AzureSearchSettings", "AzureSearch"), new { })

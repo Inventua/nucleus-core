@@ -185,7 +185,20 @@ public class FileSystemController : Controller
         try
         {
           Nucleus.Abstractions.Models.FileSystem.File file = await this.FileSystemManager.GetFile(this.Context.Site, searchResult.SourceId.Value);
-          searchResult.Title = $"{searchResult.Title} [{file.Parent.Provider}/{file.Parent.Path}]";
+          //searchResult.Title = $"{searchResult.Title} [{file.Parent.Provider}/{file.Parent.Path}]";
+          viewModel.ResultPaths[searchResult.SourceId.Value] = $"{file.Parent.Provider}/{file.Parent.Path}";
+        }
+        catch (System.IO.FileNotFoundException)
+        {
+          // suppress exception
+        }
+      }
+      else if (searchResult.Scope == Nucleus.Abstractions.Models.FileSystem.Folder.URN)
+      {
+        try
+        {
+          Nucleus.Abstractions.Models.FileSystem.Folder folder = await this.FileSystemManager.GetFolder(this.Context.Site, searchResult.SourceId.Value);
+          viewModel.ResultPaths[searchResult.SourceId.Value] = $"{folder.Parent.Provider}/{folder.Parent.Path}";
         }
         catch (System.IO.FileNotFoundException)
         {
@@ -872,7 +885,8 @@ public class FileSystemController : Controller
     {
       Site = this.Context.Site,
       SearchTerm = searchTerm,
-      PagingSettings = pagingSettings
+      PagingSettings = pagingSettings,
+      Options = SearchQuery.QueryOptions.None
     };
 
     List<Role> roles = new() { this.Context.Site.AllUsersRole };

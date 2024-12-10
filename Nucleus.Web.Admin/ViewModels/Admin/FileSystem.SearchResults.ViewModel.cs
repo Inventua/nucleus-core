@@ -9,4 +9,6 @@ public class FileSystemSearchResults
   public string SearchTerm { get; set; }
   public PagingSettings PagingSettings { get; set; }
   public  Nucleus.Abstractions.Search.SearchResults Results { get; set; }
+
+  public Dictionary<Guid, string> ResultPaths { get; set; } = [];
 }

@@ -423,7 +423,11 @@ public class AzureAI
   private static string BuildPageNumberFilter()
   {
     // We exclude "page 0" from search results, because it is a repeat of the main document (index entry)
-    return "PageNumber ne 1";
+    //return "ChunkNumber ne 1";
+
+    // removed: new logic generally leaves the "main" (parent) entry content field as null, so there isn't 
+    // duplicate content anymore
+    return "";
   }
 
   private static DataSourceFieldMappings BuildFieldMappings()

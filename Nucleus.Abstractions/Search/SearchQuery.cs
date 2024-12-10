@@ -7,35 +7,54 @@ using Nucleus.Abstractions.Models;
 
 namespace Nucleus.Abstractions.Search
 {
-	/// <summary>
-	/// Specifies search query parameters.
-	/// </summary>
-	public class SearchQuery
-	{
-		/// <summary>
-		/// Specifies the site to show results for.
-		/// </summary>
-		public Site Site { get; set; }
+  /// <summary>
+  /// Specifies search query parameters.
+  /// </summary>
+  public class SearchQuery
+  {
+    /// <summary>
+    /// Specifies the site to show results for.
+    /// </summary>
+    public Site Site { get; set; }
 
-		/// <summary>
-		/// Specifies the roles that the current user belongs to.
-		/// </summary>
-		/// <remarks>
-		/// This value is used to filter the results so that only results which the user can view are shown.
-		/// </remarks>
+    /// <summary>
+    /// Specifies the roles that the current user belongs to.
+    /// </summary>
+    /// <remarks>
+    /// This value is used to filter the results so that only results which the user can view are shown.
+    /// </remarks>
 #pragma warning disable CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
-		public IEnumerable<Role>? Roles { get; set; }
+    public IEnumerable<Role>? Roles { get; set; }
 #pragma warning restore CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
 
-		/// <summary>
-		/// Specifies the search term to search for.
-		/// </summary>
-		public string SearchTerm { get; set; }
+    /// <summary>
+    /// Specifies the search term to search for.
+    /// </summary>
+    public string SearchTerm { get; set; }
 
-		/// <summary>
-		/// Specifies whether all search terms must be present in each result (true), or whether any search terms must be present (false).
-		/// </summary>
-		public Boolean StrictSearchTerms { get; set; }
+    /// <summary>
+    /// Specifies whether all search terms must be present in each result (true), or whether any search terms must be present (false).
+    /// </summary>
+    public Boolean StrictSearchTerms { get; set; }
+
+    [Flags]
+    public enum QueryOptions
+    {
+      /// <summary>
+      /// All options off
+      /// </summary>
+      None = 0,
+
+      /// <summary>
+      /// Specifies whether to highlight search terms in results.
+      /// </summary>
+      Highlight = 1
+    }
+
+    /// <summary>
+    /// Specifies search options.
+    /// </summary>
+    public QueryOptions Options { get; set; } = QueryOptions.Highlight;
 
 		/// <summary>
 		/// Specifies scopes to include.
@@ -63,6 +82,8 @@ namespace Nucleus.Abstractions.Search
 		/// ignore these settings.  The default boost for all fields is 1.  
 		/// </remarks>
 		public BoostSettings Boost { get; set; }
+
+
 
 		/// <summary>
 		/// Specifies boost settings.

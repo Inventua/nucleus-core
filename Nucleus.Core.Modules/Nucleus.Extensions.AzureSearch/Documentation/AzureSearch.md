@@ -3,11 +3,12 @@ The Azure Search extension provides a search index manager and a search provider
 
 > 1. You need an 
 [Azure Search](https://learn.microsoft.com/en-us/azure/search/search-what-is-azure-search) service to use the Azure Search provider.  
-> 2. Azure Search can only extract content from files (like PDFs, Word documents and other formats) which are stored in an 
-[Azure Blob Storage](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction) service. If you want to extract content from files 
-for inclusion in the search index and are not using Azure Storage, you should choose another search provider, like [Elastic Search](/other-extensions/elastic-search/) or
-[Typesense](/other-extensions/typesense-search). If you just want to index file meta-data, along with your site content, you can use Azure Search without 
-storing your files in Azure Blob Storage, but you won't get results when searching terms from within your file's contents.
+> 2. Azure Search can extract content from files (like PDFs, Word documents and other formats) which are stored in an 
+[Azure Blob Storage](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction) service. \
+For files which are stored elsewhere (not in Blob Storage), the Azure Search extension will try to convert them to text in order to generate 
+vectors, but you may need a content conversion extension for some file types. The Nucleus built-in basic content converter can handle PDF and text formats.\
+If you just want to index file meta-data, along with your site content, you can use Azure Search without storing your files in Azure Blob Storage, but 
+you won't get results when searching terms from within your file's contents. 
 
 ### How it works
 
@@ -17,23 +18,28 @@ The Nucleus search system is built to support a variety of search services. The 
 core includes meta-data providers for site pages and files, and modules (like Documents and Forums) also publish their data by implementing their own meta-data 
 providers.
 - **Search index managers**: Search extensions may implement a search index manager in order to populate an index. All configured search index managers receive all
-data from meta-data providers, and use meta-data however to populate their index. Some search extensions (like a Google custom search) don't have a search index 
+data from meta-data providers, and use meta-data to populate their index. Some search extensions (like a Google custom search) don't have a search index 
 manager and just provide a search provider. 
-- **Search providers**: Search providers retrieve search results from an index.
+- **Search providers**: Search providers are called by the search module (and from other Nucleus components and extensions) to retrieve search results from an index.
 - The **[Search Module](/documentation/modules/search/)** presents a search user interface so that users can perform a search, and view results.
-- A [search feeder scheduled task](/other-extensions/azure-search/#search-feeder-scheduled-task) runs periodically. It calls all meta-data providers and passes their data to all search index managers.
+- The [search feeder scheduled task](/other-extensions/azure-search/#search-feeder-scheduled-task) runs periodically. It calls all meta-data providers and passes their data to all search index managers.
 
-The Azure Search extension provides a search index manager and a search provider, so it can populate your Azure Search index, and query it for search results.
+The Azure Search extension provides a search index manager and a search provider, so it can populate your Azure Search index, and query it for search results. The 
+settings page provides a user interface to create and manage your search Azure Search **index** settings and Azure Search **indexers, data sources and skill sets**.
+
+> Make sure to check pricing for Azure services before enabling them. Microsoft charges extra for 
+[semantic ranking (pricing)](https://learn.microsoft.com/en-us/azure/search/semantic-search-overview#availability-and-pricing) and 
+[AI services (pricing)](https://azure.microsoft.com/en-au/pricing/details/cognitive-services/) in addition to your Azure Search service.
 
 #### Azure Search
 The Azure Search index feed process consists of two parts: 
-- A "push" feed (search index manager) which runs on your server, and populates the Azure Search index with site content from Nucleus. File meta-data is 
-saved in your index by the "push" feed, but file content is not extracted and added to the index, because the Azure Search service doesn't support 
-[document cracking](stage-1-document-cracking#stage-1-document-cracking) from a push feed. \
-An exception to this is text files. The contents of plain text and markdown files are included in the index by the "push" feed.
-- A "pull" feed - which is an [Azure Search Indexer](https://learn.microsoft.com/en-us/azure/search/search-indexer-overview) - extracts document content from 
-files stored in your Azure Blob Storage service. The indexer runs in Azure and supplements the data in your index with content from within your files. If 
-selected, the indexer is executed automatically during the "push" feed process. \
+- The "push" feed (search index manager) which runs on your web server, and populates the Azure Search index with content from Nucleus. File meta-data is 
+saved in your index by the "push" feed.  File content can be extract if you have a content conversion extension which can handle the relevant file type. \
+The Nucleus core **Basic Content Converter** can handle HTML, Markdown and PDF formats, and text files are included in the index by the "push" feed because they 
+don't need conversion.
+- The "pull" feed - which is one or more [Azure Search Indexers](https://learn.microsoft.com/en-us/azure/search/search-indexer-overview) - extracts document 
+content from files stored in your Azure Blob Storage service. The indexer runs in Azure and supplements the data in your index with content from within 
+your files. Indexers are executed automatically during the "push" feed process. \
 \
 It doesn't matter what order the "push" and "pull" feeds run in, as they each update different fields in the index, but
 your content won't be searchable until the "push" feed has run, because the meta-data that is populated in the index is 
@@ -48,10 +54,17 @@ The Azure Search extension settings are accessed in the `Manage` control panel.
 {.table-25-75}
 |                           |                                                                                      |
 |---------------------------|--------------------------------------------------------------------------------------|
-| Azure Search Server Url   | Enter the domain name or address of the Azure Search service, including the scheme (http: or https:). The Azure Search service Url is displayed in the Azure Portal/Azure Search/Overview page. |
-| Index Name                | Enter an index name.  The index is created automatically.  Index names must be lower case, can contain only letters, numbers, dashes and underscores and must be 2-128 characters. |
+| Azure Search Server Endpoint  | Enter the address of your Azure Search service, including the scheme (http: or https:). The Azure Search service endpoint is displayed in the Azure Portal/Azure Search/Overview page. |
 | Api Key                   | Enter your Azure Search service API key. You can get your API key from the Azure Portal/Azure Search/Settings/Keys page. |
-| Azure Search Indexer      | If specified, the selected indexer is automatically executed when Nucleus feeds data to your Azure Search index. <br />You can automatically create an indexer by clicking the `Create` button on the right-hand side of the settings page. |
+| Index Name                | Select an index name.   |
+| - Create Index            | Create a new index: Index names must be lower case, can contain only letters, numbers, dashes and underscores and must be 2-128 characters.
+| Azure Semantic Ranking Configuration | If specified, the selected Semantic Ranking Configuration is used when performing a search. |
+| - Create Semantic Ranking Configuration | Create a new Semantic Ranking Configuration and enable semantic ranking.
+| Vector Search             | Vector search is not enabled by default, because it uses Azure OpenAI, which must be set up separately and is charged by Microsoft based on usage. |
+| -  Azure OpenAI Endpoint  | Enter the address of your Azure OpenAI service, including the scheme (http: or https:). Your Azure OpenAI service endpoint is displayed when you click "Click here to view endpoints" in the Azure Portal/OpenAI/Overview page or in [Azure OpenAI studio](https://ai.azure.com/). |
+| -  Azure OpenAI API Key   | Enter your Azure OpenAI service API key.  Your Azure OpenAI service keys are displayed when you click "Click here to view endpoints" in the Azure Portal/OpenAI/Overview page or in [Azure OpenAI studio](https://ai.azure.com/). |
+| -  Azure OpenAI Deployment Name | Enter your Azure OpenAI service embeddings model deployment name. Azure OpenAI model deployments are set up in [Azure OpenAI studio](https://ai.azure.com/). |
+| Enable Vector Search      | Click "Enable Vector Search" to enable and configure vector search for your index.
 | Attachments Size Limit    | You can specify an upper size limit (in mb) for documents which are submitted to the index.  Documents which are larger than the size limit will have index entries containing meta-data only.  To specify no limit, enter zero (0). |
 | Indexing Pause            | You can specify an pause in-between each indexing operation (in seconds), or zero for no pause. See additional information below. |
 
@@ -68,34 +81,30 @@ number of HTTP requests to 24 per minute, which gives the Azure time to release 
 [SNAT](https://learn.microsoft.com/en-us/azure/load-balancer/load-balancer-outbound-connections) ports.  For a search index with 5000 entries, this would 
 increase the search feed duration to around 3.5 hours.
 
+### Azure Data Sources
+Your Azure file system providers are listed automatically.  
+
+{.table-25-75}
+|                           |                                                                                      |
+|---------------------------|--------------------------------------------------------------------------------------|
+| Add Indexer               | Use the `Add Indexer` button to automatically create an indexer, data source and skill set for your Azure Storage files. |
+| Remove Indexer            | Use the `Remove Indexer` button to remove your previously-created indexer and data source. If you remove the last indexer that uses your skill set, it is also removed. |
+| Reset Indexer             | Use the `Reset Indexer` button to delete indexing tracking data from Azure Search. This triggers a full re-index the next time that indexing runs. |
+
 ### Tools
 |                           |                                                                                      |
 |---------------------------|--------------------------------------------------------------------------------------|
 | Get Index Count           | Displays the number of entries in the index, for use when troubleshooting or verifying that your server is functioning correctly. |
-| Clear Index               | Use the `Clear Index` function to delete your index.  It will be automatically re-created the next time that the index feeder task runs. |
-| Create Indexer            | Use the `Create` button next to the `Azure Search Indexer` drop-down to automatically create an indexer for your Azure Storage files. |
+| Re-Index                  | Use the `Re-Index` function to remove search indexing history to trigger full indexing the next time that the Search Feed scheduled task runs. |
+
+**Scoring Profiles**: The Azure Search extension automatically creates a **scoring profile** for your index in Azure and sets it as the default. Refer to the 
+Microsoft documentation for [Scoring Profiles](https://learn.microsoft.com/en-us/azure/search/index-add-scoring-profiles) for more information.
 
 ## Search Feeder Scheduled Task
 > Nucleus has a built-in [Scheduled Task](/manage/task-scheduler/) which collects data from all installed search meta-data providers, and submits that data to all installed 
 search index managers.  You must create and enable the scheduled task in the `Settings/Scheduler` control panel as it is not enabled by default.
 
 ![Search Feed Scheduled Task](azuresearch-task.png)
-
-## Advanced Settings
-
-**Scoring Profiles**: If you want to control the weighting of fields when scoring search results (also known as "boost" settings), you can create a "scoring profile" for 
-your index in the Azure Portal. Refer to the Microsoft documentation for 
-[Scoring Profiles](https://learn.microsoft.com/en-us/azure/search/index-add-scoring-profiles) for more information.
-
-**Semantic Ranking**: For paid Azure Search service tiers, you can enable [semantic ranking](https://learn.microsoft.com/en-us/azure/search/semantic-search-overview) to 
-improve search relevance. You can enable semantic ranking in Azure Portal. 
-
-**Skillsets**: You can configure [skill sets](https://learn.microsoft.com/en-us/azure/search/cognitive-search-working-with-skillsets) in Azure Portal to enrich your document (file) 
-content when the Azure Search indexer runs. Most built-in skill sets use Azure AI Services.
-
-> *Note:* Make sure to check pricing for Azure services before enabling them. Microsoft charges extra for 
-[semantic ranking (pricing)](https://learn.microsoft.com/en-us/azure/search/semantic-search-overview#availability-and-pricing) and
-[AI services (pricing)](https://azure.microsoft.com/en-au/pricing/details/cognitive-services/) in addition to your Azure Search service. 
 
 ## Supported Capabilities
 The Azure Search provider supports all of the capabilities of the Nucleus [Search Module](/documentation/modules/search/).
@@ -113,3 +122,4 @@ The Azure Search provider supports all of the capabilities of the Nucleus [Searc
 | - Published Date             | Yes                                                |
 | - Resource Type              | Yes                                                |
 | - Matched Terms Highlighting | Yes                                                |
+| Clear Index                  | No                                                 |

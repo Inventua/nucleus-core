@@ -93,14 +93,9 @@ public class AzureSearchIndexManager : ISearchIndexManager
     return _request;
   }
 
-  public async Task ClearIndex(Site site)
+  public Task ClearIndex(Site site)
   {
-    if (site == null)
-    {
-      throw new NullReferenceException("site must not be null.");
-    }
-
-    await this.AzureRequest(site).ClearIndex();
+    throw new NotSupportedException("The Azure Search extension does not support the 'Clear Index' operation.");
   }
 
   public async Task Index(ContentMetaData metadata)

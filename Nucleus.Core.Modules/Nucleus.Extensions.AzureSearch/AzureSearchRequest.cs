@@ -183,25 +183,6 @@ internal partial class AzureSearchRequest
     return name;
   }
 
-  public async Task<Boolean> ClearIndex()
-  {
-    SearchIndexClient client = await this.SearchIndexClient();
-
-    // get a copy of the index definition
-    Response<SearchIndex> searchIndex = await client.GetIndexAsync(this.Settings.IndexName);
-
-    Boolean result = await this.DeleteIndex();
-
-    // re-create the index
-    Response<SearchIndex> createIndexResponse = await client.CreateIndexAsync(searchIndex);
-
-    // reset Azure search indexers
-    await this.ResetIndexers();
-
-
-    return result;
-  }
-
   public async Task<List<SearchIndexer>> ListIndexers()
   {
     SearchIndexerClient client = new(new(this.Settings.AzureSearchServiceEndpoint), new AzureKeyCredential(AzureSearchSettings.Decrypt(this.Site, this.Settings.AzureSearchServiceEncryptedApiKey)));
@@ -474,9 +455,20 @@ internal partial class AzureSearchRequest
         {
           await RunIndexer(indexer.Name);
         }
-        catch (Exception ex)
+        catch (Azure.RequestFailedException ex)
         {
-          this.Logger.LogError(ex, "Running Indexer '{name}'.", indexer.Name);
+          if (ex.Status == (int)System.Net.HttpStatusCode.Conflict)
+          {
+            // Another indexer invocation is currently in progress. This is not an error condition: If the indexer is already running, we 
+            // don't need to run it.
+            this.Logger.LogInformation(ex, "Running Indexer '{name}'.", indexer.Name);
+          }
+          else
+          { 
+            // Any other error, log as an error, but continue anyway, a problem running an indexer should not stop the rest of the indexing
+            // process.
+            this.Logger.LogError(ex, "Running Indexer '{name}'.", indexer.Name);
+          }
         }
       }
     }

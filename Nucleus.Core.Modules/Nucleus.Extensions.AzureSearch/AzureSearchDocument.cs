@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Azure.Search.Documents.Indexes;
 using Azure.Search.Documents.Indexes.Models;
-using HtmlAgilityPack;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Search;
 
@@ -23,7 +21,6 @@ namespace Nucleus.Extensions.AzureSearch;
 internal class AzureSearchDocument : IDisposable
 {
   private bool disposedValue;
-  private readonly string[] HtmlElements = ["div", "span", "p", "h1", "h2", "h3", "h4", "h5", "h6", ""];
 
   /// <summary>
   /// Constructor used by deserialization.
@@ -66,53 +63,7 @@ internal class AzureSearchDocument : IDisposable
     this.IsSecure = !IsPublic(content.Site, content.Roles ?? []);
 
     this.IndexingDate = DateTime.UtcNow;
-  }
-
-  
-
-  public string? ToText(ContentMetaData metaData)
-  {
-    switch (metaData.ContentType)
-    {
-      case "text/html":
-        HtmlAgilityPack.HtmlDocument htmlContent = new();
-        htmlContent.LoadHtml(System.Text.Encoding.UTF8.GetString(metaData.Content));
-
-        return ConvertHtmlToPlainText(new StringBuilder(), htmlContent.DocumentNode).ToString();
-
-      case "text/plain":
-      case "text/csv":
-      case "text/markdown":
-        return System.Text.Encoding.UTF8.GetString(metaData.Content);
-
-      default:
-        // Azure search cannot process file content from a feed, the search service must be set up with "Indexers" that run in the Azure Cloud
-        // to collect and parse file content.
-        return null;
-    }
-  }
-
-  private StringBuilder ConvertHtmlToPlainText(StringBuilder builder, HtmlNode node)
-  {
-    foreach (HtmlNode subnode in node.ChildNodes)
-    {
-      if (subnode.NodeType == HtmlNodeType.Text && HtmlElements.Contains(node.Name, StringComparer.OrdinalIgnoreCase))
-      {
-        // Append the text of the current node to the StringBuilder
-        if (!String.IsNullOrWhiteSpace(subnode.InnerText))
-        {
-          builder.AppendLine(System.Web.HttpUtility.HtmlDecode(subnode.InnerText.Trim()));
-        }
-      }
-      else if (subnode.NodeType == HtmlNodeType.Element)
-      {
-        // Recursively convert the child nodes to plain text
-        ConvertHtmlToPlainText(builder, subnode);
-      }
-    }
-
-    return builder;
-  }
+  } 
 
   private static string GenerateId(ContentMetaData content)
   {
@@ -148,7 +99,7 @@ internal class AzureSearchDocument : IDisposable
   /// <summary>
   /// This Id of the site which the resource belongs to.
   /// </summary>
-  [SimpleField(IsFilterable = true)]
+  [SimpleField(IsFilterable = true, IsFacetable = true)]
   public string? SiteId { get; set; }
 
   /// <summary>
@@ -235,7 +186,7 @@ internal class AzureSearchDocument : IDisposable
   /// This value should be set to the MIME type of the Content field.  This value is used for search result filtering and also
   /// to tell Azure Search what content type is in the content field.
   /// </remarks>
-  [SearchableField(AnalyzerName = LexicalAnalyzerName.Values.EnMicrosoft)]
+  [SearchableField(AnalyzerName = LexicalAnalyzerName.Values.EnMicrosoft, IsFacetable = true, IsFilterable = true)]
   public string? ContentType { get; set; } = "";  // metadata_content_type
 
   /// <summary>

@@ -10,7 +10,7 @@
   {
     <fieldset role="group" aria-label="Settings" class="flex-1">
       <div class="nucleus-flex-fields">
-        <SettingsControl caption="Azure Search Server Url" helptext="Enter the URL for your Azure Search service.">
+        <SettingsControl caption="Azure Search Server Endpoint (url)" helptext="Enter the URL for your Azure Search service.">
           @Html.TextBoxFor(model => model.AzureSearchServiceEndpoint)
         </SettingsControl>
         <SettingsControl caption="Api Key" helptext="Enter your Azure search Api Key.  You can find this value in Azure Portal/Azure Search/Settings/Keys.">
@@ -49,28 +49,28 @@
         {
           <div class="alert alert-warning">
             <p>              
-              To use Vector search, you must first set up a Azure Open AI service and then create a "Model Deployment" for your Azure Open AI service. When you create
+              To use Vector search, you must first set up a Azure OpenAI service and then create a "Model Deployment" for your Azure OpenAI service. When you create
               your deployment, select the 'text-embedding-3-small' model.
             </p>
             <p>
               This feature is only available in the Basic and higher Azure Search pricing tiers.
             </p>
             <p class="mb-0">
-              Make sure to review <a href="https://azure.microsoft.com/en-au/pricing/details/cognitive-services/openai-service/" target="blank">Azure Open AI pricing</a> before enabling the service.
+              Make sure to review <a href="https://azure.microsoft.com/en-au/pricing/details/cognitive-services/openai-service/" target="blank">Azure OpenAI pricing</a> before enabling the service.
             </p>
           </div>
         }
 
-        <SettingsControl caption="Azure Open AI Endpoint" helptext="">
+        <SettingsControl caption="Azure OpenAI Endpoint" helptext="">
           @Html.TextBoxFor(model => model.OpenAIServiceSettings.AzureOpenAIEndpoint)
         </SettingsControl>
 
         <div class="nucleus-flex-fields">
-          <SettingsControl caption="Azure Open AI Key" helptext="">
+          <SettingsControl caption="Azure OpenAI API Key" helptext="">
             @Html.PasswordFor(model => model.AzureOpenAIApiKey, new { @value = Model.AzureOpenAIApiKey })
           </SettingsControl>
 
-          <SettingsControl caption="Azure Open AI Deployment Name" helptext="">
+          <SettingsControl caption="Azure OpenAI Deployment Name" helptext="">
             @Html.TextBoxFor(model => model.OpenAIServiceSettings.AzureOpenAIEmbeddingModelDeploymentName)
           </SettingsControl>
         </div>
@@ -109,14 +109,17 @@
           <td>@dataSource.FileSystemProviderName</td>
           <td>@(String.IsNullOrEmpty(dataSource.IndexerName) ? "Not configured" : dataSource.IndexerName)</td>
           <td class="nucleus-small-cell text-nowrap">
-            @if (String.IsNullOrEmpty(dataSource.IndexerName))
-            {
-              <button type="submit" class="btn btn-success btn-sm ms-auto nucleus-show-progress nucleus-show-progress-before" data-target=".nucleus-editor-panel.parent()" data-confirm="This will create or update a indexing data source and a search indexer for your Azure Blob Storage service. If you already have a data source, indexer or skill set, some settings may be overwritten. Do you want to continue?" formaction="@Url.NucleusAction("CreateIndexer", "AzureSearchSettings", "AzureSearch", new { @key = dataSource.FileSystemProviderKey })">Add Indexer</button>
-            }
-            else
-            {
-              <button type="submit" class="btn btn-danger btn-sm ms-auto" data-target=".nucleus-editor-panel.parent()" data-confirm="Do you want to remove the Azure Search indexer and data source for @(dataSource.FileSystemProviderName)?" formaction="@Url.NucleusAction("RemoveIndexer", "AzureSearchSettings", "AzureSearch", new { @indexerName = dataSource.IndexerName })">Remove Indexer</button>
-            }
+              <div class="d-flex gap-2 ms-auto align-items-center">
+              @if (String.IsNullOrEmpty(dataSource.IndexerName))
+              {
+                <button type="submit" class="btn btn-success btn-sm nucleus-show-progress nucleus-show-progress-before" data-target=".nucleus-editor-panel.parent()" data-confirm="This will create or update a indexing data source and a search indexer for your Azure Blob Storage service. If you already have a data source, indexer or skill set, some settings may be overwritten. Do you want to continue?" formaction="@Url.NucleusAction("CreateIndexer", "AzureSearchSettings", "AzureSearch", new { @key = dataSource.FileSystemProviderKey })">Add Indexer</button>
+              }
+              else
+              {
+                <button type="submit" class="btn btn-secondary btn-sm nucleus-show-progress nucleus-show-progress-before" data-target=".nucleus-editor-panel.parent()" data-confirm="Resetting an index clears Azure Search tracking and causes a full re-index of all documents in Azure Blob Storage for '@(dataSource.FileSystemProviderName)'. Do you want to continue?" formaction="@Url.NucleusAction("ResetIndexer", "AzureSearchSettings", "AzureSearch", new { @indexerName = dataSource.IndexerName })">Reset Indexer</button>
+                <button type="submit" class="btn btn-danger btn-sm nucleus-show-progress nucleus-show-progress-before" data-target=".nucleus-editor-panel.parent()" data-confirm="Do you want to remove the Azure Search indexer and data source for @(dataSource.FileSystemProviderName)?" formaction="@Url.NucleusAction("RemoveIndexer", "AzureSearchSettings", "AzureSearch", new { @indexerName = dataSource.IndexerName })">Remove Indexer</button>
+              }
+            </div>
           </td>
         </tr>
       }
@@ -150,8 +153,7 @@
     <div class="nucleus-form-buttonrow">
       @Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "AzureSearchSettings", "AzureSearch"), new { })
       @Html.SubmitButton("", "Get Index Count", @Url.NucleusAction("GetIndexCount", "AzureSearchSettings", "AzureSearch"), new { })
-      @* @Html.SubmitButton("", "Get Index Settings", @Url.NucleusAction("GetIndexSettings", "AzureSearchSettings", "AzureSearch"), new { }) *@
-      @Html.SubmitButton("", "Clear Index", @Url.NucleusAction("ClearIndex", "AzureSearchSettings", "AzureSearch"), new { @class = "btn btn-danger", @data_confirm = "This will delete the selected Azure Search index, and then automatically re-create it.  Do you want to continue?" })
+      @Html.SubmitButton("", "Re-Index", @Url.NucleusAction("ReIndex", "AzureSearchSettings", "AzureSearch"), new { @class = "btn btn-danger", @data_confirm = "This will delete all search indexing history and reset all Azure Search indexers for the selected index.  Do you want to continue?" })
     </div>
   }
 </div>

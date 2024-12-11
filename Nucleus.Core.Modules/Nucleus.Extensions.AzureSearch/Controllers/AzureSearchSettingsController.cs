@@ -73,21 +73,15 @@ public class AzureSearchSettingsController : Controller
 
   [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
   [HttpPost]
-  public async Task<ActionResult> ClearIndex(ViewModels.Settings viewModel)
+  public async Task<ActionResult> ReIndex(ViewModels.Settings viewModel)
   {
     AzureSearchRequest request = CreateRequest(this.Context.Site, viewModel);
 
+    // reset Azure search indexers
+    await request.ResetIndexers();
+    await this.SearchIndexHistoryManager.Delete(this.Context.Site.Id);
 
-    if (await request.ClearIndex())
-    {
-      await this.SearchIndexHistoryManager.Delete(this.Context.Site.Id);
-
-      return Json(new { Title = "Clear Index", Message = $"Index '{viewModel.IndexName}' has been deleted and re-created.", Icon = "alert" });
-    }
-    else
-    {
-      return Json(new { Title = "Clear Index", Message = $"Index '{viewModel.IndexName}' was not removed.", Icon = "error" });
-    }
+    return Json(new { Title = "Re-Index", Message = $"Search history has been cleared and all Indexers have been reset for '{viewModel.IndexName}'. All documents will be re-indexed the next time the search indexing scheduled task runs.", Icon = "alert" });    
   }
 
   [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
@@ -116,6 +110,18 @@ public class AzureSearchSettingsController : Controller
         }
       }
     }
+
+    ModelState.Clear();
+
+    return View("Settings", await BuildSettingsViewModel(viewModel));
+  }
+
+  [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+  [HttpPost]
+  public async Task<ActionResult> ResetIndexer(ViewModels.Settings viewModel, string indexerName)
+  {
+    AzureSearchRequest request = CreateRequest(this.Context.Site, viewModel);
+    await request.ResetIndexer(indexerName);
 
     ModelState.Clear();
 

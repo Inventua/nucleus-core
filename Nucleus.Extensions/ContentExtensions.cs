@@ -16,7 +16,7 @@ public static class ContentExtensions
     .UseFootnotes()
     .UseGridTables()
     .UseBootstrap()
-    .EnableTrackTrivia().UseSoftlineBreakAsHardlineBreak()
+    .EnableTrackTrivia()
     .UseGenericAttributes()
     .Build();
 

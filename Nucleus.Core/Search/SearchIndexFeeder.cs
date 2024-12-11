@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions;
 using Nucleus.Abstractions.Managers;
@@ -94,7 +95,8 @@ namespace Nucleus.Core.Search
         foreach (Site site in sites)
         {
           List<ISearchIndexManager> activeSearchIndexManagers = activeSiteSearchIndexManagers[site.Id];
-                               
+          site.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.INDEX_PAGES_USE_SSL, out Boolean useSsl);
+
           if (!activeSearchIndexManagers.Any())
           {
             this.Logger?.LogError("There are no available search index providers for site '{site}', so the search feed was terminated.", site.Name);
@@ -112,8 +114,8 @@ namespace Nucleus.Core.Search
                 if (item != null)
                 {
                   Boolean indexSuccess = false;
-
-                  item.Url = ParseUrl(item.Url);
+                  item.Url = ToAbsolute(useSsl, site.DefaultSiteAlias.Alias, ParseUrl(item.Url));
+                                
                   this.Logger.LogTrace("Adding [{scope}] {url} to index.", item.Scope, item.Url);
 
                   foreach (ISearchIndexManager searchIndexManager in activeSearchIndexManagers)
@@ -131,7 +133,7 @@ namespace Nucleus.Core.Search
                     catch (Exception e)
                     {
                       // error in .Index implementation
-                      this.Logger.LogError(e, "Error adding [{scope}] {url} to index using {type}.Index()", item.Scope, item.Url, searchIndexManager.GetType().FullName);
+                      this.Logger.LogError(e, "Error adding [{scope}] {url} ({title}) to index using {type}.Index()", item.Scope, item.Url, item.Title, searchIndexManager.GetType().FullName);
                     }
                   }
 
@@ -187,7 +189,17 @@ namespace Nucleus.Core.Search
       }
     }
 
-    private string ParseUrl(string url)
+    private static string ToAbsolute(Boolean useSsl, string alias, string url)
+    {
+      // convert relative Urls to absolute. If item.Url is already absolute, the System.Uri(Uri, string) constructor ignores baseUri.
+      // https://learn.microsoft.com/en-us/dotnet/api/system.uri.-ctor?view=net-9.0#system-uri-ctor(system-uri-system-string)
+      // "If relativeUri is an absolute URI (containing a scheme, host name, and optionally a port number), the Uri
+      // instance is created using only relativeUri.")
+      Uri absoluteUri = new(new Uri((useSsl ? "https" : "http") + Uri.SchemeDelimiter + alias), url);
+      return absoluteUri.ToString();
+    }
+
+    private static string ParseUrl(string url)
     {
       if (url.StartsWith('~'))
       {

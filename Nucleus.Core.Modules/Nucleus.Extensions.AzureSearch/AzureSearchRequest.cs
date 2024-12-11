@@ -64,21 +64,6 @@ internal partial class AzureSearchRequest
     if (this._searchIndexClient == null)
     {
       SearchIndexClient client = CreateIndexClient();
-
-      // check index
-      //try
-      //{
-      Response<SearchIndex> indexResponse = await client.GetIndexAsync(this.Settings.IndexName);
-      //}
-      //catch (Azure.RequestFailedException ex)
-      //{
-      //  if (ex.Status == 404)
-      //  {
-      //    // index not found: create it
-      //    await this.CreateIndex(client);
-      //  }
-      //}
-
       this._searchIndexClient = client;
     }
 
@@ -368,10 +353,9 @@ internal partial class AzureSearchRequest
 
   public async Task<SearchIndex> GetIndex()
   {
-    SearchIndexClient client = await this.SearchIndexClient();
-
     try
     {
+      SearchIndexClient client = await this.SearchIndexClient();
       return await client.GetIndexAsync(this.Settings.IndexName);
     }
     catch (Azure.RequestFailedException)

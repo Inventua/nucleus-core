@@ -81,7 +81,7 @@ public class AzureSearchSettingsController : Controller
     await request.ResetIndexers();
     await this.SearchIndexHistoryManager.Delete(this.Context.Site.Id);
 
-    return Json(new { Title = "Re-Index", Message = $"Search history has been cleared and all Indexers have been reset for '{viewModel.IndexName}'. All documents will be re-indexed the next time the search indexing scheduled task runs.", Icon = "alert" });    
+    return Json(new { Title = "Re-Index", Message = $"Search history has been cleared and all Indexers have been reset for '{viewModel.IndexName}'. All documents will be re-indexed the next time the search indexing scheduled task runs.", Icon = "alert" });
   }
 
   [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
@@ -319,54 +319,61 @@ public class AzureSearchSettingsController : Controller
 
     if (!string.IsNullOrEmpty(viewModel.AzureSearchServiceEndpoint) || !string.IsNullOrEmpty(GetAzureSearchApiKey(viewModel)) || !string.IsNullOrEmpty(viewModel.IndexName))
     {
+      IReadOnlyList<FileSystemProviderInfo> providers = this.FileSystemManager.ListProviders();
+      IEnumerable<FileSystemProviderInfo> azureProviders = providers.Where(provider => provider.ProviderType.Contains("AzureBlobStorageFileSystemProvider"));
+
       AzureSearchRequest request = CreateRequest(this.Context.Site, viewModel);
-      
+
       SearchIndex searchIndex = await request.GetIndex();
+      viewModel.SearchIndexes = (await request.ListIndexes(this.Context.Site))
+        .Select(index => index.Name)
+        .ToList();
 
-      try
+      if (searchIndex != null)
       {
-        viewModel.UseVectorSearch = await request.IsVectorizationConfigured();
-        viewModel.SearchIndexes = (await request.ListIndexes(this.Context.Site))
-          .Select(index => index.Name)
-          .ToList();
-
-        List<SearchIndexer> indexers = await request.ListIndexers();
-        viewModel.Semanticonfigurations = await request.ListSemanticRankingConfigurations();
-
-        if (string.IsNullOrEmpty(viewModel.SemanticConfigurationName))
+        try
         {
-          viewModel.SemanticConfigurationName= searchIndex?.SemanticSearch?.DefaultConfigurationName;
+          viewModel.UseVectorSearch = await request.IsVectorizationConfigured();
+
+          List<SearchIndexer> indexers = await request.ListIndexers();
+
+          viewModel.Semanticonfigurations = await request.ListSemanticRankingConfigurations();
+
+          if (string.IsNullOrEmpty(viewModel.SemanticConfigurationName))
+          {
+            viewModel.SemanticConfigurationName = 
+              searchIndex?.SemanticSearch?.DefaultConfigurationName
+              ??
+              searchIndex?.SemanticSearch?.Configurations?.FirstOrDefault()?.Name;
+          }
+            
+          foreach (var provider in azureProviders)
+          {
+            viewModel.DataSources.Add(new
+              (
+                provider,
+                  indexers
+                    .Where(indexer => indexer.TargetIndexName.Equals(viewModel.IndexName))
+                  .Select(indexer => indexer.Name)
+                  .FirstOrDefault()
+              )
+            );
+          }
         }
-
-        IReadOnlyList<FileSystemProviderInfo> providers = this.FileSystemManager.ListProviders();
-        IEnumerable<FileSystemProviderInfo> azureProviders = providers.Where(provider => provider.ProviderType.Contains("AzureBlobStorageFileSystemProvider"));
-
-        foreach (var provider in azureProviders)
+        catch (Azure.RequestFailedException ex)
         {
-          viewModel.DataSources.Add(new
-            (
-              provider, 
-                indexers
-                  .Where(indexer=>indexer.TargetIndexName.Equals(viewModel.IndexName))
-                .Select(indexer => indexer.Name)
-                .FirstOrDefault()
-            )
-          );
-        }
-      }
-      catch (Azure.RequestFailedException ex)
-      {
-        if (ex.Status == 404)
-        {
-          // suppress in case the index has been removed
-          viewModel.OpenAIServiceSettings ??= new();
-          viewModel.SemanticConfigurationName = "";
+          if (ex.Status == 404)
+          {
+            // suppress in case the index has been removed
+            viewModel.OpenAIServiceSettings ??= new();
+            viewModel.SemanticConfigurationName = "";
 
-          viewModel.UseVectorSearch = false;
-        }
-        else
-        {
-          throw;
+            viewModel.UseVectorSearch = false;
+          }
+          else
+          {
+            throw;
+          }
         }
       }
     }

@@ -131,7 +131,7 @@
       <SettingsControl caption="Index Name" helptext="Enter a name for your search index.">
         @Html.TextBoxFor(model => model.NewIndexName, new { })
       </SettingsControl>
-      <div class="nucleus-form-buttonrow">
+      <div class="mt-2 me-auto">
         <button type="submit" class="btn btn-success me-auto nucleus-show-progress nucleus-show-progress-after" data-target=".nucleus-editor-panel.parent()" formaction="@Url.NucleusAction("CreateIndex", "AzureSearchSettings", "AzureSearch")">Create Index</button>
       </div>
     </Modal>

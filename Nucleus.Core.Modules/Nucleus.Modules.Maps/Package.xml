@@ -31,6 +31,7 @@
         <file name="Microsoft.Identity.Client.Extensions.Msal.dll" />
         <file name="Azure.Maps.Rendering.dll" />
         <file name="Azure.Identity.dll" />
+        <file name="Azure.Maps.Search.dll" />
       </folder>
       <!-- 
         when the project property RazorCompileOnBuild=true view (.cshtml) files do not need to be included in package.xml (this file) 

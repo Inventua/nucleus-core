@@ -54,7 +54,9 @@ namespace Nucleus.ViewFeatures.HtmlContent
       // setting the text box value to the range control value after setting the range control serves to "round" the value to 
       // the "step" value of the range, and also enforces the max/min.
       textboxBuilder.Attributes.Add("onchange", $"jQuery('#{propertyId}_range').val(jQuery(this).val()); jQuery(this).val(jQuery('#{propertyId}_range').val());");
-      
+
+      outputBuilder.MergeAttributes(htmlAttributes);
+
       outputBuilder.InnerHtml.AppendHtml(rangeBuilder);
       outputBuilder.InnerHtml.AppendHtml(textboxBuilder);
 

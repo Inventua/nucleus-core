@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Nucleus.Abstractions.Search;
 
@@ -14,6 +15,11 @@ public class SearchResult : ContentMetaData
   /// Search result score.
   /// </summary>
   public double? Score { get; set; }
+
+  /// <summary>
+  /// Date/Time that the index entry was created or updated, if available.
+  /// </summary>
+  public DateTime? IndexedDate { get; set; }
 
   /// <summary>
   /// A list of terms which were matched to the document.

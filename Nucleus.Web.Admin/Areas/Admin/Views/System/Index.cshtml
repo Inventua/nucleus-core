@@ -162,7 +162,7 @@
             @foreach (var keyValue in connection.DatabaseInformation)
             {
               <tr>
-                <th scope="row" class="text-nowrap w-25 px-2"><h3>@keyValue.Key</h3></th>
+                <th scope="row" class="text-nowrap w-25 px-2"><h3 class="@(keyValue.Key == "Connection Error" ? " database-connection-error": "")">@keyValue.Key</h3></th>
                 <td>@keyValue.Value</td>
               </tr>
             }

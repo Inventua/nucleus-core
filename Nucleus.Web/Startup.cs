@@ -256,6 +256,9 @@ namespace Nucleus.Web
         services.Logger().LogInformation("Adding Plugins");
         builder.AddPlugins(Environment.ContentRootPath);
 
+        services.Logger().LogInformation("Adding Converters");
+        services.AddConverters();
+
         // For Linux only: None of the "default" behaviors work on Linux, so we have to persist to the file system.
         // This should be replaced in the future with config file options.
         // reference: https://github.com/dotnet/aspnetcore/blob/bec278eabea54f63da15e10e654bdfa4168a2479/src/DataProtection/DataProtection/src/DataProtectionBuilderExtensions.cs

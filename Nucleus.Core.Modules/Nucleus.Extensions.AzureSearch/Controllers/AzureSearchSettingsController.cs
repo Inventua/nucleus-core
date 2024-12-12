@@ -11,6 +11,7 @@ using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Search;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
+using Azure.Search.Documents.Indexes.Models;
 
 namespace Nucleus.Extensions.AzureSearch.Controllers;
 
@@ -21,7 +22,7 @@ public class AzureSearchSettingsController : Controller
   private Context Context { get; }
   private ISiteManager SiteManager { get; }
   private ISearchIndexHistoryManager SearchIndexHistoryManager { get; }
-  private IFileSystemManager FileSystemManager { get; } 
+  private IFileSystemManager FileSystemManager { get; }
   private IConfiguration Configuration { get; }
   private ILogger<AzureSearchSettingsController> Logger { get; }
 
@@ -50,7 +51,7 @@ public class AzureSearchSettingsController : Controller
   [HttpPost]
   public async Task<ActionResult> SaveSettings(ViewModels.Settings viewModel)
   {
-    viewModel.SaveSettings(this.Context.Site, viewModel.ApiKey, viewModel.AzureOpenAIApiKey);
+    viewModel.SaveSettings(this.Context.Site, viewModel.AzureSearchApiKey, viewModel.AzureOpenAIApiKey);
 
     await this.SiteManager.Save(this.Context.Site);
 
@@ -72,40 +73,25 @@ public class AzureSearchSettingsController : Controller
 
   [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
   [HttpPost]
-  public async Task<ActionResult> ClearIndex(ViewModels.Settings viewModel)
+  public async Task<ActionResult> ReIndex(ViewModels.Settings viewModel)
   {
     AzureSearchRequest request = CreateRequest(this.Context.Site, viewModel);
 
+    // reset Azure search indexers
+    await request.ResetIndexers();
+    await this.SearchIndexHistoryManager.Delete(this.Context.Site.Id);
 
-    if (await request.ClearIndex())
-    {
-      await this.SearchIndexHistoryManager.Delete(this.Context.Site.Id);
-      
-      return Json(new { Title = "Clear Index", Message = $"Index '{viewModel.IndexName}' has been deleted and re-created.", Icon = "alert" });
-    }
-    else
-    {
-      return Json(new { Title = "Clear Index", Message = $"Index '{viewModel.IndexName}' was not removed.", Icon = "error" });
-    }
+    return Json(new { Title = "Re-Index", Message = $"Search history has been cleared and all Indexers have been reset for '{viewModel.IndexName}'. All documents will be re-indexed the next time the search indexing scheduled task runs.", Icon = "alert" });
   }
 
   [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
   [HttpPost]
-  public async Task<ActionResult> CreateIndexer(ViewModels.Settings viewModel)
+  public async Task<ActionResult> CreateIndexer(ViewModels.Settings viewModel, string key)
   {
     AzureSearchRequest request = CreateRequest(this.Context.Site, viewModel);
     IReadOnlyList<FileSystemProviderInfo> providers = this.FileSystemManager.ListProviders();
 
-    IEnumerable<FileSystemProviderInfo> azureProviders = providers.Where(provider => provider.ProviderType.Contains("AzureBlobStorageFileSystemProvider"));
-
-    if (!azureProviders.Any())
-    {
-      return BadRequest("Cannot automatically create an indexer because there are no Azure Blob Storage file system providers configured for Nucleus.");
-    }
-    else if (azureProviders.Count() > 1) 
-    {
-      return BadRequest("Cannot automatically create an indexer because there are multiple Azure Blob Storage file system providers configured for Nucleus.");
-    }
+    FileSystemProviderInfo azureProvider = providers.Where(provider => provider.ProviderType.Contains("AzureBlobStorageFileSystemProvider") && provider.Key == key).FirstOrDefault();
 
     // ensure that index exists
     if (await request.CanConnect(this.Context.Site))
@@ -114,15 +100,62 @@ public class AzureSearchSettingsController : Controller
       for (int count = 1; count < providers.Count + 1; count++)
       {
         string configKeyPrefix = $"{Nucleus.Abstractions.Models.Configuration.FileSystemProviderFactoryOptions.Section}:Providers:{count}";
-        if (this.Configuration.GetValue<string>($"{configKeyPrefix}:Key") == azureProviders.First().Key)
+        if (this.Configuration.GetValue<string>($"{configKeyPrefix}:Key") == azureProvider.Key)
         {
           string connectionString = this.Configuration.GetValue<string>($"{configKeyPrefix}:ConnectionString");
           string rootPath = this.Configuration.GetValue<string>($"{configKeyPrefix}:RootPath");
 
-          viewModel.IndexerName = await request.CreateIndexer(azureProviders.First().Key, connectionString, rootPath, this.Context.Site.HomeDirectory);
+          await request.CreateIndexer(azureProvider.Key, connectionString, rootPath, this.Context.Site.HomeDirectory);
           break;
         }
       }
+    }
+
+    ModelState.Clear();
+
+    return View("Settings", await BuildSettingsViewModel(viewModel));
+  }
+
+  [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+  [HttpPost]
+  public async Task<ActionResult> ResetIndexer(ViewModels.Settings viewModel, string indexerName)
+  {
+    AzureSearchRequest request = CreateRequest(this.Context.Site, viewModel);
+    await request.ResetIndexer(indexerName);
+
+    ModelState.Clear();
+
+    return View("Settings", await BuildSettingsViewModel(viewModel));
+  }
+
+  [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+  [HttpPost]
+  public async Task<ActionResult> RemoveIndexer(ViewModels.Settings viewModel, string indexerName)
+  {
+    AzureSearchRequest request = CreateRequest(this.Context.Site, viewModel);
+    await request.DeleteIndexer(indexerName);
+
+    ModelState.Clear();
+
+    return View("Settings", await BuildSettingsViewModel(viewModel));
+  }
+
+  [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+  [HttpPost]
+  public async Task<ActionResult> CreateIndex(ViewModels.Settings viewModel)
+  {
+    AzureSearchRequest request = CreateRequest(this.Context.Site, viewModel);
+
+    try
+    {
+      viewModel.IndexName = await request.CreateIndex(viewModel.NewIndexName);
+
+      viewModel.SaveSettings(this.Context.Site, viewModel.AzureSearchApiKey, viewModel.AzureOpenAIApiKey);
+      await this.SiteManager.Save(this.Context.Site);
+    }
+    catch (Azure.RequestFailedException ex)
+    {
+      return Json(new { Title = "Create Index", Message = ex.Message, Icon = "alert" });
     }
 
     ModelState.Clear();
@@ -140,10 +173,10 @@ public class AzureSearchSettingsController : Controller
     if (await request.CanConnect(this.Context.Site))
     {
       try
-      { 
-        viewModel.SemanticConfigurationName = await request.AddSemanticRanking();
-        
-        viewModel.SaveSettings(this.Context.Site, viewModel.ApiKey, viewModel.AzureOpenAIApiKey);
+      {
+        viewModel.SemanticConfigurationName = await request.AddSemanticRanking(viewModel.NewSemanticRankingConfigurationName);
+
+        viewModel.SaveSettings(this.Context.Site, viewModel.AzureSearchApiKey, viewModel.AzureOpenAIApiKey);
         await this.SiteManager.Save(this.Context.Site);
       }
       catch (Azure.RequestFailedException ex)
@@ -161,9 +194,9 @@ public class AzureSearchSettingsController : Controller
   [HttpPost]
   public async Task<ActionResult> AddVectorization(ViewModels.Settings viewModel)
   {
-    if (string.IsNullOrEmpty(viewModel.AzureOpenAIEndpoint))
+    if (string.IsNullOrEmpty(viewModel.OpenAIServiceSettings.AzureOpenAIEndpoint))
     {
-      ModelState.AddModelError<ViewModels.Settings>(viewModel => viewModel.AzureOpenAIEndpoint, "Azure Open AI endpoint is required.");
+      ModelState.AddModelError<ViewModels.Settings>(viewModel => viewModel.OpenAIServiceSettings.AzureOpenAIEndpoint, "Azure Open AI endpoint is required.");
     }
 
     if (string.IsNullOrEmpty(viewModel.AzureOpenAIApiKey))
@@ -171,9 +204,9 @@ public class AzureSearchSettingsController : Controller
       ModelState.AddModelError<ViewModels.Settings>(viewModel => viewModel.AzureOpenAIApiKey, "Azure Open AI key is required.");
     }
 
-    if (string.IsNullOrEmpty(viewModel.AzureOpenAIDeploymentName))
+    if (string.IsNullOrEmpty(viewModel.OpenAIServiceSettings.AzureOpenAIEmbeddingModelDeploymentName))
     {
-      ModelState.AddModelError<ViewModels.Settings>(viewModel => viewModel.AzureOpenAIDeploymentName, "Azure Open AI deployment name is required.");
+      ModelState.AddModelError<ViewModels.Settings>(viewModel => viewModel.OpenAIServiceSettings.AzureOpenAIEmbeddingModelDeploymentName, "Azure Open AI deployment name is required.");
     }
 
     if (!ModelState.IsValid)
@@ -188,13 +221,13 @@ public class AzureSearchSettingsController : Controller
     {
       try
       {
-        viewModel.VectorizationEnabled = await request.AddVectorization();
-        viewModel.SaveSettings(this.Context.Site, viewModel.ApiKey, viewModel.AzureOpenAIApiKey);
+        viewModel.UseVectorSearch = await request.AddVectorization();
+        viewModel.SaveSettings(this.Context.Site, viewModel.AzureSearchApiKey, viewModel.AzureOpenAIApiKey);
         await this.SiteManager.Save(this.Context.Site);
       }
       catch (Azure.RequestFailedException ex)
       {
-        return Json(new { Title = "Add Vectorization", Message = ex.Message, Icon = "alert" });       
+        return Json(new { Title = "Add Vectorization", Message = ex.Message, Icon = "alert" });
       }
     }
 
@@ -221,16 +254,16 @@ public class AzureSearchSettingsController : Controller
     }
   }
 
-  private string GetApiKey(ViewModels.Settings viewModel)
+  private string GetAzureSearchApiKey(ViewModels.Settings viewModel)
   {
-    if (viewModel.ApiKey == ViewModels.Settings.DUMMY_APIKEY)
+    if (viewModel.AzureSearchApiKey == ViewModels.Settings.DUMMY_APIKEY)
     {
-      ConfigSettings settings = new(this.Context.Site);
-      return ConfigSettings.DecryptApiKey(this.Context.Site, settings.EncryptedApiKey);
+      AzureSearchSettings settings = new(this.Context.Site);
+      return AzureSearchSettings.Decrypt(this.Context.Site, settings.AzureSearchServiceEncryptedApiKey);
     }
     else
     {
-      return viewModel.ApiKey;
+      return viewModel.AzureSearchApiKey;
     }
   }
 
@@ -238,8 +271,8 @@ public class AzureSearchSettingsController : Controller
   {
     if (viewModel.AzureOpenAIApiKey == ViewModels.Settings.DUMMY_APIKEY)
     {
-      ConfigSettings settings = new(this.Context.Site);
-      return ConfigSettings.DecryptApiKey(this.Context.Site, settings.EncryptedAzureOpenAIApiKey);
+      AzureSearchSettings settings = new(this.Context.Site);
+      return AzureSearchSettings.Decrypt(this.Context.Site, settings.OpenAIServiceSettings.AzureOpenAIEncryptedApiKey);
     }
     else
     {
@@ -249,19 +282,28 @@ public class AzureSearchSettingsController : Controller
 
   private AzureSearchRequest CreateRequest(Site site, ViewModels.Settings settings)
   {
+    settings.AzureSearchServiceEncryptedApiKey = AzureSearchSettings.Encrypt(site, GetAzureSearchApiKey(settings));
+    settings.OpenAIServiceSettings.AzureOpenAIEncryptedApiKey = AzureSearchSettings.Encrypt(site, GetOpenAIApiKey(settings));
+
     return new
     (
-      new System.Uri(settings.ServerUrl),
-      GetApiKey(settings),
-      settings.IndexName,
-      settings.IndexerName,
-      settings.SemanticConfigurationName,
-      settings.VectorizationEnabled,
-      settings.AzureOpenAIEndpoint,
-      GetOpenAIApiKey(settings),
-      settings.AzureOpenAIDeploymentName,
+      site,
+      settings,
       this.Logger
     );
+    ////return new
+    ////(
+    ////  new System.Uri(settings.AzureSearchServiceEndpoint),
+    ////  GetApiKey(settings),
+    ////  settings.IndexName,
+    ////  settings.IndexerName,
+    ////  settings.SemanticConfigurationName,
+    ////  settings.VectorizationEnabled,
+    ////  settings.AzureOpenAIEndpoint,
+    ////  GetOpenAIApiKey(settings),
+    ////  settings.AzureOpenAIDeploymentName,
+    ////  this.Logger
+    ////);
   }
 
   private async Task<ViewModels.Settings> BuildSettingsViewModel(ViewModels.Settings viewModel)
@@ -271,36 +313,67 @@ public class AzureSearchSettingsController : Controller
       viewModel = new(this.Context.Site);
     }
 
-    viewModel.Indexers = [];
+    viewModel.SearchIndexes = [];
+    viewModel.DataSources = [];
     viewModel.Semanticonfigurations = [];
 
-    if (!string.IsNullOrEmpty(viewModel.ServerUrl) || !string.IsNullOrEmpty(GetApiKey(viewModel)) || !string.IsNullOrEmpty(viewModel.IndexName))
+    if (!string.IsNullOrEmpty(viewModel.AzureSearchServiceEndpoint) || !string.IsNullOrEmpty(GetAzureSearchApiKey(viewModel)) || !string.IsNullOrEmpty(viewModel.IndexName))
     {
-      var request = CreateRequest(this.Context.Site, viewModel);
+      IReadOnlyList<FileSystemProviderInfo> providers = this.FileSystemManager.ListProviders();
+      IEnumerable<FileSystemProviderInfo> azureProviders = providers.Where(provider => provider.ProviderType.Contains("AzureBlobStorageFileSystemProvider"));
 
-      try
+      AzureSearchRequest request = CreateRequest(this.Context.Site, viewModel);
+
+      SearchIndex searchIndex = await request.GetIndex();
+      viewModel.SearchIndexes = (await request.ListIndexes(this.Context.Site))
+        .Select(index => index.Name)
+        .ToList();
+
+      if (searchIndex != null)
       {
-        viewModel.VectorizationEnabled = await request.IsVectorizationConfigured();
-        viewModel.Indexers = await request.ListIndexers();
-        viewModel.Semanticonfigurations = await request.ListSemanticRankingConfigurations();
-      }
-      catch (Azure.RequestFailedException ex)
-      {
-        if (ex.Status == 404)
+        try
         {
-          // suppress in case the index has been removed
-          viewModel.AzureOpenAIEndpoint= "";
-          viewModel.AzureOpenAIApiKey = "";
-          viewModel.AzureOpenAIDeploymentName = "";
+          viewModel.UseVectorSearch = await request.IsVectorizationConfigured();
 
-          viewModel.IndexerName = "";
-          viewModel.SemanticConfigurationName = "";
+          List<SearchIndexer> indexers = await request.ListIndexers();
 
-          viewModel.VectorizationEnabled = false;
+          viewModel.Semanticonfigurations = await request.ListSemanticRankingConfigurations();
+
+          if (string.IsNullOrEmpty(viewModel.SemanticConfigurationName))
+          {
+            viewModel.SemanticConfigurationName = 
+              searchIndex?.SemanticSearch?.DefaultConfigurationName
+              ??
+              searchIndex?.SemanticSearch?.Configurations?.FirstOrDefault()?.Name;
+          }
+            
+          foreach (var provider in azureProviders)
+          {
+            viewModel.DataSources.Add(new
+              (
+                provider,
+                  indexers
+                    .Where(indexer => indexer.TargetIndexName.Equals(viewModel.IndexName))
+                  .Select(indexer => indexer.Name)
+                  .FirstOrDefault()
+              )
+            );
+          }
         }
-        else
+        catch (Azure.RequestFailedException ex)
         {
-          throw;
+          if (ex.Status == 404)
+          {
+            // suppress in case the index has been removed
+            viewModel.OpenAIServiceSettings ??= new();
+            viewModel.SemanticConfigurationName = "";
+
+            viewModel.UseVectorSearch = false;
+          }
+          else
+          {
+            throw;
+          }
         }
       }
     }

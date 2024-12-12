@@ -10,6 +10,7 @@
       <thead>
         <tr>
           <th class="file-name">Name</th>
+          <th class="file-path">Path</th>
           <th class="file-type">Type</th>
           <th class="file-modified-date">Modified Date</th>
           <th class="file-size">Size</th>
@@ -27,9 +28,15 @@
                 }
                 else if (searchResult.Scope == Nucleus.Abstractions.Models.FileSystem.File.URN)
                 {
-                  @Html.AreaActionLink(searchResult.Title, "SelectFile", "FileSystem", "Admin", new { fileId = @searchResult.SourceId }, new { @class = "NavigateLink nucleus-show-progress nucleus-show-progress-after", @data_target = ".nucleus-adminpage" })
+                  @Html.AreaActionLink(searchResult.Title, "SelectFile", "FileSystem", "Admin", new { fileId = @searchResult.SourceId }, new { @class = "NavigateLink nucleus-show-progress nucleus-show-progress-after", @data_target = ".nucleus-adminpage" })                  
                 }
               </label>
+            </td>
+            <td>
+              @if (searchResult.SourceId.HasValue && Model.ResultPaths.ContainsKey(searchResult.SourceId.Value))
+              {
+                <span>@Model.ResultPaths[searchResult.SourceId.Value]</span>
+              }
             </td>
             <td>@searchResult.Type</td>
             <td>@searchResult.PublishedDate.FormatDate(this.Context.Request.GetUserTimeZone())</td>

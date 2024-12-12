@@ -34,7 +34,7 @@ namespace Nucleus.Core.Authorization
 						{
 							IPageManager pageManager = context.HttpContext.RequestServices.GetService<IPageManager>();
 
-							SitePages sitePages = context.HttpContext.RequestServices.GetService<Context>().Site?.GetSitePages() ?? new();
+							SitePages sitePages = context.HttpContext.RequestServices.GetService<Context>().Site?.GetSitePages();
 							string returnUrl;
 																
 							if (context.HttpContext.Request.Path.StartsWithSegments("/admin"))
@@ -48,7 +48,7 @@ namespace Nucleus.Core.Authorization
 								returnUrl = context.HttpContext.Request.PathBase + context.HttpContext.Request.Path;
 							}
 
-              PageRoute loginPageRoute = await GetPageRoute(sitePages.LoginPageId, pageManager);
+              PageRoute loginPageRoute = await GetPageRoute(sitePages?.LoginPageId, pageManager);
               
               if (loginPageRoute == null)
               {

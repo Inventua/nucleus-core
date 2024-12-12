@@ -18,6 +18,7 @@
     "Nucleus.Web.Local": {
       "commandName": "Project",
       "launchBrowser": true,
+      "externalUrlConfiguration": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
@@ -26,6 +27,7 @@
     "Nucleus.Web.Golem-Kestrel": {
       "commandName": "Project",
       "launchBrowser": true,
+      "externalUrlConfiguration": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
@@ -34,6 +36,7 @@
     "Nucleus.Web.Golem-Testing": {
       "commandName": "Project",
       "launchBrowser": true,
+      "externalUrlConfiguration": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Testing"
       },
@@ -42,6 +45,7 @@
     "Nucleus.Web.Minion-Kestrel": {
       "commandName": "Project",
       "launchBrowser": true,
+      "externalUrlConfiguration": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

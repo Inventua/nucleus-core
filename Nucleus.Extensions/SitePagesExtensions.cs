@@ -41,65 +41,7 @@ namespace Nucleus.Extensions
 		/// <returns></returns>
 		public static SitePages GetSitePages(this Site site)
 		{
-			SitePages result = new();
-
-			{
-				if (site.SiteSettings.TryGetValue(Site.SitePagesKeys.SITEPAGE_ERROR, out Guid id))
-				{
-					result.ErrorPageId = id;
-				}
-			}
-
-			{
-				if (site.SiteSettings.TryGetValue(Site.SitePagesKeys.SITEPAGE_LOGIN, out Guid id))
-				{
-					result.LoginPageId = id;
-				}
-			}
-
-			{
-				if (site.SiteSettings.TryGetValue(Site.SitePagesKeys.SITEPAGE_NOTFOUND, out Guid id))
-				{
-					result.NotFoundPageId = id;
-				}
-			}
-
-			{
-				if (site.SiteSettings.TryGetValue(Site.SitePagesKeys.SITEPAGE_PRIVACY, out Guid id))
-				{
-					result.PrivacyPageId = id;
-				}
-			}
-
-			{
-				if (site.SiteSettings.TryGetValue(Site.SitePagesKeys.SITEPAGE_USERREGISTER, out Guid id))
-				{
-					result.UserRegisterPageId = id;
-				}
-			}
-
-			{
-				if (site.SiteSettings.TryGetValue(Site.SitePagesKeys.SITEPAGE_TERMS, out Guid id))
-				{
-					result.TermsPageId = id;
-				}
-			}
-
-			{
-				if (site.SiteSettings.TryGetValue(Site.SitePagesKeys.SITEPAGE_USERPROFILE, out Guid id))
-				{
-					result.UserProfilePageId = id;
-				}
-			}
-
-			{
-				if (site.SiteSettings.TryGetValue(Site.SitePagesKeys.SITEPAGE_USERCHANGEPASSWORD, out Guid id))
-				{
-					result.UserChangePasswordPageId = id;
-				}
-			}
-
-			return result;
+      return new(site);
 		}		
 	}
 }

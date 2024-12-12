@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nucleus.Abstractions;
+using Nucleus.Abstractions.Conversion;
 using Nucleus.Abstractions.EventHandlers;
 using Nucleus.Abstractions.Mail;
 using Nucleus.Abstractions.Managers;
@@ -25,6 +26,7 @@ using Nucleus.Core.FileSystemProviders;
 using Nucleus.Core.Layout;
 using Nucleus.Core.Logging;
 using Nucleus.Core.Plugins;
+using Nucleus.Core.Services.Conversion;
 
 namespace Nucleus.Core;
 
@@ -51,6 +53,19 @@ public static class CoreServiceExtensions
     AddOption<SecurityHeaderOptions>(services, configuration, SecurityHeaderOptions.Section);
     // Add middleware
     services.AddSingleton<SecurityHeadersMiddleware>();
+    return services;
+  }
+
+  /// <summary>
+  /// Add content converters.
+  /// </summary>
+  /// <param name="services"></param>
+  /// <param name="configuration"></param>
+  /// <returns></returns>
+  public static IServiceCollection AddConverters(this IServiceCollection services)
+  {
+    services.AddSingleton<Nucleus.Abstractions.Conversion.IContentConverter, BasicContentConverter>();
+    services.AddSingleton<IContentConverterFactory, ContentConverterFactory>();
     return services;
   }
 

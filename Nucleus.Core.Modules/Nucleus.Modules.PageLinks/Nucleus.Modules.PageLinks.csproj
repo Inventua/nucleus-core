@@ -72,6 +72,7 @@
   <PropertyGroup Label="Nucleus">
     <ExtensionFolder>PageLinks</ExtensionFolder>
     <Version>2.0.2</Version>
+    <Product>Nucleus</Product>
     <Copyright>(c) Inventua Pty Ptd</Copyright>
     <NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
     <CopyToDefaultSetup>false</CopyToDefaultSetup>

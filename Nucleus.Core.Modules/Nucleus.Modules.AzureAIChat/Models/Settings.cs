@@ -32,7 +32,7 @@ public class Settings
   internal const string SITESETTING_AZURE_SEARCH_APIKEY = "azuresearch:apikey";
   internal const string SITESETTING_AZURE_SEARCH_SEMANTIC_RANKING_CONFIGURATION_NAME = "azuresearch:semantic-ranking-configuration-name";
 
-  internal const string SITESETTING_AZURE_SEARCH__VECTORIZATION_ENABLED = "azuresearch:vectorization-enabled";
+  internal const string SITESETTING_AZURE_SEARCH_VECTORIZATION_ENABLED = "azuresearch:vectorization-enabled";
 
   internal const string SITESETTING_OPENAI_ENDPOINT = "azuresearch:openai-endpoint";
   internal const string SITESETTING_OPENAI_APIKEY = "azuresearch:openai-apikey";
@@ -105,7 +105,7 @@ public class Settings
       this.AzureSearchSemanticConfigurationName = semanticConfigurationName;
     }
 
-    if (site.SiteSettings.TryGetValue(SITESETTING_AZURE_SEARCH__VECTORIZATION_ENABLED, out bool vectorizationEnabled))
+    if (site.SiteSettings.TryGetValue(SITESETTING_AZURE_SEARCH_VECTORIZATION_ENABLED, out bool vectorizationEnabled))
     {
       this.AzureSearchVectorizationEnabled = vectorizationEnabled;
     }

@@ -102,6 +102,7 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.8.1" />
     <PackageReference Include="System.DirectoryServices.Protocols" Version="8.0.0" />
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.0" />
+    <PackageReference Include="PdfPig" Version="0.1.9" />
   </ItemGroup>
 	
 	<ItemGroup>

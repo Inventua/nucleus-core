@@ -37,14 +37,26 @@ namespace Nucleus.Extensions
 		{
 			try
 			{
-        if (size > (1024 * 1024 * 1024))
+        if (size <= 0)
+        {
+          return "";
+        }
+        else if (size > (1024 * 1024 * 1024))
+        {
           return (size / (double)(1024 * 1024 * 1024)).ToString("#,##0.00 GB");
+        }
         else if (size > (1024 * 1024))
-					return (size / (double)(1024 * 1024)).ToString("#,##0.00 MB");
-				else if (size > 1024)
-					return (size / (double)1024).ToString("#,##0.00 KB");
-				else
-					return size.ToString("#0 bytes");				
+        {
+          return (size / (double)(1024 * 1024)).ToString("#,##0.00 MB");
+        }
+        else if (size > 1024)
+        {
+          return (size / (double)1024).ToString("#,##0.00 KB");
+        }
+        else
+        {
+          return size.ToString("#0 bytes");
+        }
 			}
 			catch (Exception)
 			{

@@ -1,14 +1,13 @@
 ## Maps Module
 The maps modules displays a static map determined by the latitude and longitude.
 
-Some settings are only available to the selected provider.
+Some settings are provider-specific.
 
 For Azure, visit [Azure Maps Render client library](https://learn.microsoft.com/en-us/dotnet/api/overview/azure/maps.rendering-readme) for more information
 
 For Google, visit [Google Maps Static API](https://developers.google.com/maps/documentation/maps-static/start) for more information on the settings.
 
 ![Maps Settings](mapssettings.png)
-
 
 ## Settings
 Users can select the map providers (Azure or Google) to use, control the size of the image and the level of zoom. The rendered image can be downloaded and saved to a file provider to reduce the volume of
@@ -20,8 +19,8 @@ The accuracy of the coordinates is dependent on the address entered.
 {.table-25-75}
 |                        |                                                                                      |
 |------------------------|--------------------------------------------------------------------------------------|
-| API Key                | Get the API Key from the Azure Portal or Google Console. |
-| Zoom Level             | Zoom level of the maps. 
+| API Key                | Your service API key. Get the API Key from the Azure Portal or Google Console. |
+| Zoom Level             | Zoom level of the map. 
 | Save to                | Folder location and file name of the image downloaded and saved.  |
 | Latitude               | Latitude coordinate value of the map. Based on the distance from the prime meridian (Greenwich Meridian). |
 | Longitude              | Longitude coordinate value of the map. Based on the distance from the prime meridian (Greenwich Meridian). |

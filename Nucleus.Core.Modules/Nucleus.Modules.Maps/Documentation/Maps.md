@@ -21,7 +21,7 @@ The accuracy of the coordinates is dependent on the address entered.
 |------------------------|--------------------------------------------------------------------------------------|
 | API Key                | Your service API key. Get the API Key from the Azure Portal or Google Console. |
 | Zoom Level             | Zoom level of the map. 
-| Save to                | Folder location and file name of the image downloaded and saved.  |
+| Save to                | Location of folder/file name of the image to download and save.  |
 | Latitude               | Latitude coordinate value of the map. Based on the distance from the prime meridian (Greenwich Meridian). |
 | Longitude              | Longitude coordinate value of the map. Based on the distance from the prime meridian (Greenwich Meridian). |
 | Width                  | Horizontal dimension size of the map image. |

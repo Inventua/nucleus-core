@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml.ExtendedProperties;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions;
@@ -69,15 +70,29 @@ namespace Nucleus.Core.Search
         // Test connections for each site/search index manager
         foreach (ISearchIndexManager searchIndexManager in this.SearchIndexManagers)
         {
+          Boolean indexManagerEnabled = true;
+
+          if (fullSite.SiteSettings.TryGetValue($"{Site.SiteSearchSettingsKeys.SEARCH_INDEX_MANAGER_PREFIX}:{searchIndexManager.GetType().FullName.ToLower()}:enabled", out Boolean isEnabled))
+          {
+            indexManagerEnabled = isEnabled;
+          }
+          
           try
           {
-            if (await searchIndexManager.CanConnect(fullSite))
+            if (indexManagerEnabled)
             {
-              activeSearchIndexManagers.Add(searchIndexManager);              
+              if (await searchIndexManager.CanConnect(fullSite))
+              {
+                activeSearchIndexManagers.Add(searchIndexManager);
+              }
+              else
+              {
+                this.Logger?.LogWarning("Search index provider {providername} did not connect using the settings for site '{site}', and will not receive data.", searchIndexManager.GetType().FullName, fullSite.Name);
+              }
             }
             else
             {
-              this.Logger?.LogWarning("Search index provider {providername} did not connect using the settings for site '{site}', and will not receive data.", searchIndexManager.GetType().FullName, fullSite.Name);
+              this.Logger?.LogWarning("Search index provider {providername} is disabled for site '{site}', and will not receive data.", searchIndexManager.GetType().FullName, fullSite.Name);
             }
           }
           catch (Exception e)

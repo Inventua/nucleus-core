@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package id="6ef525da-4858-4d7d-805b-f8c05d478ed4" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
+  <name>TikaServerConverter</name>
+  <version>1.0.0.0</version>
+  <publisher name="Inventua" url="https://www.inventua.com/nucleus" email="support@inventua.com" />
+  <description>
+		File converter extension used to convert documents using an Apache Tika Server.
+	</description>
+  <compatibility minVersion="2.0.0.1" maxVersion="*" />
+  <components>
+    <component folderName="TikaServerConverter" optional="false">
+      <controlPanelExtensionDefinition id="8e8c2c25-9dda-4e05-8120-e7b4f4f608ac">
+        <friendlyName>Tika Server Converter</friendlyName>
+        <helpUrl>https://www.nucleus-cms.com/other-extensions/tika-server-converter/</helpUrl>
+        <description>Configure Apache Tika Server converter settings.</description>
+        <controllerName>TikaServerConverterSettingsController</controllerName>
+        <extensionName>TikaServerConverter</extensionName>
+        <scope>Site</scope>
+        <editAction>Settings</editAction>
+        <icon>&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 -830 960 960&quot; fill=&quot;#5f6368&quot;&gt;&lt;path d=&quot;M400-280h160v-80H400v80Zm0-160h280v-80H400v80ZM280-600h400v-80H280v80Zm200 120ZM80-80v-80h102q-48-23-77.5-68T75-330q0-79 55.5-134.5T265-520v80q-45 0-77.5 32T155-330q0 39 24 69t61 38v-97h80v240H80Zm320-40v-80h360v-560H200v160h-80v-160q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H400Z&quot;/&gt;&lt;/svg&gt;</icon>
+      </controlPanelExtensionDefinition>
+      <file name="readme.txt" />
+      <!-- 
+        when the project property GenerateEmbeddedFilesManifest=true and your static resources Build Action=Embedded resource, static resource
+        files do not need to be included in package.xml (this file) 
+      -->
+      <!--<file name="viewer.css" />
+			<file name="settings.css" />-->
+      <folder name="bin">
+        <file name="Nucleus.Extensions.TikaServerConverter.dll" />
+      </folder>
+      <!-- 
+        when the project property RazorCompileOnBuild=true view (.cshtml) files do not need to be included in package.xml (this file) 
+      -->
+      <!--<folder name="Views">
+				<file name="_ViewImports.cshtml" />
+				<file name="Viewer.cshtml" />
+				<file name="Settings.cshtml" />
+			</folder>-->
+    </component>
+  </components>
+</package>

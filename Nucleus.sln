@@ -265,6 +265,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Extensions.TypeSens
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Modules.Maps", "Nucleus.Core.Modules\Nucleus.Modules.Maps\Nucleus.Modules.Maps.csproj", "{EDF7AB6A-0180-4396-9917-3F9CCC7C19B8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nucleus.Extensions.TikaServerConverter", "Nucleus.Core.Modules\Nucleus.Extensions.TikaServerConverter\Nucleus.Extensions.TikaServerConverter.csproj", "{67A79D5D-5807-41DC-A457-86E5C6717C5F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -483,6 +485,10 @@ Global
 		{EDF7AB6A-0180-4396-9917-3F9CCC7C19B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EDF7AB6A-0180-4396-9917-3F9CCC7C19B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EDF7AB6A-0180-4396-9917-3F9CCC7C19B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67A79D5D-5807-41DC-A457-86E5C6717C5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67A79D5D-5807-41DC-A457-86E5C6717C5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67A79D5D-5807-41DC-A457-86E5C6717C5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67A79D5D-5807-41DC-A457-86E5C6717C5F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -538,6 +544,7 @@ Global
 		{12707DD2-E78C-4DBA-BA4D-AA90F8E35F97} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
 		{C05D6C09-4836-4CF3-B34F-4E8C8C7B4A57} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
 		{EDF7AB6A-0180-4396-9917-3F9CCC7C19B8} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
+		{67A79D5D-5807-41DC-A457-86E5C6717C5F} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D84CD364-9C8E-400E-84AA-45562061ED44}

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,9 +11,10 @@ using Nucleus.Abstractions.Search;
 
 namespace Nucleus.Extensions.ElasticSearch
 {
-	// https://www.elastic.co/guide/en/elasticsearch/client/net-api/current/elasticsearch-net-getting-started.html
+  // https://www.elastic.co/guide/en/elasticsearch/client/net-api/current/elasticsearch-net-getting-started.html
 
-	public class SearchIndexManager : ISearchIndexManager
+  [DisplayName("Elastic Search")]
+  public class SearchIndexManager : ISearchIndexManager
 	{		
     private ILogger<SearchIndexManager> Logger { get; }
     private ElasticSearchRequest _request { get; set; }

@@ -19,11 +19,17 @@ namespace Nucleus.Web.ViewModels.Admin
 
     public string DefaultSearchProvider { get; set; }
 
+    public List<AvailableSearchManager> SearchIndexManagers { get; set; }
+
     public class AvailableSearchProvider
     {
       public string Name { get; set; }
       public string ClassName { get; set; }
+    }
 
+    public class AvailableSearchManager : AvailableSearchProvider 
+    { 
+      public Boolean Enabled {  get; set; } 
     }
   }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Nucleus.Abstractions.Conversion;
+using Nucleus.Abstractions.Models;
 
 namespace Nucleus.Core.Services.Conversion;
 
@@ -57,8 +59,8 @@ public class ContentConverterFactory : IContentConverterFactory
   /// <exception cref="System.InvalidOperationException">
   /// No content converter (<see cref="IContentConverter"/> implementation) could perform the conversion.
   /// </exception>
-  public byte[] ConvertTo(byte[] content, string sourceContentType, string targetContentType)
+  public async Task<byte[]> ConvertTo(Site site, byte[] content, string sourceContentType, string targetContentType)
   {
-    return this.Create(sourceContentType, targetContentType)?.ConvertTo(content, sourceContentType, targetContentType) ?? throw new InvalidOperationException($"No content converters could convert '{sourceContentType}' to '{targetContentType}'.");
+    return await this.Create(sourceContentType, targetContentType)?.ConvertTo(site, content, sourceContentType, targetContentType) ?? throw new InvalidOperationException($"No content converters could convert '{sourceContentType}' to '{targetContentType}'.");
   }
 }

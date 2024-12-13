@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Markdig.Syntax;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nucleus.Abstractions.Search;
 using Typesense;
@@ -10,6 +12,8 @@ namespace Nucleus.Extensions.TypeSense;
 
 internal class TypeSenseRequest
 {
+  // https://github.com/DAXGRID/typesense-dotnet
+
   System.Net.Http.IHttpClientFactory HttpClientFactory { get; }
   public Uri Uri { get; }
   public string IndexName { get; }
@@ -19,23 +23,26 @@ internal class TypeSenseRequest
   private TimeSpan IndexingPause { get; } = TimeSpan.FromSeconds(1);
 
   private Typesense.ITypesenseClient _client { get; set; }
+  private ILogger Logger { get; }
 
   public string DebugInformation { get; internal set; }
 
-  internal static readonly char[] TOKEN_SPLIT_CHARS = [' ', ',', ';', ':', '<', '>', '.', '!', '#', '_', '\t', '\n', '\r'];
-  internal const int TOKENS_PER_CHUNK = 512;  // the token limit for gte-large is 512
-  internal const int IMPORT_BATCH_SIZE = 10;
+  internal static readonly char[] WORD_BREAKING_CHARS = [' ', ',', ';', ':', '<', '>', '.', '!', '#', '_', '/', '\\', '\t', '\n', '\r'];
+  internal const int WORDS_PER_CHUNK = 512;  // the token limit for gte-large is 512
+  internal const int IMPORT_BATCH_SIZE = 32;
+  internal const string CHUNK_ENTITY_NAME = "chunk";
 
-  public TypeSenseRequest(System.Net.Http.IHttpClientFactory httpClientFactory, Uri uri, string indexName, string apiKey)
-    : this(httpClientFactory, uri, indexName, apiKey, TimeSpan.Zero) { }
+  public TypeSenseRequest(System.Net.Http.IHttpClientFactory httpClientFactory, Uri uri, string indexName, string apiKey, ILogger logger)
+    : this(httpClientFactory, uri, indexName, apiKey, TimeSpan.Zero, logger) { }
 
-  public TypeSenseRequest(System.Net.Http.IHttpClientFactory httpClientFactory, Uri uri, string indexName, string apiKey, TimeSpan indexingPause)
+  public TypeSenseRequest(System.Net.Http.IHttpClientFactory httpClientFactory, Uri uri, string indexName, string apiKey, TimeSpan indexingPause, ILogger logger)
   {
     this.HttpClientFactory = httpClientFactory;
     this.Uri = uri;
     this.IndexName = indexName;
     this.ApiKey = apiKey;
     this.IndexingPause = indexingPause;
+    this.Logger = logger;
   }
 
   public Boolean Equals(Uri uri, string indexName, string apiKey)
@@ -98,11 +105,11 @@ internal class TypeSenseRequest
       new List<Field>
       {
         new Field(CamelCase(nameof(TypeSenseDocument.Id)), FieldType.String, false),
-        new Field(CamelCase(nameof(TypeSenseDocument.ParentId)), FieldType.String, false, true),
-        new Field(CamelCase(nameof(TypeSenseDocument.SiteId)), FieldType.String, false),
-        new Field(CamelCase(nameof(TypeSenseDocument.Url)), FieldType.String, false),
+        new Field(CamelCase(nameof(TypeSenseDocument.ParentId)), FieldType.String, true, true),
+        new Field(CamelCase(nameof(TypeSenseDocument.SiteId)), FieldType.String, true, false),
+        new Field(CamelCase(nameof(TypeSenseDocument.Url)), FieldType.String, false, false),
         
-        new Field(CamelCase(nameof(TypeSenseDocument.PageNumber)), FieldType.Int32, false, true),
+        new Field(CamelCase(nameof(TypeSenseDocument.ChunkNumber)), FieldType.Int32, false, true),
         new Field(CamelCase(nameof(TypeSenseDocument.Title)), FieldType.String, false, true),
         new Field(CamelCase(nameof(TypeSenseDocument.Content)), FieldType.String, false, true),        
         new Field(CamelCase(nameof(TypeSenseDocument.Summary)), FieldType.String, false, true),
@@ -116,18 +123,18 @@ internal class TypeSenseRequest
               CamelCase(nameof(TypeSenseDocument.Summary)),
               CamelCase(nameof(TypeSenseDocument.Content))
             ], 
-            new("ts/gte-large") 
+            new("ts/gte-large")
           )
         },
 
-        new Field(CamelCase(nameof(TypeSenseDocument.Categories)), FieldType.StringArray, false, true),
-        new Field(CamelCase(nameof(TypeSenseDocument.Keywords)), FieldType.StringArray, false, true),
-        new Field(CamelCase(nameof(TypeSenseDocument.Scope)), FieldType.String, false, true),
+        new Field(CamelCase(nameof(TypeSenseDocument.Categories)), FieldType.StringArray, true, true),
+        new Field(CamelCase(nameof(TypeSenseDocument.Keywords)), FieldType.StringArray, true, true),
+        new Field(CamelCase(nameof(TypeSenseDocument.Scope)), FieldType.String, true, true),
         new Field(CamelCase(nameof(TypeSenseDocument.SourceId)), FieldType.String, false, true),
 
         new Field(CamelCase(nameof(TypeSenseDocument.ContentType)), FieldType.String, false, true),
         new Field(CamelCase(nameof(TypeSenseDocument.PublishedDate)), FieldType.String, false, true),
-        new Field(CamelCase(nameof(TypeSenseDocument.Type)), FieldType.String, false, true),
+        new Field(CamelCase(nameof(TypeSenseDocument.Type)), FieldType.String, true, true),
         new Field(CamelCase(nameof(TypeSenseDocument.Size)), FieldType.Int64, false, true),
 
         new Field(CamelCase(nameof(TypeSenseDocument.IsSecure)), FieldType.Bool, false, true),
@@ -188,66 +195,109 @@ internal class TypeSenseRequest
     return await client.RetrieveCollection(this.IndexName);
   }
 
-  public async Task IndexContent(List<TypeSenseDocument> contents)
+  public async Task IndexContent(TypeSenseDocument document)
   {
-    // break large content into chunks
-    foreach (TypeSenseDocument content in contents.ToList())
+    List<TypeSenseDocument> actions = [];
+
+    // break large content into chunks    
+    if (!String.IsNullOrEmpty(document.Content))
     {
-      if (!String.IsNullOrEmpty(content.Content))
+      foreach (TypeSenseDocument action in SplitContent(document))
       {
-        // try to fit into the token limit.  
+        actions.Add(action);
+      }        
+    }
+    
+    // include original document
+    actions.Insert(0, document);
 
-        string[] tokens = content.Content.Split(TOKEN_SPLIT_CHARS, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        int pages = (int)Math.Floor((decimal)tokens.Length / TOKENS_PER_CHUNK) + 1;
-        string[] tokenizedContent = content.Content.Split(TOKEN_SPLIT_CHARS, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        List<string[]> chunks = tokenizedContent.Chunk(TOKENS_PER_CHUNK).ToList();
+    ITypesenseClient client = await GetClient();
 
-        // if the content has more than TOKENS_PER_PAGE tokens, create additional chunks
-        if (tokenizedContent.Length > TOKENS_PER_CHUNK)
+    foreach(TypeSenseDocument[] block in actions.Chunk(IMPORT_BATCH_SIZE))
+    {
+      await ExecuteBatch(client, document.Id, block);
+    }   
+
+    return;
+  }
+
+  private async Task ExecuteBatch(ITypesenseClient client, string key, TypeSenseDocument[] batch)
+  {
+    List<ImportResponse> indexResponse = await client.ImportDocuments<TypeSenseDocument>(this.IndexName, batch, batch.Length, ImportType.Upsert);
+
+    foreach (ImportResponse response in indexResponse)
+    {
+      if (!response.Success)
+      {
+        Logger.LogError("IndexContent for [{key}] succeeded with error '{error}'.", key, response.Error);
+        throw new InvalidOperationException(response.Error);
+      }
+    }    
+
+    if (this.IndexingPause > TimeSpan.Zero)
+    {
+      await Task.Delay(this.IndexingPause);
+    }
+  }
+
+  private IEnumerable<TypeSenseDocument> SplitContent(TypeSenseDocument contentItem)
+  {
+    if (!String.IsNullOrEmpty(contentItem.Content))
+    {
+      string[] tokens = contentItem.Content.Split(WORD_BREAKING_CHARS, StringSplitOptions.RemoveEmptyEntries);
+      int pageCount = (int)Math.Floor((decimal)tokens.Length / WORDS_PER_CHUNK) + 1;
+      string[] contentWords = contentItem.Content.Split(WORD_BREAKING_CHARS, StringSplitOptions.RemoveEmptyEntries);
+      List<string[]> chunks = contentWords.Chunk(WORDS_PER_CHUNK).ToList();
+
+      if (contentWords.Length <= WORDS_PER_CHUNK)
+      {
+        // document token count is less than the chunk limit, do nothing. The original document index entry is submitted 
+        this.Logger.LogInformation("The document content fits the vector token limit, generating a vector for the original document content of type '{type},{id}', url '{url}'.", contentItem.Scope, contentItem.SourceId, contentItem.Url);
+      }
+      else
+      {
+        this.Logger.LogInformation("The document content exceeds the vector token limit, generating {pagecount} chunked index entries for content of type '{type},{id}', url '{url}'.", pageCount, contentItem.Scope, contentItem.SourceId, contentItem.Url);
+
+        // set .Content property on the main index entry to null - we are chunking because it exceeds the limit. The chunks array already contains the split/chunked content - if
+        // we left .Content set, we would get a Request Entity Too Large error response when submitting the index update.
+        contentItem.Content = null;
+
+        // generate document chunks. TypeSense generates vectors on its own, so we don't need to create them here, just make sure the index entries are 
+        // split into chunks with Content that is small enough to vectorize.
+        for (int page = 0; page < pageCount; page++)
         {
-          for (int page = 0; page < pages; page++)
+          this.Logger.LogTrace("Generating chunk #{page}.", page);
+
+          IEnumerable<string> words = chunks[page].Where(chunk => chunk.Length > 1 && chunk.Length < 30);
+          string vectorContent = string.Join(" ", words);
+          int tokenCount = words.Count();
+
+          TypeSenseDocument pagedDocument = new();
+
+          CopyMetaData(contentItem, pagedDocument);
+
+          pagedDocument.ChunkNumber = page + 1;
+
+          pagedDocument.Id = $"{contentItem.Id}_{CHUNK_ENTITY_NAME}_{pagedDocument.ChunkNumber}";
+
+          pagedDocument.IndexingDate = DateTime.UtcNow;
+
+          pagedDocument.ParentId = contentItem.Id;
+          pagedDocument.Title += $" [{pagedDocument.ChunkNumber}]";
+          pagedDocument.IndexingDate = DateTime.UtcNow;
+
+          // only try to generate vectors if the "tokenized" content is not empty
+          if (!string.IsNullOrEmpty(vectorContent))
           {
-            string vectorContent = string.Join(' ', chunks[page]); //string.Join(' ', tokenizedContent.Skip(page * TOKENS_PER_CHUNK).Take(TOKENS_PER_CHUNK));
-
-            TypeSenseDocument pagedDocument = new();
-
-            pagedDocument.Id += $"{content.Id}_pages_{page + 1}";
-            pagedDocument.Title += $" [{page + 1}]";
-            pagedDocument.ParentId = content.Id;
-            pagedDocument.PageNumber = page + 1;
-
-            CopyMetaData(content, pagedDocument);
             pagedDocument.Content = vectorContent;
-
-            contents.Add(pagedDocument);
+            
+            // submit chunked index entry            
+            this.Logger.LogTrace("Returning chunk #{page}.", page);
+            yield return pagedDocument;            
           }
         }
       }
     }
-
-    ITypesenseClient client = await GetClient();
-
-    IEnumerable<TypeSenseDocument[]> batchChunks = contents.Chunk(IMPORT_BATCH_SIZE);
-
-    foreach (TypeSenseDocument[] chunk in batchChunks)
-    {
-      List<ImportResponse> indexResponse = await client.ImportDocuments<TypeSenseDocument>(this.IndexName, chunk, chunk.Length, ImportType.Upsert);
-
-      foreach (ImportResponse response in indexResponse)
-      {
-        if (!response.Success)
-        {
-          throw new InvalidOperationException(response.Error);
-        }
-      }
-
-      if (this.IndexingPause > TimeSpan.Zero)
-      {
-        await Task.Delay(this.IndexingPause);
-      }
-    }
-
-    return;
   }
 
   private static void CopyMetaData(TypeSenseDocument source, TypeSenseDocument target)
@@ -288,7 +338,7 @@ internal class TypeSenseRequest
     return await client.RetrieveDocument<TypeSenseDocument>(this.IndexName, id);
   }
 
-  public async Task<SearchResult<TypeSenseDocument>> Search(SearchQuery query)
+  public async Task<SearchGroupedResult<TypeSenseDocument>> Search(SearchQuery query)
   {
     ITypesenseClient client = await GetClient();
 
@@ -298,7 +348,9 @@ internal class TypeSenseRequest
     }
     else
     {
-      SearchParameters searchParameters = new(query.SearchTerm)
+      string groupBy = CamelCase(nameof(TypeSenseDocument.ParentId));
+
+      GroupedSearchParameters searchParameters = new(query.SearchTerm, "", groupBy) //CamelCase(nameof(TypeSenseDocument.ParentId)))
       {
         HighlightStartTag = "<em>",
         HighlightEndTag = "</em>",
@@ -310,16 +362,19 @@ internal class TypeSenseRequest
         QueryByWeights = BuildFieldWeights(query),
         FilterBy = BuildFilter($"{BuildSiteFilter(query)}", $"{BuildRolesFilter(query)}", $"{BuildScopeFilter(query)}", $"{BuildArgsFilter(query)}"),
         TextMatchType = "max_score",
-        SortBy = "_text_match:desc"
+        SortBy = "_text_match:desc",
+        GroupMissingValues = false, 
+        GroupLimit = 1
       };
 
-      SearchResult<TypeSenseDocument> response = await client.Search<TypeSenseDocument>(this.IndexName, searchParameters);
+
+      SearchGroupedResult<TypeSenseDocument> response = await client.SearchGrouped<TypeSenseDocument>(this.IndexName, searchParameters);
    
       return ReplaceHighlights(response);
     }
   }
 
-  public async Task<SearchResult<TypeSenseDocument>> Suggest(SearchQuery query)
+  public async Task<SearchGroupedResult<TypeSenseDocument>> Suggest(SearchQuery query)
   {
     ITypesenseClient client = await GetClient();
 
@@ -329,7 +384,9 @@ internal class TypeSenseRequest
     }
     else
     {
-      SearchParameters searchParameters = new(query.SearchTerm + "*")
+      string groupBy = CamelCase(nameof(TypeSenseDocument.ParentId));
+
+      GroupedSearchParameters searchParameters = new(query.SearchTerm + "*", "", groupBy)
       {
         HighlightStartTag = "",
         HighlightEndTag = "", 
@@ -340,42 +397,47 @@ internal class TypeSenseRequest
         QueryByWeights = BuildFieldWeights(query),
         FilterBy = BuildFilter($"{BuildSiteFilter(query)}", $"{BuildRolesFilter(query)}", $"{BuildScopeFilter(query)}", $"{BuildArgsFilter(query)}"),
         TextMatchType = "max_score",
-        SortBy = "_text_match:desc"
+        SortBy = "_text_match:desc",
+        GroupMissingValues = false,
+        GroupLimit = 1
       };
 
-      SearchResult<TypeSenseDocument> response = await client.Search<TypeSenseDocument>(this.IndexName, searchParameters);
+      SearchGroupedResult<TypeSenseDocument> response = await client.SearchGrouped<TypeSenseDocument>(this.IndexName, searchParameters);
 
       return ReplaceHighlights(response);
     }
   }
 
 
-  private SearchResult<TypeSenseDocument> ReplaceHighlights(SearchResult<TypeSenseDocument> response)
+  private SearchGroupedResult<TypeSenseDocument> ReplaceHighlights(SearchGroupedResult<TypeSenseDocument> response)
   {
     // replace document field values with highlighted ones
-    foreach (Hit<TypeSenseDocument> objHit in response.Hits)
+    foreach (GroupedHit<TypeSenseDocument> groupedHit in response.GroupedHits)
     {
       // ?? objHit.Source.Score = objHit.VectorDistance;
 
-      foreach (Highlight highlight in objHit.Highlights)
+      foreach (Hit<TypeSenseDocument> hit in groupedHit.Hits)
       {
-        if (!string.IsNullOrEmpty(highlight.Snippet))
+        foreach (Highlight highlight in hit.Highlights)
         {
-          string strField = highlight.Field;
-
-          switch (strField)
+          if (!string.IsNullOrEmpty(highlight.Snippet))
           {
-            case "title":
-            {
+            string strField = highlight.Field;
 
-              objHit.Document.Title = highlight.Snippet;
-
-              break;
-            }
-            case "summary":
+            switch (strField)
             {
-              objHit.Document.Summary = highlight.Snippet;
-              break;
+              case "title":
+              {
+
+                hit.Document.Title = highlight.Snippet;
+
+                break;
+              }
+              case "summary":
+              {
+                hit.Document.Summary = highlight.Snippet;
+                break;
+              }
             }
           }
         }
@@ -432,10 +494,11 @@ internal class TypeSenseRequest
     return
     [
       CamelCase(nameof(TypeSenseDocument.Id)),
+      CamelCase(nameof(TypeSenseDocument.ParentId)),
       CamelCase(nameof(TypeSenseDocument.SiteId)),
       CamelCase(nameof(TypeSenseDocument.Url)),
       CamelCase(nameof(TypeSenseDocument.Title)),
-      CamelCase(nameof(TypeSenseDocument.PageNumber)),
+      CamelCase(nameof(TypeSenseDocument.ChunkNumber)),
       CamelCase(nameof(TypeSenseDocument.Summary)),
       CamelCase(nameof(TypeSenseDocument.Scope)),
       CamelCase(nameof(TypeSenseDocument.Type)),

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +12,7 @@ using Nucleus.Abstractions.Search;
 
 namespace Nucleus.Extensions.AdvancedSiteMap;
 
+[DisplayName("Advanced Site Map")]
 public class SearchIndexManager : ISearchIndexManager
 {
   private Nucleus.Abstractions.Models.Configuration.FolderOptions Options { get; }

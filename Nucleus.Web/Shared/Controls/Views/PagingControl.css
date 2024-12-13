@@ -6,13 +6,13 @@
 	display: flex;
 	gap: 4px;
 	align-items: center;
-	font-size: 0.9em;
+	font-size: 0.9rem;
 	justify-content: flex-end;
 }
 
 .nucleus-paging-control.compact
 {
-	font-size: 0.8em;
+	font-size: 0.8rem;
 	padding: 4px 4px 4px 4px;
 	gap: 2px;	
 }
@@ -53,14 +53,14 @@
 
 .nucleus-paging-control label
 {
-	margin-left: 0.5em;
-	margin-right: 0.5em;
+	margin-left: 0.5rem;
+	margin-right: 0.5rem;
 }
 
 .nucleus-paging-control.compact label
 {
-	margin-left: 0.25em;
-	margin-right: 0.25em;
+	margin-left: 0.25rem;
+	margin-right: 0.25rem;
 }
 
 .nucleus-paging-control .nucleus-pagingcontrol-pagebutton, .nucleus-paging-control .nucleus-pagingcontrol-pagedropdown, .nucleus-paging-control .nucleus-pagingcontrol-pagesizedropdown
@@ -86,13 +86,13 @@
 
 .nucleus-paging-control .nucleus-pagingcontrol-pagedropdown
 {
-	margin-left: 1em;
+	margin-left: 1rem;
 }
 
 .nucleus-paging-control.compact .nucleus-pagingcontrol-pagedropdown
 {
   margin-left: 0;
-	margin-right: 0.5em;
+	margin-right: 0.5rem;
 }
 
 .nucleus-paging-control .nucleus-pagingcontrol-pagesizedropdown, .nucleus-paging-control .nucleus-pagingcontrol-pagedropdown

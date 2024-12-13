@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Text.RegularExpressions;
@@ -16,6 +17,7 @@ using Nucleus.Extensions.Logging;
 
 namespace Nucleus.Extensions.AzureSearch;
 
+[DisplayName("Azure Search")]
 public class AzureSearchIndexManager : ISearchIndexManager
 {
   private ILogger<AzureSearchIndexManager> Logger { get; }
@@ -129,14 +131,14 @@ public class AzureSearchIndexManager : ISearchIndexManager
         {
           case "application/pdf":
             // Convert to plain text and perform special post-processing 
-            document.Content = RemoveInvalidChars(ToString(this.ContentConverter.ConvertTo(metadata.Content, metadata.ContentType, "text/plain")));
+            document.Content = RemoveInvalidChars(ToString(await this.ContentConverter.ConvertTo(metadata.Site, metadata.Content, metadata.ContentType, "text/plain")));
             break;
 
           case "text/html":
             //  Remove non-content HTML elements and attributes, then try to convert html format content to markdown, which maintains the structure of
             //  headings, tables, etc but is less verbose than HTML.
             byte[] htmlContent = CleanHtml(metadata.Content, metadata.ContentType, ["header", "footer", "script", "style", "noscript", "iframe", "link", "input", "img", "svg", "nav"], ["id", "class", "href", "method", "action", "enctype", "tabindex"], true);
-            document.Content = ToString(this.ContentConverter.ConvertTo(htmlContent, metadata.ContentType, "text/markdown"));
+            document.Content = ToString(await this.ContentConverter.ConvertTo(metadata.Site, htmlContent, metadata.ContentType, "text/markdown"));
             break;
 
           case "application/x-zip-compressed":
@@ -146,7 +148,7 @@ public class AzureSearchIndexManager : ISearchIndexManager
 
           default:
             // other formats, convert to plain text
-            document.Content = ToString(this.ContentConverter.ConvertTo(metadata.Content, metadata.ContentType, "text/plain"));
+            document.Content = ToString(await this.ContentConverter.ConvertTo(metadata.Site, metadata.Content, metadata.ContentType, "text/plain"));
             break;
         }
       }

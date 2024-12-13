@@ -50,13 +50,14 @@ public interface IContentConverter
   /// <summary>
   /// Convert the specified <paramref name="content"/> from <paramref name="sourceContentType"/> to <paramref name="targetContentType"/>.
   /// </summary>
+  /// <param name="site"></param>
   /// <param name="content"></param>
   /// <param name="sourceContentType"></param>
   /// <param name="targetContentType"></param>
   /// <returns></returns>
   /// <exception cref="InvalidOperationException">Thrown when the content converter is unable to convert the specified <paramref name="content"/> 
   /// from <paramref name="sourceContentType"/> to the specified to <paramref name="targetContentType"/></exception>
-  public byte[] ConvertTo(byte[] content, string sourceContentType, string targetContentType);
+  public Task<byte[]> ConvertTo(Models.Site site, byte[] content, string sourceContentType, string targetContentType);
 
   /// <summary>
   /// Allows the <see cref="IContentConverter"/> to nominate its priority for converting <paramref name="sourceContentType"/> to <paramref name="targetContentType"/>.

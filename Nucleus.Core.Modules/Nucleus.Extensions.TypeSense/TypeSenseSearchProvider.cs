@@ -75,7 +75,7 @@ public partial class TypeSenseSearchProvider : ISearchProvider
       query.Boost = settings.Boost;
     }
 
-    SearchResult<TypeSenseDocument> response = await request.Search(query);
+    SearchGroupedResult<TypeSenseDocument> response = await request.Search(query);
 
     IEnumerable<SearchResult> results = await ToSearchResults(query.Site, response);
 
@@ -95,13 +95,13 @@ public partial class TypeSenseSearchProvider : ISearchProvider
     return await request.GetContentByKey(key);
   }
 
-  private async Task<IEnumerable<SearchResult>> ToSearchResults(Site site, SearchResult<TypeSenseDocument> response)
+  private async Task<IEnumerable<SearchResult>> ToSearchResults(Site site, SearchGroupedResult<TypeSenseDocument> response)
   {
     List<SearchResult> results = [];
 
-    foreach (Hit<TypeSenseDocument> result in response.Hits)
+    foreach (GroupedHit<TypeSenseDocument> result in response.GroupedHits)
     {
-      results.Add(await ToSearchResult(site, result));
+      results.Add(await ToSearchResult(site, result.Hits.First()));
     }
 
     return results;
@@ -201,7 +201,7 @@ public partial class TypeSenseSearchProvider : ISearchProvider
 
     TypeSenseRequest request = CreateRequest(query.Site, settings);
 
-    SearchResult<TypeSenseDocument> response = await request.Suggest(query);
+    SearchGroupedResult<TypeSenseDocument> response = await request.Suggest(query);
 
     IEnumerable<SearchResult> results = await ToSearchResults(query.Site, response);
 
@@ -222,7 +222,8 @@ public partial class TypeSenseSearchProvider : ISearchProvider
       new System.Uri(settings.ServerUrl),
       settings.IndexName,
       Models.Settings.DecryptApiKey(site, settings.EncryptedApiKey),
-      TimeSpan.FromSeconds(settings.IndexingPause)
+      TimeSpan.FromSeconds(settings.IndexingPause),
+      this.Logger
     );
   }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Nucleus.Abstractions.Models;
 
 namespace Nucleus.Abstractions.Conversion;
 
@@ -23,10 +24,11 @@ public interface IContentConverterFactory
   /// <summary>
   /// Perform conversion using the best available content converter (<see cref="IContentConverter"/> implementation).
   /// </summary>
+  /// <param name="site"></param>
   /// <param name="content"></param>
   /// <param name="sourceContentType"></param>
   /// <param name="targetContentType"></param>
   /// <returns></returns>
-  public byte[] ConvertTo(byte[] content, string sourceContentType, string targetContentType);
+  public Task<byte[]> ConvertTo(Site site, byte[] content, string sourceContentType, string targetContentType);
 
 }

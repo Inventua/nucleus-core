@@ -1,24 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
-using HtmlAgilityPack;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Http.Logging;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Nucleus.Abstractions.Managers;
+using Nucleus.Abstractions.Conversion;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Search;
 using Nucleus.Extensions.Logging;
 
 namespace Nucleus.Extensions.TypeSense;
 
+[DisplayName("Typesense")]
 public class TypeSenseIndexManager : ISearchIndexManager
 {
   private IHttpClientFactory HttpClientFactory { get;}
+  private IContentConverterFactory ContentConverter { get; }
 
   private ILogger<TypeSenseIndexManager> Logger { get; }
 
@@ -27,9 +23,10 @@ public class TypeSenseIndexManager : ISearchIndexManager
   private readonly string[] HtmlElements = ["div", "span", "p", "h1", "h2", "h3", "h4", "h5", "h6", ""];
 
 
-  public TypeSenseIndexManager(IConfiguration configuration, IHttpClientFactory httpClientFactory, ILogger<TypeSenseIndexManager> logger)
+  public TypeSenseIndexManager(IHttpClientFactory httpClientFactory, IContentConverterFactory contentConverter, ILogger<TypeSenseIndexManager> logger)
   {
     this.HttpClientFactory = httpClientFactory;
+    this.ContentConverter = contentConverter;
     this.Logger = logger;
   }
 
@@ -55,7 +52,8 @@ public class TypeSenseIndexManager : ISearchIndexManager
         new System.Uri(settings.ServerUrl),
         settings.IndexName,
         Models.Settings.DecryptApiKey(site, settings.EncryptedApiKey),
-        TimeSpan.FromSeconds(settings.IndexingPause)
+        TimeSpan.FromSeconds(settings.IndexingPause), 
+        this.Logger
       );
     }
 
@@ -102,7 +100,7 @@ public class TypeSenseIndexManager : ISearchIndexManager
       this.Logger?.LogError(ex, "An error was encounted deriving text content for {url}. The index entry will be created with meta-data (no content) only.", metadata.Url);      
     }
 
-    await this.Request(metadata.Site).IndexContent([document]);
+    await this.Request(metadata.Site).IndexContent(document);
 
     // free up memory - file content is part of the feed data, and this could exhaust available memory 
     document.Dispose();
@@ -116,74 +114,75 @@ public class TypeSenseIndexManager : ISearchIndexManager
     }
     else
     {
-      if (!String.IsNullOrEmpty(settings.TikaServerUrl))
-      {
-        HttpClient client = this.HttpClientFactory.CreateClient();
-        HttpRequestMessage request = new(HttpMethod.Put, new System.Uri( new System.Uri(settings.TikaServerUrl), "/tika"));
+      return System.Text.Encoding.UTF8.GetString(await this.ContentConverter.ConvertTo(metaData.Site, metaData.Content, metaData.ContentType, "text/plain"));
+      ////if (!String.IsNullOrEmpty(settings.TikaServerUrl))
+      ////{
+      ////  HttpClient client = this.HttpClientFactory.CreateClient();
+      ////  HttpRequestMessage request = new(HttpMethod.Put, new System.Uri( new System.Uri(settings.TikaServerUrl), "/tika"));
 
-        ByteArrayContent content = new(metaData.Content);
+      ////  ByteArrayContent content = new(metaData.Content);
 
-        if (!string.IsNullOrEmpty(metaData.ContentType))
-        {
-          content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(metaData.ContentType);
-        }
+      ////  if (!string.IsNullOrEmpty(metaData.ContentType))
+      ////  {
+      ////    content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(metaData.ContentType);
+      ////  }
 
-        request.Content = content;
+      ////  request.Content = content;
 
-        request.Headers.Accept.Add(new("text/plain"));
+      ////  request.Headers.Accept.Add(new("text/plain"));
 
-        HttpResponseMessage response = client.Send(request);
+      ////  HttpResponseMessage response = client.Send(request);
 
-        response.EnsureSuccessStatusCode();
+      ////  response.EnsureSuccessStatusCode();
         
-        return await response.Content.ReadAsStringAsync();       
-      }
-      else
-      {
-        // tika server not specified, handle content from text-based files only
-        switch (metaData.ContentType)
-        {
-          case "text/html":
-            HtmlAgilityPack.HtmlDocument htmlContent = new();
-            htmlContent.LoadHtml(System.Text.Encoding.UTF8.GetString(metaData.Content));
+      ////  return await response.Content.ReadAsStringAsync();       
+      ////}
+      ////else
+      ////{
+      ////  // tika server not specified, handle content from text-based files only
+      ////  switch (metaData.ContentType)
+      ////  {
+      ////    case "text/html":
+      ////      HtmlAgilityPack.HtmlDocument htmlContent = new();
+      ////      htmlContent.LoadHtml(System.Text.Encoding.UTF8.GetString(metaData.Content));
 
-            return ConvertHtmlToPlainText(new StringBuilder(), htmlContent.DocumentNode).ToString();
+      ////      return ConvertHtmlToPlainText(new StringBuilder(), htmlContent.DocumentNode).ToString();
 
-          case "text/plain":
-          case "text/csv":
-          case "text/markdown":
-            return System.Text.Encoding.UTF8.GetString(metaData.Content);
+      ////    case "text/plain":
+      ////    case "text/csv":
+      ////    case "text/markdown":
+      ////      return System.Text.Encoding.UTF8.GetString(metaData.Content);
 
-          default:
-            // TypeSense search cannot process file content from a feed, the search service must be set up with "Indexers" that run in the TypeSense Cloud
-            // to collect and parse file content.
-            return null;
-        }
-      }
+      ////    default:
+      ////      // TypeSense search cannot process file content from a feed, the search service must be set up with "Indexers" that run in the TypeSense Cloud
+      ////      // to collect and parse file content.
+      ////      return null;
+      ////  }
+      ////}
     }
   }
 
-  private StringBuilder ConvertHtmlToPlainText(StringBuilder builder, HtmlNode node)
-  {
-    foreach (HtmlNode subnode in node.ChildNodes)
-    {
-      if (subnode.NodeType == HtmlNodeType.Text && HtmlElements.Contains(node.Name, StringComparer.OrdinalIgnoreCase))
-      {
-        // Append the text of the current node to the StringBuilder
-        if (!String.IsNullOrWhiteSpace(subnode.InnerText))
-        {
-          builder.AppendLine(System.Web.HttpUtility.HtmlDecode(subnode.InnerText.Trim()));
-        }
-      }
-      else if (subnode.NodeType == HtmlNodeType.Element)
-      {
-        // Recursively convert the child nodes to plain text
-        ConvertHtmlToPlainText(builder, subnode);
-      }
-    }
+  ////private StringBuilder ConvertHtmlToPlainText(StringBuilder builder, HtmlNode node)
+  ////{
+  ////  foreach (HtmlNode subnode in node.ChildNodes)
+  ////  {
+  ////    if (subnode.NodeType == HtmlNodeType.Text && HtmlElements.Contains(node.Name, StringComparer.OrdinalIgnoreCase))
+  ////    {
+  ////      // Append the text of the current node to the StringBuilder
+  ////      if (!String.IsNullOrWhiteSpace(subnode.InnerText))
+  ////      {
+  ////        builder.AppendLine(System.Web.HttpUtility.HtmlDecode(subnode.InnerText.Trim()));
+  ////      }
+  ////    }
+  ////    else if (subnode.NodeType == HtmlNodeType.Element)
+  ////    {
+  ////      // Recursively convert the child nodes to plain text
+  ////      ConvertHtmlToPlainText(builder, subnode);
+  ////    }
+  ////  }
 
-    return builder;
-  }
+  ////  return builder;
+  ////}
 
 
   public async Task Remove(ContentMetaData metadata)

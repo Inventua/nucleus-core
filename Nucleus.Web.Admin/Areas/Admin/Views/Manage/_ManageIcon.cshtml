@@ -9,8 +9,13 @@
     { @* image *@
       <img class="nucleus-index-icon" src="@Html.Raw(Model.Glyph)"/>
     }
+    else if (Model.Glyph?.StartsWith("<svg ") == true && Model.Glyph?.EndsWith("</svg>") == true)
+    {
+      <span class="nucleus-index-icon">@Html.Raw(Model.Glyph)</span>
+    }
     else
-    { @* not specified, use default "puzzle piece" material icon *@
+    { 
+    @* not specified, use default "puzzle piece" material icon *@
       <span class="nucleus-index-icon">&#xe87b;</span>
     }
     <div class="nucleus-index-button-content">

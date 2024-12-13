@@ -12,7 +12,6 @@ public class Settings
   internal const string SITESETTING_ATTACHMENT_MAXSIZE = "typesense:attachment-maxsize";
   internal const string SITESETTING_INDEXING_PAUSE = "typesense:indexing-pause";
 
-  internal const string SITESETTING_TIKA_SERVER_URL = "typesense:tika-server-url";
 
   internal const string SITESETTING_BOOST_TITLE = "typesense:boost-title";
   internal const string SITESETTING_BOOST_SUMMARY = "typesense:boost-summary";
@@ -31,8 +30,6 @@ public class Settings
   public string EncryptedApiKey { get; set; }
 
   public double IndexingPause { get; set; } = 1;
-
-  public string TikaServerUrl { get; set; }
 
   public Nucleus.Abstractions.Search.SearchQuery.BoostSettings Boost { get; set; } = new();
 
@@ -77,12 +74,6 @@ public class Settings
       }
     }
 
-    if (site.SiteSettings.TryGetValue(SITESETTING_TIKA_SERVER_URL, out string tikaServerUrl))
-    {
-      this.TikaServerUrl = tikaServerUrl;
-    }
-
-
     this.Boost.Title = GetSetting(site, SITESETTING_BOOST_TITLE, this.Boost.Title);
     this.Boost.Summary = GetSetting(site, SITESETTING_BOOST_SUMMARY, this.Boost.Summary);
     this.Boost.Categories = GetSetting(site, SITESETTING_BOOST_CATEGORIES, this.Boost.Categories);
@@ -110,8 +101,6 @@ public class Settings
     site.SiteSettings.TrySetValue(SITESETTING_INDEXING_PAUSE, this.IndexingPause);
 
     site.SiteSettings.TrySetValue(SITESETTING_INDEXER_NAME, this.IndexerName);
-
-    site.SiteSettings.TrySetValue(SITESETTING_TIKA_SERVER_URL, this.TikaServerUrl);
 
     site.SiteSettings.TrySetValue(SITESETTING_BOOST_TITLE, this.Boost.Title);
     site.SiteSettings.TrySetValue(SITESETTING_BOOST_SUMMARY, this.Boost.Summary);

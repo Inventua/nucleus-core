@@ -34,7 +34,10 @@ vector and sematic search in the future.
 
 ### Typesense
 The [Nucleus search provider for Typesense](/other-extensions/typesense-search/) is the second-most fully-featured implementation. If you plan to self-manage 
-your search service, you can install Typesense and Tika server and get nearly all of the features of the more expensive cloud-based services. 
+your search service, you can install Typesense and Tika server and get nearly all of the features of the more expensive cloud-based services. If you are self-hosting,
+be aware that generating vectors using the gte-large model during indexing is very slow.  Indexing runs in a scheduled task so the slow indexing performance is 
+generally not noticable. When you are populating your index for the first time, you may need to wait a while before all resources are added to your search index.
+> Our test/dev Typesense server is an old Mac Mini i5 (2 core) running Unbuntu. A faster server could reduce or eliminate the vector-generation performance issue.
 
 ### Bing and Google
 The [Nucleus search provider for Bing](/other-extensions/bing-custom-search/) and [Nucleus search provider for Google](/other-extensions/google-custom-search/) 

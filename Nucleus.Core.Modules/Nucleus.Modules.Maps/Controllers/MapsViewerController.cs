@@ -2,7 +2,9 @@
 using Nucleus.Abstractions;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
+using Nucleus.Abstractions.Models.FileSystem;
 using Nucleus.Modules.Maps.MapProviders;
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -14,12 +16,15 @@ namespace Nucleus.Modules.Maps.Controllers
     private Context Context { get; }
     private IPageModuleManager PageModuleManager { get; }
     private IHttpClientFactory HttpClientFactory { get; }
+    private IFileSystemManager FileSystemManager { get; }
 
-    public MapsViewerController(IHttpClientFactory httpClientFactory, Context Context, IPageModuleManager pageModuleManager)
+
+    public MapsViewerController(IHttpClientFactory httpClientFactory, Context Context, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager)
     {
       this.Context = Context;
       this.PageModuleManager = pageModuleManager;
       this.HttpClientFactory = httpClientFactory;
+      this.FileSystemManager = fileSystemManager;
     }
 
     [HttpGet]
@@ -37,10 +42,22 @@ namespace Nucleus.Modules.Maps.Controllers
 
       settings.GetSettings(this.Context.Module);
 
-      return File (await mapProvider.GetRenderer().RenderMap(this.Context.Site, this.HttpClientFactory, settings), "image/png");
+      if (settings.MapFileId != Guid.Empty)
+      {
+
+        File mapFile = await this.FileSystemManager.GetFile(this.Context.Site, settings.MapFileId);
+        if (mapFile != null)
+        {
+          return File(await this.FileSystemManager.GetFileContents(this.Context.Site, mapFile), "image/png");
+        }
+
+      }
+
+      return File(await mapProvider.GetRenderer().RenderMap(this.Context.Site, this.HttpClientFactory, settings), "image/png");
+
     }
 
-    internal static IMapProvider GetMapProvider(string  provider)
+    internal static IMapProvider GetMapProvider(string provider)
     {
       return provider == "AzureMaps" ? new AzureMapProvider() : new GoogleMapProvider();
     }
@@ -48,8 +65,15 @@ namespace Nucleus.Modules.Maps.Controllers
     private ViewModels.Viewer BuildViewModel()
     {
       ViewModels.Viewer viewModel = new();
-            
+
       viewModel.MapProvider = Models.Settings.GetMapProvider(this.Context.Module);
+
+      IMapProvider mapProvider = GetMapProvider(viewModel.MapProvider);
+      Models.Settings settings = mapProvider.GetSettings();
+      settings.GetSettings(this.Context.Module);
+
+      viewModel.Width = settings.Width;
+      viewModel.Height = settings.Height;
 
       return viewModel;
     }

@@ -19,6 +19,7 @@ public class Settings
     public const string MODULESETTING_MAPS_LATITUDE = "maps:latitude";
     public const string MODULESETTING_MAPS_HEIGHT = "maps:height";
     public const string MODULESETTING_MAPS_WIDTH = "maps:width";
+    public const string MODULESETTING_MAPS_MAP_FILE_ID = "maps:map-file:id";
   }
   public const string DEFAULT_MAPPROVIDER = "AzureMaps";
 
@@ -35,11 +36,12 @@ public class Settings
   // Azure zoom/tile grid info https://learn.microsoft.com/en-au/azure/azure-maps/zoom-levels-and-tile-grid
   // Google Maps https://developers.google.com/maps/documentation/maps-static/start#Zoomlevels
   public int Zoom { get; set; } = 10;
-  public double Longitude { get; set; } = 145.123793D;
-  public double Latitude { get; set; } = -38.145244D;
+  public double Longitude { get; set; } 
+  public double Latitude { get; set; }
   public int Height { get; set; } = 500;
   public int Width { get; set; } = 500;
-
+  public Guid MapFileId { get; set; }
+ 
 
   public virtual void GetSettings(PageModule module)
   {
@@ -48,6 +50,7 @@ public class Settings
     this.Longitude = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_MAPS_LONGITUDE, this.Longitude);
     this.Width = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_MAPS_WIDTH, this.Width);
     this.Height = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_MAPS_HEIGHT, this.Height);
+    this.MapFileId = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_MAPS_MAP_FILE_ID, this.MapFileId);
   }
 
 
@@ -58,6 +61,7 @@ public class Settings
     module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_MAPS_LONGITUDE, this.Longitude);
     module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_MAPS_WIDTH, this.Width);
     module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_MAPS_HEIGHT, this.Height);
+    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_MAPS_MAP_FILE_ID, this.MapFileId);
   }
 
   public virtual void SetApiKey(PageModule module, string key)

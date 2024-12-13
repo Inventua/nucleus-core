@@ -33,6 +33,8 @@ public class GoogleMapRenderer : IMapRenderer
 
     HttpResponseMessage response = await httpClient.SendAsync(request);
 
+    response.EnsureSuccessStatusCode();
+
     return await response.Content.ReadAsStreamAsync();
   }
 

@@ -11,6 +11,8 @@ namespace Nucleus.Modules.Maps.MapRenderers;
 
 public class AzureMapRenderer : IMapRenderer
 {
+  private const int TILE_SIZE = 512; // roadmap
+
   public async Task<Stream> RenderMap(Site site, IHttpClientFactory httpClientFactory, Settings settings)
   {
     //return await RenderAzureMap(settings.GetApiKey(site), settings.Zoom, settings.Longitude, settings.Latitude, settings.Height, settings.Width); 
@@ -40,26 +42,12 @@ public class AzureMapRenderer : IMapRenderer
     return client;
   }
 
-  //private static async Task<System.IO.Stream> RenderAzureMap(string apiKey, int zoom, double longitude, double latitude, int height, int width)
-  //{    
-  //  Azure.AzureKeyCredential credential = new(apiKey);
-  //  MapsRenderingClient client = new(credential);
-
-  //  MapTileIndex tileIndex = MapsRenderingClient.PositionToTileXY(new Azure.Core.GeoJson.GeoPosition(longitude, latitude), zoom, width);
-
-  //  GetMapTileOptions mapTileOptions = new(MapTileSetId.MicrosoftImagery, tileIndex); //new MapTileIndex(tileIndex.X, tileIndex.Y, zoom));
-
-  //  Azure.Response<System.IO.Stream> mapTile = await client.GetMapTileAsync(mapTileOptions);
-
-  //  return mapTile;
-  //}
-
   private static async Task<System.IO.Stream> RenderAzureMap(MapsRenderingClient client, int zoom, double longitude, double latitude, int height, int width)
   {
-    MapTileIndex tileIndex = MapsRenderingClient.PositionToTileXY(new Azure.Core.GeoJson.GeoPosition(longitude, latitude), zoom, width);
+    MapTileIndex tileIndex = MapsRenderingClient.PositionToTileXY(new Azure.Core.GeoJson.GeoPosition(longitude, latitude), zoom, TILE_SIZE);
 
     GetMapTileOptions mapTileOptions = new(MapTileSetId.MicrosoftImagery, tileIndex); //new MapTileIndex(tileIndex.X, tileIndex.Y, zoom));
-
+    
     Azure.Response<System.IO.Stream> mapTile = await client.GetMapTileAsync(mapTileOptions);
 
     return mapTile;

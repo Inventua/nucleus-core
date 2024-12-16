@@ -125,7 +125,8 @@ public class TypeSenseSettingsController : Controller
       this.HttpClientFactory,
       new System.Uri(settings.ServerUrl),
       settings.IndexName,
-      GetApiKey(settings)
+      GetApiKey(settings),
+      this.Logger
     );
   }
 

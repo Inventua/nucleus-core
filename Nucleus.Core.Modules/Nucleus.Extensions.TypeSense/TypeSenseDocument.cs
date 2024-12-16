@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
-using HtmlAgilityPack;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Search;
 
@@ -54,6 +53,7 @@ internal class TypeSenseDocument : IDisposable
     {
       this.PublishedDate = content.PublishedDate.Value.Date;
     }
+    this.IndexingDate = DateTime.UtcNow;
 
     if (content.Size.HasValue)
     {
@@ -80,14 +80,14 @@ internal class TypeSenseDocument : IDisposable
   public string Id { get; set; } = "";
 
   /// <summary>
-  /// Special field for document chunks (pages). ParentId contains the Id of the document for which this is a "chunk"
+  /// Special field for document chunks. ParentId contains the Id of the document for which this is a "chunk"
   /// </summary>
   public string? ParentId { get; set; }
 
   /// <summary>
-  /// Page number for document chunks (pages). 
+  /// Chunk number for document chunks. 
   /// </summary>
-  public int? PageNumber { get; set; }
+  public int? ChunkNumber { get; set; }
 
   /// <summary>
   /// This Id of the site which the resource belongs to.
@@ -168,6 +168,11 @@ internal class TypeSenseDocument : IDisposable
   /// This value is optional.  If specified, it can be displayed in search results.
   /// </remarks>
   public DateTime? PublishedDate { get; set; }
+
+  /// <summary>
+  /// The date/time that the index entry was created or modified.
+  /// </summary>
+  public DateTime? IndexingDate { get; set; }
 
   /// <summary>
   /// The size of the resource in bytes.

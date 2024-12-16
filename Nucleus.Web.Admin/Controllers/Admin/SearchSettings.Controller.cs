@@ -24,16 +24,18 @@ public class SearchSettingsController : Controller
   private IApiKeyManager ApiKeyManager { get; }
   private ISiteManager SiteManager { get; }
   private IEnumerable<ISearchProvider> SearchProviders { get; }
+  private IEnumerable<ISearchIndexManager> SearchIndexManagers { get; }
 
   private Context Context { get; }
 
-  public SearchSettingsController(Context context, ILogger<ApiKeysController> logger, ISiteManager siteManager, IApiKeyManager ApiKeyManager, IEnumerable<ISearchProvider> searchProviders)
+  public SearchSettingsController(Context context, ILogger<ApiKeysController> logger, ISiteManager siteManager, IApiKeyManager ApiKeyManager, IEnumerable<ISearchProvider> searchProviders, IEnumerable<ISearchIndexManager> searchIndexManagers)
   {
     this.Context = context;
     this.Logger = logger;
     this.ApiKeyManager = ApiKeyManager;
     this.SiteManager = siteManager;
     this.SearchProviders = searchProviders;
+    this.SearchIndexManagers = searchIndexManagers;
   }
 
   /// <summary>
@@ -68,7 +70,6 @@ public class SearchSettingsController : Controller
       await this.ApiKeyManager.Save(viewModel.ApiKey);
     }
 
-
     this.Context.Site.SiteSettings.TrySetValue(Site.SiteSearchSettingsKeys.APIKEY_ID, viewModel.ApiKey.Id);
     this.Context.Site.SiteSettings.TrySetValue(Site.SiteSearchSettingsKeys.DEFAULT_SEARCH_PROVIDER, viewModel.DefaultSearchProvider);
 
@@ -76,6 +77,11 @@ public class SearchSettingsController : Controller
     this.Context.Site.SiteSettings.TrySetValue(Site.SiteSearchSettingsKeys.INDEX_PUBLIC_FILES_ONLY, viewModel.IndexPublicFilesOnly);
     this.Context.Site.SiteSettings.TrySetValue(Site.SiteSearchSettingsKeys.INDEX_PUBLIC_PAGES_ONLY, viewModel.IndexPublicPagesOnly);
     this.Context.Site.SiteSettings.TrySetValue(Site.SiteSearchSettingsKeys.INDEX_PAGES_USE_SSL, viewModel.IndexPagesUseSsl);
+
+    foreach (ViewModels.Admin.SearchSettings.AvailableSearchManager manager in viewModel.SearchIndexManagers)
+    {
+      this.Context.Site.SiteSettings.TrySetValue($"{Site.SiteSearchSettingsKeys.SEARCH_INDEX_MANAGER_PREFIX}:{manager.ClassName.ToLower()}:enabled", manager.Enabled);
+    }
 
     await this.SiteManager.Save(this.Context.Site);
 
@@ -117,7 +123,28 @@ public class SearchSettingsController : Controller
     }
 
     viewModel.ApiKeys = await this.ApiKeyManager.List();
-    viewModel.SearchProviders = this.SearchProviders.Select(provider => new ViewModels.Admin.SearchSettings.AvailableSearchProvider() { Name = GetFriendlyName(provider.GetType()), ClassName = provider.GetType().FullName }).OrderBy(provider => provider.Name).ToList();
+
+    viewModel.SearchProviders = this.SearchProviders
+      .Select(provider => new ViewModels.Admin.SearchSettings.AvailableSearchProvider() { Name = GetFriendlyName(provider.GetType()), ClassName = provider.GetType().FullName })
+      .OrderBy(provider => provider.Name)
+      .ToList();
+
+    viewModel.SearchIndexManagers = this.SearchIndexManagers
+      .Select(Manager => new ViewModels.Admin.SearchSettings.AvailableSearchManager() { Name = GetFriendlyName(Manager.GetType()), ClassName = Manager.GetType().FullName })
+      .OrderBy(Manager => Manager.Name)
+      .ToList();
+
+    foreach (ViewModels.Admin.SearchSettings.AvailableSearchManager manager in viewModel.SearchIndexManagers)
+    {
+      if (this.Context.Site.SiteSettings.TryGetValue($"{Site.SiteSearchSettingsKeys.SEARCH_INDEX_MANAGER_PREFIX}:{manager.ClassName.ToLower()}:enabled",out Boolean isEnabled))
+      {
+        manager.Enabled = isEnabled;
+      }
+      else
+      {
+        manager.Enabled = true;
+      }
+    }
 
     return viewModel;
   }

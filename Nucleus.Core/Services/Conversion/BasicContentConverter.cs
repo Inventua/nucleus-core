@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Nucleus.Abstractions.Conversion;
+using Nucleus.Abstractions.Models;
 using UglyToad.PdfPig.DocumentLayoutAnalysis;
 using UglyToad.PdfPig.DocumentLayoutAnalysis.WordExtractor;
 
@@ -82,18 +84,18 @@ public class BasicContentConverter : Abstractions.Conversion.IContentConverter
   /// <remarks>
   /// This function supports convertion to and from text/html, text/markdown and text/plain.
   /// </remarks>
-  public byte[] ConvertTo(byte[] content, string sourceContentType, string targetContentType)
+  public Task<byte[]> ConvertTo(Site site, byte[] content, string sourceContentType, string targetContentType)
   {
     switch (targetContentType)
     {
       case "text/markdown":
-        return ToMarkdown(content, sourceContentType);
+        return Task.FromResult(ToMarkdown(content, sourceContentType));
 
       case "text/html":
-        return ToHtml(content, sourceContentType);
+        return Task.FromResult(ToHtml(content, sourceContentType));
 
       case "text/plain":
-        return ToPlainText(content, sourceContentType);
+        return Task.FromResult(ToPlainText(content, sourceContentType));
 
       default:
         throw new InvalidOperationException($"{nameof(BasicContentConverter)} cannot convert to '{sourceContentType}' to '{targetContentType}'.");

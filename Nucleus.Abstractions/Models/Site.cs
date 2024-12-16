@@ -84,7 +84,12 @@ namespace Nucleus.Abstractions.Models
 			/// Specifies whether to index files which are not available for "all users"
 			/// </summary>
 			public const string INDEX_PUBLIC_FILES_ONLY = "searchfeeder:include-public-files-only";
-		}
+
+      /// <summary>
+      /// Prefix for search index manager settings (enabled)
+      /// </summary>
+      public const string SEARCH_INDEX_MANAGER_PREFIX = "searchfeeder:indexmanager";
+    }
 
 		/// <summary>
 		/// SiteSettings keys for mail template settings.

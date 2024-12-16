@@ -1,0 +1,24 @@
+﻿@model Nucleus.Extensions.TikaServerConverter.ViewModels.Settings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@Html.AddStyle("~!/../settings.css")
+<div class="nucleus-editor-panel">
+  <h2 class="nucleus-control-panel-heading">Tika Server Settings</h2>
+  @using (Html.BeginNucleusForm("SaveSettings", "SaveSettings", "TikaServerConverterSettings", "TikaServerConverter", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+  {
+    <fieldset role="group" aria-labelledby="heading" class="flex-grow-1">
+		  <h2 class="nucleus-control-panel-heading">Settings</h2>
+		  <div class="nucleus-flex-fields">
+        <SettingsControl caption="Tika Server Endpoint" helptext="Enter the endpoint (URL) for your Tika server, including the port, which is normally 9998. If specified, Tika will be used to extract file contents.">
+          @Html.TextBoxFor(model => model.TikaServerEndpoint)
+        </SettingsControl>
+		  </div>
+	  </fieldset>
+
+	  <div class="nucleus-form-buttonrow">
+      @Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "TikaServerConverterSettings", "TikaServerConverter"), new { })
+	  </div>
+  }
+</div>

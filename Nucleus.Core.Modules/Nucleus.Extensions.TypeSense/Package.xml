@@ -28,7 +28,6 @@
       <folder name="bin">
         <file name="Nucleus.Extensions.TypeSense.dll" />
         <file name="Typesense.dll" />
-        <file name="HtmlAgilityPack.dll" />
       </folder>
       <!-- 
         when the project property RazorCompileOnBuild=true view (.cshtml) files do not need to be included in package.xml (this file) 
@@ -38,6 +37,12 @@
 				<file name="Viewer.cshtml" />
 				<file name="Settings.cshtml" />
 			</folder>-->
+
+      <cleanup>
+        <folder name="bin">          
+          <file name="HtmlAgilityPack.dll" />
+        </folder>
+      </cleanup>
     </component>
   </components>
 </package>

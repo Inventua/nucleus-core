@@ -35,6 +35,27 @@
         @Html.CheckBoxFor(model => model.IndexPagesUseSsl, new { @class = "ToggleSwitch" })
       </SettingsControl>
 
+      <h3>Search Index Managers</h3>
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Enabled</th>
+          </tr>
+        </thead>
+        <tbody>
+          @foreach (var item in Model.SearchIndexManagers.Select((manager, index) => new { Index = index, Manager = manager }))
+          {
+            <tr>
+              <td>@item.Manager.Name</td>
+              <td>
+                @Html.HiddenFor(model => model.SearchIndexManagers[item.Index].ClassName)
+                @Html.CheckBoxFor(model => model.SearchIndexManagers[item.Index].Enabled, new { @class = "ToggleSwitch" })
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
     </fieldset>
 
     <div class="nucleus-button-panel">

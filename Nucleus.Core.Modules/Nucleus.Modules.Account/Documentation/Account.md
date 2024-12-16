@@ -26,7 +26,6 @@ The Login module allows a registered user to login to the site.
 | Allow remember me?          | Users have the option to extend their login session by toggling . |
 | Allow user name recovery?   | An existing user can enter their registered email address to recover their username. |
 | Allow password reset?       | Enables an existing user to reset their password using a token sent to their registered email address. |
-| Prevent Automatic Login?    | Enables an existing user to automatically logon for future sessions. |
 
 ### Recover module
 Users can recover their username via their registered email address.

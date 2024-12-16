@@ -5,7 +5,7 @@
   <description>
 		The Bing Custom Search extension provides a search provider that retrieves search results using the Bing custom search service.
 	</description>
-  <compatibility minVersion="2.0.0.1" maxVersion="*" />
+  <compatibility minVersion="2.1.0.0" maxVersion="*" />
   <components>
     <component folderName="BingCustomSearch" optional="false">
       <controlPanelExtensionDefinition id="a5af24c3-0152-4513-9039-e3293791fb37">

@@ -6,7 +6,7 @@
   <description>
 		File converter extension used to convert documents using an Apache Tika Server.
 	</description>
-  <compatibility minVersion="2.0.0.1" maxVersion="*" />
+  <compatibility minVersion="2.1.0.0" maxVersion="*" />
   <components>
     <component folderName="TikaServerConverter" optional="false">
       <controlPanelExtensionDefinition id="8e8c2c25-9dda-4e05-8120-e7b4f4f608ac">

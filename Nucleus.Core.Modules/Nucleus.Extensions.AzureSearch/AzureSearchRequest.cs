@@ -11,7 +11,6 @@ using Azure.Search.Documents.Models;
 using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Search;
-using Nucleus.Extensions.AzureSearch.Models;
 using OpenAI.Embeddings;
 
 // https://learn.microsoft.com/en-us/azure/search/index-projections-concept-intro?tabs=kstore-rest
@@ -678,10 +677,10 @@ internal partial class AzureSearchRequest
   {
     if (!String.IsNullOrEmpty(contentItem.Content))
     {
-      string[] tokens = contentItem.Content.Split(WORD_BREAKING_CHARS, StringSplitOptions.RemoveEmptyEntries);
-      int pageCount = (int)Math.Floor((decimal)tokens.Length / WORDS_PER_CHUNK) + 1;
+      //string[] tokens = contentItem.Content.Split(WORD_BREAKING_CHARS, StringSplitOptions.RemoveEmptyEntries);
       string[] contentWords = contentItem.Content.Split(WORD_BREAKING_CHARS, StringSplitOptions.RemoveEmptyEntries);
       List<string[]> chunks = contentWords.Chunk(WORDS_PER_CHUNK).ToList();
+      int pageCount = chunks.Count(); // (int)Math.Floor((decimal)tokens.Length / WORDS_PER_CHUNK) + 1;
 
       if (contentWords.Length <= WORDS_PER_CHUNK)
       {

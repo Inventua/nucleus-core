@@ -100,9 +100,9 @@
 						@foreach (var item in Model.History)
 						{
 							<tr>
-								<td>@item.StartDate.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-								<td>@item.FinishDate.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-								<td>@item.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+								<td>@item.StartDate.FormatDate(this.Context.Request.GetUserTimeZone(), true)</td>
+                <td>@item.FinishDate.FormatDate(this.Context.Request.GetUserTimeZone(), true)</td>
+                <td>@item.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone(), true)</td>
 								<td>@item.Server</td>
 								<td>@item.Status</td>
 							</tr>

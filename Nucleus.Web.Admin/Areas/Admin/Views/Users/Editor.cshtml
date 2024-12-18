@@ -108,7 +108,7 @@
               {
                 <div class="alert alert-info d-flex align-items-center gap-1">
                   <span>
-                    This user was locked out at @Model.User.Secrets.LastLockoutDate.FormatDate(this.Context.Request.GetUserTimeZone()) after
+                    This user was locked out at @Model.User.Secrets.LastLockoutDate.FormatDate(this.Context.Request.GetUserTimeZone(), true) after
                     @Model.User.Secrets.FailedPasswordAttemptCount unsuccessful login attempts.
 
                     @if (@Model.LockoutResetDate < DateTime.UtcNow)
@@ -117,7 +117,7 @@
                     }
                     else
                     {
-                      <text>The lockout will automatically end at <text>@Model.LockoutResetDate.FormatDate(this.Context.Request.GetUserTimeZone())</text>.</text>
+                      <text>The lockout will automatically end at <text>@Model.LockoutResetDate.FormatDate(this.Context.Request.GetUserTimeZone(), true)</text>.</text>
                     }
                   </span>
                   <button type="submit" class="btn btn-primary ms-auto text-nowrap" data-target=".UserEditor" formaction="@Url.AreaAction("UnlockUser", "Users", "Admin")">Unlock Account</button>
@@ -128,7 +128,7 @@
                   Last Login Date:
                   @if (Model.User.Secrets.LastLoginDate.HasValue)
                   {
-                    <span>@Model.User.Secrets.LastLoginDate.Value.FormatDate(this.Context.Request.GetUserTimeZone())</span>
+                    <span>@Model.User.Secrets.LastLoginDate.Value.FormatDate(this.Context.Request.GetUserTimeZone(), true)</span>
                   }
                   else
                   {
@@ -141,7 +141,7 @@
                   Last Password Changed Date:
                   @if (Model.User.Secrets.LastPasswordChangedDate.HasValue)
                   {
-                    <span>@Model.User.Secrets.LastPasswordChangedDate.Value.FormatDate(this.Context.Request.GetUserTimeZone())</span>
+                    <span>@Model.User.Secrets.LastPasswordChangedDate.Value.FormatDate(this.Context.Request.GetUserTimeZone(), true)</span>
                   }
                   else
                   {

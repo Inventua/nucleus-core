@@ -33,6 +33,19 @@ namespace Nucleus.ViewFeatures
     /// <param name="timezone">Current user time zone.  Use this.Context.Request.GetUserTimeZone() to use the auto-detected time zone.</param>
     /// <returns></returns>
     public static string FormatDate(this DateTime? value, TimeZoneInfo timezone)
+    {
+      return FormatDate(value, timezone, false);
+    }
+
+    /// <summary>
+    /// Convert a DateTime from UTC to local time and output as a string in short date+short or long time format. The <paramref name="useLongTimeFormat"/> 
+    /// parameter controls the time format.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="timezone">Current user time zone.  Use this.Context.Request.GetUserTimeZone() to use the auto-detected time zone.</param>
+    /// <param name="useLongTimeFormat">Specifies whether to use short or long time format.</param>
+    /// <returns></returns>
+    public static string FormatDate(this DateTime? value, TimeZoneInfo timezone, Boolean useLongTimeFormat)
 		{
 			if (value.HasValue)
 			{
@@ -44,6 +57,7 @@ namespace Nucleus.ViewFeatures
 			}
 		}
 
+
     /// <summary>
     /// Convert a DateTime from UTC to local time and output as a string in short date+short time format.
     /// </summary>
@@ -51,6 +65,19 @@ namespace Nucleus.ViewFeatures
     /// <param name="timezone">Current user time zone.  Use this.Context.Request.GetUserTimeZone() to use the auto-detected time zone.</param>
     /// <returns></returns>
     public static string FormatDate(this DateTime value, TimeZoneInfo timezone)
+    {
+      return FormatDate(value, timezone, false);
+    }
+
+    /// <summary>
+    /// Convert a DateTime from UTC to local time and output as a string in short date + short or long time format. The <paramref name="useLongTimeFormat"/> 
+    /// parameter controls the time format.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="timezone">Current user time zone.  Use this.Context.Request.GetUserTimeZone() to use the auto-detected time zone.</param>
+    /// <param name="useLongTimeFormat">Specifies whether to use short or long time format.</param>
+    /// <returns></returns>
+    public static string FormatDate(this DateTime value, TimeZoneInfo timezone, Boolean useLongTimeFormat)
 		{
 			if (value == DateTime.MinValue)
 			{
@@ -74,7 +101,14 @@ namespace Nucleus.ViewFeatures
         }
         else
         {
-          return $"{TimeZoneInfo.ConvertTime(utcValue, timezone):g}";
+          if (useLongTimeFormat)
+          {
+            return $"{TimeZoneInfo.ConvertTime(utcValue, timezone):G}";
+          }
+          else
+          {
+            return $"{TimeZoneInfo.ConvertTime(utcValue, timezone):g}";
+          }
         }
 			}
 		}

@@ -37,6 +37,9 @@ namespace Nucleus.Abstractions.Search
     /// </summary>
     public Boolean StrictSearchTerms { get; set; }
 
+    /// <summary>
+    /// Flags used for the <see cref="Options"/> property to select search result behaviors.
+    /// </summary>
     [Flags]
     public enum QueryOptions
     {

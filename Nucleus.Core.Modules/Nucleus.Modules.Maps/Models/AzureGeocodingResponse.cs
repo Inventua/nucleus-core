@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Nucleus.Abstractions.Models;
-using Nucleus.Extensions;
+﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace Nucleus.Modules.Maps.Models;
@@ -83,7 +80,7 @@ public class AzureGeocodingResponse
   public class GeocodePoint
   {
     [JsonPropertyName("coordinates")]
-    public string[]? Coordinates { get; set; }
+    public string[] Coordinates { get; set; }
     //public Coordinates Location { get; set; }
 
     [JsonPropertyName("type")]

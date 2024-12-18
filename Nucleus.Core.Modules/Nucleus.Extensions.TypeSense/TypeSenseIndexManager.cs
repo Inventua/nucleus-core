@@ -19,9 +19,7 @@ public class TypeSenseIndexManager : ISearchIndexManager
 
   private ILogger<TypeSenseIndexManager> Logger { get; }
 
-  private TypeSenseRequest _request { get; set; }
-
-  private readonly string[] HtmlElements = ["div", "span", "p", "h1", "h2", "h3", "h4", "h5", "h6", ""];
+  private TypeSenseRequest CachedRequest { get; set; }
 
   private readonly string[] ARCHIVE_MIME_TYPES = ["application/x-zip-compressed", "application/x-gzip", "application/x-tar", "application/x-7z-compressed"];
 
@@ -46,9 +44,9 @@ public class TypeSenseIndexManager : ISearchIndexManager
       throw new InvalidOperationException($"The TypeSense search index name is not set for site '{site.Name}'.");
     }
 
-    if (_request == null || !_request.Equals(new System.Uri(settings.ServerUrl), settings.IndexName, Models.Settings.DecryptApiKey(site, settings.EncryptedApiKey)))
+    if (CachedRequest == null || !CachedRequest.Equals(new System.Uri(settings.ServerUrl), settings.IndexName, Models.Settings.DecryptApiKey(site, settings.EncryptedApiKey)))
     {
-      _request = new
+      CachedRequest = new
       (
         this.HttpClientFactory,
         new System.Uri(settings.ServerUrl),
@@ -59,7 +57,7 @@ public class TypeSenseIndexManager : ISearchIndexManager
       );
     }
 
-    return _request;
+    return CachedRequest;
   }
 
   public async Task<Boolean> CanConnect(Site site)
@@ -95,14 +93,7 @@ public class TypeSenseIndexManager : ISearchIndexManager
 
     try
     {
-      if (metadata.Content.Length > settings.AttachmentMaxSize * 1024 * 1024 )
-      {
-        document.Content = null;
-      }
-      else
-      {
-        document.Content = await ToText(metadata, settings);
-      }
+      document.Content = await ToText(metadata, settings);      
     }
     catch (Exception ex)
     {
@@ -115,9 +106,13 @@ public class TypeSenseIndexManager : ISearchIndexManager
     document.Dispose();
   }
 
-  public async Task<string?> ToText(ContentMetaData metaData, Models.Settings settings)
+  public async Task<string> ToText(ContentMetaData metaData, Models.Settings settings)
   {
-    if (metaData.Content.Length == 0)
+    if (metaData.Content.Length > settings.AttachmentMaxSize * 1024 * 1024)
+    {
+      return null;
+    }
+    else if (metaData.Content.Length == 0)
     {
       return null;
     }
@@ -135,9 +130,7 @@ public class TypeSenseIndexManager : ISearchIndexManager
   }
 
   public async Task Remove(ContentMetaData metadata)
-  {
-    Models.Settings settings = new(metadata.Site);
-
+  {    
     await this.Request(metadata.Site).RemoveContent(TypeSenseDocument.GenerateId(metadata));
   }
 }

@@ -58,11 +58,11 @@
           </tr>
           <tr>
             <th scope="row">Process Start Time</th>
-            <td>@Model.StartTime.FormatDate(this.Context.Request.GetUserTimeZone()) [UTC @this.Context.Request.GetUserTimeZone().BaseUtcOffset.FormatTimeSpan(FormatExtensions.TimespanFormats.TimeOffset)] (@Model.Uptime)</td>
+            <td>@Model.StartTime.FormatDate(this.Context.Request.GetUserTimeZone(), true) [UTC @this.Context.Request.GetUserTimeZone().BaseUtcOffset.FormatTimeSpan(FormatExtensions.TimespanFormats.TimeOffset)] (@Model.Uptime)</td>
           </tr>
           <tr>
             <th scope="row">Server Time</th>
-            <td>@DateTime.UtcNow.FormatDate(this.Context.Request.GetUserTimeZone()) [UTC @this.Context.Request.GetUserTimeZone().BaseUtcOffset.FormatTimeSpan(FormatExtensions.TimespanFormats.TimeOffset)]</td>
+            <td>@DateTime.UtcNow.FormatDate(this.Context.Request.GetUserTimeZone(), true) [UTC @this.Context.Request.GetUserTimeZone().BaseUtcOffset.FormatTimeSpan(FormatExtensions.TimespanFormats.TimeOffset)]</td>
           </tr>
           <tr>
             <th scope="row">CPU Used</th>
@@ -307,5 +307,18 @@
 </div>
 
 <script>
+  // get the log file content when a log is selected from the dropdown
   jQuery('.System .LogFile').on('change', function () { jQuery(this).parents('form').submit(); })
+
+  // open the logs dropdown when the logs tab is selected, if it does not have a value selected already
+  jQuery('.System .nav-tabs button[data-bs-target="#system-logs"]').on('click', function (event)
+  { 
+    var selectElement = jQuery('.System .LogFile');
+    if (selectElement.length > 0 && selectElement.val() === '' && selectElement[0].showPicker)
+    {
+      selectElement[0].showPicker();       
+    }
+  });
+  
+
 </script>

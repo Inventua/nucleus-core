@@ -437,7 +437,7 @@ public class SystemController : Controller
       System.IO.DirectoryInfo logFolder = new(this.LogFolderPath);
       Logger.LogTrace("Log folder {logFolderPath} exists, and contains {count} .log files.", this.LogFolderPath, logFolder.EnumerateFiles("*.log").Count());
 
-      List<Nucleus.Web.ViewModels.Admin.Shared.LogFileInfo> logs = new();
+      List<Nucleus.Web.ViewModels.Admin.Shared.LogFileInfo> logs = [];
       foreach (System.IO.FileInfo file in logFolder.EnumerateFiles("*.log"))
       {
         System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(file.Name, LogFileConstants.LOGFILE_REGEX);
@@ -445,13 +445,20 @@ public class SystemController : Controller
         if (match.Success && match.Groups.Count >= 3)
         {
           Logger.LogTrace("Log file {file.Name} matches the expected pattern.", file.Name);
+          string machineName = match.Groups["computername"].Value;
 
-          if (DateTime.TryParseExact(match.Groups[1].Value, LogFileConstants.DATE_FILENAME_FORMAT, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeUniversal, out DateTime logDate))
+          if (DateTime.TryParseExact(match.Groups["logdate"].Value, LogFileConstants.DATE_FILENAME_FORMAT, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeUniversal, out DateTime logDate))
           {
+            string startTime = $"{logDate.ToLocalTime():dd MMM yyyy hh:mm tt}";
+            // use start + 23h 59m unless it would be in the future, otherwise "now"
+            string finishTime = logDate > DateTime.UtcNow ? "now" : $"{logDate.AddDays(1).AddSeconds(-1).ToLocalTime():dd MMM yyyy hh:mm tt}";
+            
             logs.Add(new Nucleus.Web.ViewModels.Admin.Shared.LogFileInfo()
             {
               Filename = file.Name,
-              Title = $"{logDate.ToLocalTime():dd MMM yyyy} [{match.Groups[2].Value}]",
+              // the date embedded in the file name is UTC. We convert to local time and show a date/time range (start/finish time) in the dropdown to
+              // make it clear what the date range of log entries in the file is.
+              Title = $"{machineName} {startTime} - {finishTime}",
               LogDate = logDate
             });
           }
@@ -472,7 +479,7 @@ public class SystemController : Controller
     }
     else
     {
-      viewModelOutput.LogSettings.LogFiles = new();
+      viewModelOutput.LogSettings.LogFiles = [];
       if (String.IsNullOrEmpty(this.LogFolderPath))
       {
         viewModelOutput.LogSettings.LogMessage = $"The text file log folder is not set.";

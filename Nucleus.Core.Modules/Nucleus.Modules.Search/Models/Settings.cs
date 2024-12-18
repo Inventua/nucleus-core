@@ -11,7 +11,7 @@ namespace Nucleus.Modules.Search.Models;
 
 public class Settings
 {
-  private class ModuleSettingsKeys
+  private class SettingsKeys
   {
     public const string MODULESETTING_SEARCHPROVIDER = "search:search-provider";
     public const string MODULESETTING_DISPLAY_MODE = "search:display-mode";
@@ -54,83 +54,80 @@ public class Settings
   }
 
   public string SearchProvider { get; set; }
-  public Guid ResultsPageId { get; set; }
+  public Guid ResultsPageId { get; set; } = Guid.Empty;
   public string Prompt { get; set; } = PROMPT_DEFAULT;
 
-  public DisplayModes DisplayMode { get; set; }
-  public SearchModes SearchMode { get; set; }
-  public string SearchCaption { get; set; }
-  public string SearchButtonCaption { get; set; }
+  public DisplayModes DisplayMode { get; set; } = DisplayModes.Full;
+  public SearchModes SearchMode { get; set; } = SearchModes.Any;
+  public string SearchCaption { get; set; } = "Search Term";
+  public string SearchButtonCaption { get; set; } = "Search";
 
-  public Boolean IncludeUrlTextFragment { get; set; }
+  public Boolean IncludeUrlTextFragment { get; set; } = true;
   public Boolean IncludeFiles { get; set; } = true;
   public string IncludeScopes { get; set; }
-  public int MaximumSuggestions { get; set; }
+  public int MaximumSuggestions { get; set; } = 5;
 
-  public Boolean ShowUrl { get; set; }
-  public Boolean ShowSummary { get; set; }
-  public Boolean ShowCategories { get; set; }
-  public Boolean ShowPublishDate { get; set; }
+  public Boolean ShowUrl { get; set; } = false;
+  public Boolean ShowSummary { get; set; } = true;
+  public Boolean ShowCategories { get; set; } = true;
+  public Boolean ShowPublishDate { get; set; } = true;
 
-  public Boolean ShowSize { get; set; }
-  public Boolean ShowScore { get; set; }
-  public Boolean ShowScoreAssessment { get; set; }
-  public Boolean ShowType { get; set; }
-
+  public Boolean ShowSize { get; set; } = true;
+  public Boolean ShowScore { get; set; } = true;
+  public Boolean ShowScoreAssessment { get; set; } = false;
+  public Boolean ShowType { get; set; } = true;
 
   public void GetSettings(PageModule module)
   {
-    this.SearchProvider = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SEARCHPROVIDER, "");
-    this.ResultsPageId = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RESULTS_PAGE, Guid.Empty);
-    this.DisplayMode = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_DISPLAY_MODE, DisplayModes.Full);
-    this.SearchCaption = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SEARCH_CAPTION, "Search Term");
-    this.Prompt = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SEARCH_PROMPT, PROMPT_DEFAULT);
-    this.SearchButtonCaption = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SEARCH_BUTTON_CAPTION, "Search");
-    this.IncludeFiles = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_INCLUDE_FILES, true);
+    this.SearchProvider = module.ModuleSettings.Get(SettingsKeys.MODULESETTING_SEARCHPROVIDER, this.SearchProvider);
+    this.ResultsPageId = module.ModuleSettings.Get(SettingsKeys.MODULESETTING_RESULTS_PAGE, this.ResultsPageId);
+    this.DisplayMode = module.ModuleSettings.Get(SettingsKeys.MODULESETTING_DISPLAY_MODE, this.DisplayMode);
+    this.SearchCaption = module.ModuleSettings.Get(SettingsKeys.MODULESETTING_SEARCH_CAPTION, this.SearchCaption);
+    this.Prompt = module.ModuleSettings.Get(SettingsKeys.MODULESETTING_SEARCH_PROMPT, this.Prompt);
+    this.SearchButtonCaption = module.ModuleSettings.Get(SettingsKeys.MODULESETTING_SEARCH_BUTTON_CAPTION, this.SearchButtonCaption);
+    this.IncludeFiles = module.ModuleSettings.Get(SettingsKeys.MODULESETTING_INCLUDE_FILES, this.IncludeFiles);
 
-    this.ShowUrl = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SHOW_URL, false);
-    this.ShowSummary = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SHOW_SUMMARY, true);
-    this.ShowCategories = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SHOW_CATEGORIES, true);
-    this.ShowPublishDate = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SHOW_PUBLISHEDDATE, true);
+    this.ShowUrl = module.ModuleSettings.Get(SettingsKeys.MODULESETTING_SHOW_URL, this.ShowUrl);
+    this.ShowSummary = module.ModuleSettings.Get(SettingsKeys.MODULESETTING_SHOW_SUMMARY, this.ShowSummary);
+    this.ShowCategories = module.ModuleSettings.Get(SettingsKeys.MODULESETTING_SHOW_CATEGORIES, this.ShowCategories);
+    this.ShowPublishDate = module.ModuleSettings.Get(SettingsKeys.MODULESETTING_SHOW_PUBLISHEDDATE, this.ShowPublishDate);
 
-    this.ShowType = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SHOW_TYPE, true);
-    this.ShowSize = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SHOW_SIZE, true);
-    this.ShowScore = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SHOW_SCORE, true);
-    this.ShowScoreAssessment = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SHOW_SCORE_ASSESSMENT, true);
-    this.IncludeUrlTextFragment = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_INCLUDE_URL_TEXT_FRAGMENT, true);
+    this.ShowType = module.ModuleSettings.Get(SettingsKeys.MODULESETTING_SHOW_TYPE, this.ShowType);
+    this.ShowSize = module.ModuleSettings.Get(SettingsKeys.MODULESETTING_SHOW_SIZE, this.ShowSize);
+    this.ShowScore = module.ModuleSettings.Get(SettingsKeys.MODULESETTING_SHOW_SCORE, this.ShowScore);
+    this.ShowScoreAssessment = module.ModuleSettings.Get(SettingsKeys.MODULESETTING_SHOW_SCORE_ASSESSMENT, this.ShowScoreAssessment);
+    this.IncludeUrlTextFragment = module.ModuleSettings.Get(SettingsKeys.MODULESETTING_INCLUDE_URL_TEXT_FRAGMENT, this.IncludeUrlTextFragment);
 
-    this.IncludeScopes = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_INCLUDE_SCOPES, "");
-    this.MaximumSuggestions = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_MAXIMUM_SUGGESTIONS, 5);
-    this.SearchMode = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SEARCH_MODE, SearchModes.Any);
-
-    this.SearchButtonCaption = String.IsNullOrWhiteSpace(this.SearchButtonCaption) ? "Search" : this.SearchButtonCaption;
+    this.IncludeScopes = module.ModuleSettings.Get(SettingsKeys.MODULESETTING_INCLUDE_SCOPES, this.IncludeScopes);
+    this.MaximumSuggestions = module.ModuleSettings.Get(SettingsKeys.MODULESETTING_MAXIMUM_SUGGESTIONS, this.MaximumSuggestions);
+    this.SearchMode = module.ModuleSettings.Get(SettingsKeys.MODULESETTING_SEARCH_MODE, this.SearchMode);
   }
 
   public void SetSettings(PageModule module)
   {
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_SEARCHPROVIDER, this.SearchProvider);
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_RESULTS_PAGE, this.ResultsPageId);
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_DISPLAY_MODE, this.DisplayMode);
+    module.ModuleSettings.Set(SettingsKeys.MODULESETTING_SEARCHPROVIDER, this.SearchProvider);
+    module.ModuleSettings.Set(SettingsKeys.MODULESETTING_RESULTS_PAGE, this.ResultsPageId);
+    module.ModuleSettings.Set(SettingsKeys.MODULESETTING_DISPLAY_MODE, this.DisplayMode);
 
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_SEARCH_CAPTION, this.SearchCaption);
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_SEARCH_PROMPT, this.Prompt);
+    module.ModuleSettings.Set(SettingsKeys.MODULESETTING_SEARCH_CAPTION, this.SearchCaption);
+    module.ModuleSettings.Set(SettingsKeys.MODULESETTING_SEARCH_PROMPT, this.Prompt);
 
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_SEARCH_BUTTON_CAPTION, this.SearchButtonCaption);
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_INCLUDE_FILES, this.IncludeFiles);
+    module.ModuleSettings.Set(SettingsKeys.MODULESETTING_SEARCH_BUTTON_CAPTION, this.SearchButtonCaption);
+    module.ModuleSettings.Set(SettingsKeys.MODULESETTING_INCLUDE_FILES, this.IncludeFiles);
 
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_SHOW_URL, this.ShowUrl);
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_SHOW_SUMMARY, this.ShowSummary);
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_SHOW_CATEGORIES, this.ShowCategories);
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_SHOW_PUBLISHEDDATE, this.ShowPublishDate);
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_INCLUDE_URL_TEXT_FRAGMENT, this.IncludeUrlTextFragment);
+    module.ModuleSettings.Set(SettingsKeys.MODULESETTING_SHOW_URL, this.ShowUrl);
+    module.ModuleSettings.Set(SettingsKeys.MODULESETTING_SHOW_SUMMARY, this.ShowSummary);
+    module.ModuleSettings.Set(SettingsKeys.MODULESETTING_SHOW_CATEGORIES, this.ShowCategories);
+    module.ModuleSettings.Set(SettingsKeys.MODULESETTING_SHOW_PUBLISHEDDATE, this.ShowPublishDate);
+    module.ModuleSettings.Set(SettingsKeys.MODULESETTING_INCLUDE_URL_TEXT_FRAGMENT, this.IncludeUrlTextFragment);
 
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_SHOW_TYPE, this.ShowType);
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_SHOW_SIZE, this.ShowSize);
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_SHOW_SCORE, this.ShowScore);
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_SHOW_SCORE_ASSESSMENT, this.ShowScoreAssessment);
+    module.ModuleSettings.Set(SettingsKeys.MODULESETTING_SHOW_TYPE, this.ShowType);
+    module.ModuleSettings.Set(SettingsKeys.MODULESETTING_SHOW_SIZE, this.ShowSize);
+    module.ModuleSettings.Set(SettingsKeys.MODULESETTING_SHOW_SCORE, this.ShowScore);
+    module.ModuleSettings.Set(SettingsKeys.MODULESETTING_SHOW_SCORE_ASSESSMENT, this.ShowScoreAssessment);
 
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_INCLUDE_SCOPES, this.IncludeScopes);
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_MAXIMUM_SUGGESTIONS, this.MaximumSuggestions);
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_SEARCH_MODE, this.SearchMode);
+    module.ModuleSettings.Set(SettingsKeys.MODULESETTING_INCLUDE_SCOPES, this.IncludeScopes);
+    module.ModuleSettings.Set(SettingsKeys.MODULESETTING_MAXIMUM_SUGGESTIONS, this.MaximumSuggestions);
+    module.ModuleSettings.Set(SettingsKeys.MODULESETTING_SEARCH_MODE, this.SearchMode);
   }
 }

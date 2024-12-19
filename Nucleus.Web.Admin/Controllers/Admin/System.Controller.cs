@@ -560,7 +560,7 @@ public class SystemController : Controller
   {
     try
     {
-      string licenseFilePath = Path.Join(this.HostingEnvironment.WebRootPath, "license.txt");
+      string licenseFilePath = Path.Join(FolderOptions.GetWebRootFolder(), "license.txt");
       if (System.IO.File.Exists(licenseFilePath))
       {
         return System.IO.File.ReadAllText(licenseFilePath).ToHtml("text/plain");

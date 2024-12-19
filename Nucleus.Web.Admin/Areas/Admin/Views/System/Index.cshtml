@@ -296,12 +296,18 @@
             <th scope="row">Copyright</th>
             <td>@Model.Copyright</td>
           </tr>
-          <tr>
+          @* <tr>
             <th scope="row">License</th>
             <td>@Html.Raw(Model.License)</td>
-          </tr>
+          </tr> *@
         </tbody>
       </table>
+
+      <div class="p-2 border border-1 border-primary-subtle">
+        <h2 action="fw-bold">License</h2>
+        <div>@Html.Raw(Model.License)</div>
+      </div>
+
     </TabPanel>
   </TabContent>
 </div>

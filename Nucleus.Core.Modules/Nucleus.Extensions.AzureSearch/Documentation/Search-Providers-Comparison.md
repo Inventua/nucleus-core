@@ -37,7 +37,8 @@ The [Nucleus search provider for Typesense](/other-extensions/typesense-search/)
 your search service, you can install Typesense and Tika server and get nearly all of the features of the more expensive cloud-based services. If you are self-hosting,
 be aware that generating vectors using the gte-large model during indexing is very slow.  Indexing runs in a scheduled task so the slow indexing performance is 
 generally not noticable. When you are populating your index for the first time, you may need to wait a while before all resources are added to your search index.
-> Our test/dev Typesense server is an old Mac Mini i5 (2 core) running Unbuntu. A faster server could reduce or eliminate the vector-generation performance issue.
+> Our test/development Typesense server is an old Mac Mini i5 (2 core) running Unbuntu, which works, but is not adequate for production use. A faster server and GPU would 
+reduce or eliminate the vector-generation performance issue.
 
 ### Bing and Google
 The [Nucleus search provider for Bing](/other-extensions/bing-custom-search/) and [Nucleus search provider for Google](/other-extensions/google-custom-search/) 
@@ -50,9 +51,9 @@ The Azure OpenAI chat completions service can integrate with your Azure Search i
 [Retrieval-Augmented Generation](https://learn.microsoft.com/en-us/azure/search/retrieval-augmented-generation-overview) (RAG). We have developed a 
 proof-of-concept module which provides a chat completion interface using an Azure Search index.
 
-Elastic Search and Typesense also have support for Retrieval Augmented Generation. 
+Elastic Search and Typesense also have support for Retrieval Augmented Generation (but our proof-of-concept was for Azure Search only). 
 
-Our current implementation of the Elastic Search provider does not implement vectors, which is normally a requirement for RAG. 
+**Elastic Search**: Our current implementation of the Elastic Search provider does not implement vectors, which is normally a requirement for RAG. 
 
-Typesense can integrate with OpenAI (that is, [OpenAI](https://openai.com/), not Microsoft Azure OpenAI) for generative AI, but we have not 
+**Typesense**: Typesense can integrate with OpenAI (that is, [OpenAI](https://openai.com/), not Microsoft Azure OpenAI as at December 2024) for generative AI, but we have not 
 tested RAG with Typesense.

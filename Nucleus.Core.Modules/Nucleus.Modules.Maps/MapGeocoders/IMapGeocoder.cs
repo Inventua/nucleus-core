@@ -1,14 +1,10 @@
-﻿using Nucleus.Abstractions.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Nucleus.Modules.Maps.Models;
 
 namespace Nucleus.Modules.Maps.MapGeocoders;
 
-internal interface IMapGeocoder
+public interface IMapGeocoder
 {
-  public Task<Models.GeocodingLocation> LookupAddress(Site site, IHttpClientFactory httpClientFactory, Models.Settings settings, string address);
+  public Task<IEnumerable<GeocodingLocation>> LookupAddress(Settings settings, string address);
 }

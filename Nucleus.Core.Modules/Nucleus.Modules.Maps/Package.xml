@@ -13,6 +13,7 @@
         <settingsController>MapsSettingsController</settingsController>
         <viewAction>Index</viewAction>
         <editAction>Settings</editAction>
+        <categories>Content</categories>
       </moduleDefinition>
       <file name="readme.txt" />
       <!-- 

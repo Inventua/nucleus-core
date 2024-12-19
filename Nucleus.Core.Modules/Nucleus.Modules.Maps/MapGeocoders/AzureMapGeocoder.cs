@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Net.Http;
+using System.Linq;
 using System.Threading.Tasks;
-using Azure.Core;
 using Azure.Identity;
 using Azure.Maps.Search;
 using Nucleus.Abstractions.Models;
@@ -11,11 +10,17 @@ namespace Nucleus.Modules.Maps.MapGeocoders;
 
 public class AzureMapGeocoder : IMapGeocoder
 {
-  public async Task<Models.GeocodingLocation> LookupAddress(Site site, IHttpClientFactory httpClientFactory, Settings settings, string address)
+  private Site Site { get; }
+
+  public AzureMapGeocoder(Context context)
   {
-    return await GetGeocodeLocation(GetSearchClient(site, settings), address);
+    this.Site = context.Site;
   }
 
+  public async Task<IEnumerable<GeocodingLocation>> LookupAddress(Settings settings, string address)
+  {
+    return await GetGeocodeLocation(GetSearchClient(settings), address);
+  }
 
   /// <summary>
   /// Get the search client by using API key or client id if API key is not present.
@@ -23,47 +28,44 @@ public class AzureMapGeocoder : IMapGeocoder
   /// <param name="site"></param>
   /// <param name="settings"></param>
   /// <returns></returns>
-  private MapsSearchClient GetSearchClient(Site site, Settings settings)
+  private MapsSearchClient GetSearchClient(Settings settings)
   {
-    MapsSearchClient client;
-    
-    string apiKey = settings.GetApiKey(site);
-    if (!string.IsNullOrEmpty(apiKey))
-    {
-      Azure.AzureKeyCredential credential = new(apiKey);
-      client = new(credential);
-    }
-    else
-    {
-      TokenCredential clientCredential = new DefaultAzureCredential();
-      client = new(clientCredential, (settings as AzureMapSettings)?.AzureClientId);
-    }
-    return client;
+    string apiKey = settings.GetApiKey(this.Site);
+
+    return
+      !string.IsNullOrEmpty(apiKey) ?
+        new(new Azure.AzureKeyCredential(apiKey)) :
+        new(new DefaultAzureCredential(), (settings as AzureMapSettings)?.AzureClientId);
   }
 
-  private static async Task<Models.GeocodingLocation> GetGeocodeLocation(MapsSearchClient client, string address)
+  private static async Task<IEnumerable<GeocodingLocation>> GetGeocodeLocation(MapsSearchClient client, string address)
   {
     Azure.Response<Azure.Maps.Search.Models.GeocodingResponse> response = await client.GetGeocodingAsync(address);
 
     return BuildGeocodingLocation(response.Value.Features);
   }
 
-  private static Models.GeocodingLocation BuildGeocodingLocation(IReadOnlyList<Azure.Maps.Search.Models.FeaturesItem> features)
+  private static IEnumerable<GeocodingLocation> BuildGeocodingLocation(IReadOnlyList<Azure.Maps.Search.Models.FeaturesItem> features)
   {
-    Models.GeocodingLocation geocodingLocation = new();
+    GeocodingLocation geocodingLocation = new();
 
     if (features != null && features.Count > 0)
     {
-      //
-      geocodingLocation.Address = features[0].Properties.Address.FormattedAddress;
-      geocodingLocation.LocationTypes = new List<string>()
+      return features.Select(feature => new GeocodingLocation()
       {
-        features[0].Geometry.Type.ToString()
-      };
-      geocodingLocation.Geometry.Latitude = features[0].Geometry.Coordinates.Latitude;
-      geocodingLocation.Geometry.Longitude = features[0].Geometry.Coordinates.Longitude;
+        Address = feature.Properties.Address.FormattedAddress,
+        LocationTypes = new List<string>()
+        {
+          feature.Geometry.Type.ToString()
+        },
+        Geometry = new() 
+        {
+          Latitude = feature.Geometry.Coordinates.Latitude,
+          Longitude = feature.Geometry.Coordinates.Longitude
+        }
+      });
     }
 
-    return geocodingLocation;
+    return [];
   }
 }

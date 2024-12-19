@@ -7,9 +7,9 @@
     <h2 class="nucleus-control-panel-heading">Settings</h2>
     <div class="nucleus-flex-fields">
       <SettingsControl caption="Maps" helptext="Select maps provider.">
-        @Html.DropDownListFor(model => model.MapProvider, new SelectList(Model.MapProviders), new { @data_autopostbackevent = "change" })
+        @Html.DropDownListFor(model => model.MapProviderTypeName, new SelectList(Model.AvailableMapProviders, "TypeName", "Name"), new { @data_autopostbackevent = "change" })
       </SettingsControl>
-      <SettingsControl caption="API Key" helptext="Mandatory API Key that is used to authenticate requests to the API." class="flex-grow-2">
+      <SettingsControl caption="API Key" helptext="Enter your maps service API Key." class="flex-grow-2">
         @Html.PasswordFor(model => model.ApiKey, new { value = (Model.MapSettings.IsSubscriptionKeySet ? Nucleus.Modules.Maps.ViewModels.Settings.DUMMY_APIKEY : "") })
       </SettingsControl>
     </div>
@@ -22,10 +22,28 @@
       </SettingsControl>
     </div>
     <div class="nucleus-flex-fields">
-      <SettingsControl caption="Address" helptext="Address to lookup the coordinates" >
-        @Html.TextBoxFor(model => model.Address, new { @class = "flex-2", @maxlength = "256", @placeholder = "Address" })
+      <SettingsControl caption="Address" helptext="Address to lookup the coordinates" class="">
+        <div class="d-flex gap-1">
+          <div class="d-flex flex-column flex-1 gap-1">
+            @Html.TextBoxFor(model => model.Address, new { @class = "flex-2", @maxlength = "256", @placeholder = "Address" })
+            @if (Model.Locations?.Any() == true)
+            {
+              <select class="map-location">
+                @if (Model.Locations.Count() > 1)
+                {
+                  <option>(select)</option>
+                }
+                @foreach (var location in Model.Locations)
+                {
+                  <option data-latitude="@location.Geometry.Latitude" data-longitude="@location.Geometry.Longitude">@location.Address</option>
+                }
+              </select>
+            }
+          </div>
+        
+          <button type="submit" class="btn btn-secondary btn-sm mb-auto" formaction="@Url.NucleusAction("LookupAddress", "MapsSettings", "Maps")">Lookup</button>
+        </div>
       </SettingsControl>
-      <button type="submit" class="btn btn-secondary btn-sm" formaction="@Url.NucleusAction("LookupAddress", "MapsSettings", "Maps")">Lookup</button>
     </div>
     <div class="nucleus-flex-fields">
       <SettingsControl caption="Latitude" helptext="Latitude map coordinate with a precision up to 6 decimal places. Valid range is between -90 to 90." class="flex-grow-2">
@@ -45,14 +63,37 @@
       <SettingsControl caption="Height" helptext="Height of the map image in pixels." class="flex-grow-2">
         @Html.TextBoxFor(model => model.MapSettings.Height, new { @type = "number" })
       </SettingsControl>
+
+      <SettingsControl caption="Show Marker?" helptext="Specifies whether to include a marker at the specified location.">
+        @Html.CheckBoxFor(model => model.MapSettings.ShowMarker, new { @class = "ToggleSwitch" })
+      </SettingsControl>
     </div>
     @{
       ViewDataDictionary providerSettings = new ViewDataDictionary(ViewData);
       providerSettings.TemplateInfo.HtmlFieldPrefix = Html.NameFor(model => model.MapSettings);
     }
-    @await Html.PartialAsync(Model.MapProviderSettingsView, Model.MapSettings, providerSettings)
+    @if (Model.MapProvider != null)
+    {
+      @await Html.PartialAsync(Model.MapProvider.SettingsView(), Model.MapSettings, providerSettings)
+    }
   </fieldset>
 	<div class="nucleus-form-buttonrow">
 		@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "MapsSettings", "Maps"), new { })
 	</div>
 }
+<script>
+  jQuery('.map-location').on('change', function () 
+  { 
+    var option = jQuery('.map-location option:selected');
+    if (option.length !== 0 && option[0].hasAttribute('data-latitude'))
+    {
+      jQuery('#@nameof(Model.MapSettings)_@nameof(Model.MapSettings.Latitude)').val(option.attr('data-latitude'));
+      jQuery('#@nameof(Model.MapSettings)_@nameof(Model.MapSettings.Longitude)').val(option.attr('data-longitude'));
+    }
+  });
+
+  @if (Model.ShowLocationPicker)
+  { 
+    <text>if (jQuery('.map-location')[0].showPicker) jQuery('.map-location')[0].showPicker();</text>
+  }
+</script>

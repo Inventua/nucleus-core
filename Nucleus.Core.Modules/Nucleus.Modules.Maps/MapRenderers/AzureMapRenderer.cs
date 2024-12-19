@@ -1,7 +1,7 @@
-﻿using System.IO;
-using System.Net.Http;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
-using Azure.Core;
 using Azure.Identity;
 using Azure.Maps.Rendering;
 using Nucleus.Abstractions.Models;
@@ -11,12 +11,16 @@ namespace Nucleus.Modules.Maps.MapRenderers;
 
 public class AzureMapRenderer : IMapRenderer
 {
-  private const int TILE_SIZE = 512; // roadmap
+  private Site Site { get; }
 
-  public async Task<Stream> RenderMap(Site site, IHttpClientFactory httpClientFactory, Settings settings)
+  public AzureMapRenderer(Context context)
   {
-    //return await RenderAzureMap(settings.GetApiKey(site), settings.Zoom, settings.Longitude, settings.Latitude, settings.Height, settings.Width); 
-    return await RenderAzureMap(GetRenderingClient(site, settings), settings.Zoom, settings.Longitude, settings.Latitude, settings.Height, settings.Width);
+    this.Site = context.Site;
+  }
+
+  public async Task<Stream> RenderMap(Settings settings)
+  {
+    return await RenderAzureMap(GetRenderingClient(settings), settings.Zoom, settings.Longitude, settings.Latitude, settings.Height, settings.Width, settings.ShowMarker);
   }
 
   /// <summary>
@@ -25,32 +29,29 @@ public class AzureMapRenderer : IMapRenderer
   /// <param name="site"></param>
   /// <param name="settings"></param>
   /// <returns></returns>
-  private MapsRenderingClient GetRenderingClient(Site site, Settings settings)
+  private MapsRenderingClient GetRenderingClient(Settings settings)
   {
-    MapsRenderingClient client;
-    string apiKey = settings.GetApiKey(site);
-    if (!string.IsNullOrEmpty(apiKey))
-    {
-      Azure.AzureKeyCredential credential = new(apiKey);
-      client = new(credential);
-    }
-    else
-    {
-      TokenCredential clientCredential = new DefaultAzureCredential();
-      client = new(clientCredential, (settings as AzureMapSettings)?.AzureClientId);
-    }
-    return client;
+    string apiKey = settings.GetApiKey(this.Site);
+
+    return 
+      !string.IsNullOrEmpty(apiKey) ? 
+        new(new Azure.AzureKeyCredential(apiKey)) : 
+        new(new DefaultAzureCredential(), (settings as AzureMapSettings)?.AzureClientId);
   }
 
-  private static async Task<System.IO.Stream> RenderAzureMap(MapsRenderingClient client, int zoom, double longitude, double latitude, int height, int width)
+  private static async Task<System.IO.Stream> RenderAzureMap(MapsRenderingClient client, int zoom, double longitude, double latitude, int height, int width, Boolean showMarker)
   {
-    MapTileIndex tileIndex = MapsRenderingClient.PositionToTileXY(new Azure.Core.GeoJson.GeoPosition(longitude, latitude), zoom, TILE_SIZE);
+    //private const int TILE_SIZE = 512; // roadmap
+    //MapTileIndex tileIndex = MapsRenderingClient.PositionToTileXY(new Azure.Core.GeoJson.GeoPosition(longitude, latitude), zoom, TILE_SIZE);
+    //GetMapTileOptions mapTileOptions = new(string.IsNullOrEmpty(mapStyle) ? MapTileSetId.MicrosoftBaseRoad : mapStyle, tileIndex) ;    
+    //Azure.Response<System.IO.Stream> mapTile = await client.GetMapTileAsync(mapTileOptions);
 
-    GetMapTileOptions mapTileOptions = new(MapTileSetId.MicrosoftImagery, tileIndex); //new MapTileIndex(tileIndex.X, tileIndex.Y, zoom));
+    List<ImagePushpinStyle> markers = showMarker ? [new([new PushpinPosition(longitude, latitude)])] : [];
+    GetMapStaticImageOptions options = new(new Azure.Core.GeoJson.GeoPosition(longitude, latitude), width, height, markers) 
+    {
+      ZoomLevel = zoom
+    };
     
-    Azure.Response<System.IO.Stream> mapTile = await client.GetMapTileAsync(mapTileOptions);
-
-    return mapTile;
+    return await client.GetMapStaticImageAsync(options);
   }
-
 }

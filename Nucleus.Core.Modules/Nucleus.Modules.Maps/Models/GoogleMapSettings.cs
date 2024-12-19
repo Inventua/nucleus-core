@@ -6,11 +6,12 @@ namespace Nucleus.Modules.Maps.Models;
 
 public class GoogleMapSettings : Settings
 {
-  public class ModuleSettingsKeys
+  public class SettingsKeys
   {
-    public const string MODULESETTING_GOOGLE_MAPS_API_KEY = "maps:google:apikey";
-    public const string MODULESETTING_GOOGLE_MAPS_TYPE = "maps:google:maptype";
-    public const string MODULESETTING_GOOGLE_MAPS_SCALE = "maps:google:scale";
+    public const string SETTING_GOOGLE_MAPS_API_KEY = "maps:google:apikey";
+    public const string SETTING_GOOGLE_MAPS_TYPE = "maps:google:maptype";
+    public const string SETTING_GOOGLE_MAPS_SCALE = "maps:google:scale";
+
   }
 
   /// <summary>
@@ -44,13 +45,15 @@ public class GoogleMapSettings : Settings
 
   public int Scale { get; set; } = 1;
 
+
   public override void GetSettings(PageModule module)
   {
     base.GetSettings(module);
 
-    this.EncryptedGoogleApiKey = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_GOOGLE_MAPS_API_KEY, this.EncryptedGoogleApiKey);
-    this.MapType = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_GOOGLE_MAPS_TYPE, this.MapType);
-    this.Scale = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_GOOGLE_MAPS_SCALE, this.Scale);
+    this.EncryptedGoogleApiKey = module.ModuleSettings.Get(SettingsKeys.SETTING_GOOGLE_MAPS_API_KEY, this.EncryptedGoogleApiKey);
+    this.MapType = module.ModuleSettings.Get(SettingsKeys.SETTING_GOOGLE_MAPS_TYPE, this.MapType);
+    this.Scale = module.ModuleSettings.Get(SettingsKeys.SETTING_GOOGLE_MAPS_SCALE, this.Scale);
+
   }
 
   public override void SetSettings(Site site, PageModule module, string apiKey)
@@ -59,14 +62,17 @@ public class GoogleMapSettings : Settings
 
     if (apiKey != ViewModels.Settings.DUMMY_APIKEY)
     {
-      SetApiKey(module, Encrypt(site, apiKey));
+      SetApiKey(site, apiKey);
     }
     else if (string.IsNullOrEmpty(apiKey))
     {
-      SetApiKey(module, "");
+      SetApiKey(site, "");
     }
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_GOOGLE_MAPS_TYPE, this.MapType);
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_GOOGLE_MAPS_SCALE, this.Scale);
+
+    module.ModuleSettings.Set(SettingsKeys.SETTING_GOOGLE_MAPS_API_KEY, this.EncryptedGoogleApiKey);
+    module.ModuleSettings.Set(SettingsKeys.SETTING_GOOGLE_MAPS_TYPE, this.MapType);
+    module.ModuleSettings.Set(SettingsKeys.SETTING_GOOGLE_MAPS_SCALE, this.Scale);
+
   }
 
   public override string GetApiKey(Site site)
@@ -74,9 +80,9 @@ public class GoogleMapSettings : Settings
     return (string.IsNullOrEmpty(this.EncryptedGoogleApiKey) ? "" : Decrypt(site, this.EncryptedGoogleApiKey));
   }
 
-  public override void SetApiKey(PageModule module, string key)
+  public override void SetApiKey(Site site, string key)
   {
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_GOOGLE_MAPS_API_KEY, key);
+    this.EncryptedGoogleApiKey = Encrypt(site, key);
   }
 
 }

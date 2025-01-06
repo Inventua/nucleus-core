@@ -22,6 +22,8 @@ using Nucleus.Abstractions.Models.Mail.Template;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.Negotiate;
+using OtpNet;
+using QRCoder;
 
 namespace Nucleus.Modules.Account.Controllers;
 
@@ -37,7 +39,7 @@ public class LoginController : Controller
   private IMailClientFactory MailClientFactory { get; }
   private IMailTemplateManager MailTemplateManager { get; }
   private AuthenticationProtocols AuthenticationProtocols { get; }
-  
+
   public LoginController(Context context, IMailClientFactory mailClientFactory, IMailTemplateManager mailTemplateManager, IUserManager userManager, ISessionManager sessionManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IOptions<AuthenticationProtocols> authenticationProtocols, ILogger<LoginController> logger)
   {
     this.Context = context;
@@ -112,7 +114,7 @@ public class LoginController : Controller
     if (!User.Identity.IsAuthenticated)
     {
       if (scheme.Equals(NegotiateDefaults.AuthenticationScheme, StringComparison.OrdinalIgnoreCase))
-      {       
+      {
         // see comments on Negotiate for why we have to redirect for the Negotiate protocol rather than returning a challenge
         string location = Url.NucleusAction(nameof(Negotiate), "Login", "Account", new { returnUrl });
 
@@ -186,7 +188,7 @@ public class LoginController : Controller
   async public Task<ActionResult> Login(ViewModels.Login viewModel)
   {
     User loginUser;
-    
+
 
     viewModel.ReadSettings(this.Context.Module);
 
@@ -248,6 +250,21 @@ public class LoginController : Controller
 
           if (!Url.IsLocalUrl(viewModel.ReturnUrl)) viewModel.ReturnUrl = "";
 
+          if (loginUser.UserName == "caeli.walker") // loginUser.Is2FAEnabled
+          {
+            // When ready, move to another area/function/class etc where these properties are created (hidden from user) using constants?
+            loginUser.Secrets.TotpSecretKey = String.IsNullOrEmpty(loginUser.Secrets.TotpSecretKey) ? OtpNet.Base32Encoding.ToString(System.Text.Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())) : loginUser.Secrets.TotpSecretKey;
+            loginUser.Secrets.TotpSecretKeyAlgorithm = String.IsNullOrEmpty(loginUser.Secrets.TotpSecretKeyAlgorithm) ? "SHA1" : loginUser.Secrets.TotpSecretKeyAlgorithm;
+            loginUser.Secrets.TotpDigits = (loginUser.Secrets.TotpDigits != 6 || loginUser.Secrets.TotpDigits != 8) ? 6 : loginUser.Secrets.TotpDigits;
+            loginUser.Secrets.TotpPeriod = (loginUser.Secrets.TotpPeriod != 30 || loginUser.Secrets.TotpDigits != 60) ? 30 : loginUser.Secrets.TotpPeriod;
+
+            UserSession otpSession = await this.SessionManager.CreateNew(this.Context.Site, loginUser, viewModel.AllowRememberMe && viewModel.RememberMe, ControllerContext.HttpContext.Connection.RemoteIpAddress);
+
+            await this.SessionManager.Save(otpSession);
+
+            return View("VerifyOtp", BuildVerifyOtpViewModel(this.Context.Site, viewModel, loginUser, otpSession.Id));
+          }
+
           UserSession session = await this.SessionManager.CreateNew(this.Context.Site, loginUser, viewModel.AllowRememberMe && viewModel.RememberMe, ControllerContext.HttpContext.Connection.RemoteIpAddress);
           await this.SessionManager.SignIn(session, HttpContext, viewModel.ReturnUrl);
 
@@ -259,6 +276,66 @@ public class LoginController : Controller
       }
     }
 
+  }
+
+  [HttpPost]
+  public async Task<ActionResult> VerifyOtp(ViewModels.VerifyOtp viewModel)
+  {
+    UserSession session = await this.SessionManager.Get(viewModel.SessionId);
+    if (session == null)
+    {
+      return BadRequest();
+    }
+
+    User loginUser = await this.UserManager.Get(session.UserId);
+    if (loginUser == null)
+    {
+      return BadRequest();
+    }
+
+    if (VerifyTOTP (loginUser, viewModel.OneTimePassword))
+    {
+      await this.SessionManager.SignIn(session, HttpContext, viewModel.ReturnUrl);
+
+      string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.Content("~/").ToString() : Url.Content(viewModel.ReturnUrl);
+
+      return ControllerContext.HttpContext.NucleusRedirect(location);
+    }
+    else
+    {
+      await Task.Delay(TimeSpan.FromSeconds(10));
+      return Json(new { Title = "Login", Message = "Invalid one-time password.", Icon = "alert" });
+    }
+  }
+
+  private Boolean VerifyTOTP(User loginUser, string oneTimePassword)
+  {
+    return VerifyTOTP(loginUser.UserName, oneTimePassword, loginUser.Secrets.TotpSecretKey, loginUser.Secrets.TotpDigits, loginUser.Secrets.TotpPeriod );
+  }
+
+  private Boolean VerifyTOTP(string userName, string oneTimePassword, string secretKey, int totpDigits, int totpPeriod)
+  {
+    
+    byte[] secret = Base32Encoding.ToBytes(secretKey);//"JBSWY3DPEHPK3PXP");
+    
+    Totp totp = new (secret, step: totpPeriod, mode: OtpHashMode.Sha1, totpSize: totpDigits);
+    // TODO put prev/future into settings
+    VerificationWindow window = new (previous: 1, future: 1);
+
+    string result = totp.ComputeTotp(); // Defaults to DateTime.UtcNow
+
+    Boolean isValid = totp.VerifyTotp(oneTimePassword, out long timeWindowUsed, window);
+
+    if (isValid)
+    {
+      this.Logger.LogInformation("User '{userName}' OTP verified. Time window: {timeWindowUsed}.", userName, timeWindowUsed);
+    }
+    else
+    {
+      this.Logger.LogWarning("User '{userName}' OTP invalid.", userName);
+    }
+
+    return isValid;
   }
 
   [HttpPost]
@@ -333,7 +410,6 @@ public class LoginController : Controller
     //return View("Recover", viewModel);
   }
 
-
   public async Task<ActionResult> Logout(string returnUrl)
   {
     await this.SessionManager.SignOut(HttpContext);
@@ -385,5 +461,44 @@ public class LoginController : Controller
 
     viewModel.ReturnUrl = returnUrl;
     return viewModel;
+  }
+
+  private ViewModels.VerifyOtp BuildVerifyOtpViewModel(Site site, ViewModels.Login viewModelLogin, User loginUser, Guid sessionId)
+  {
+    ViewModels.VerifyOtp viewModel = new();
+
+    viewModel.ReturnUrl = viewModelLogin.ReturnUrl;
+    viewModel.Message = viewModelLogin.Message;
+    viewModel.SessionId = sessionId;
+
+    viewModel.QrCodeAsSvg = GenerateUserMFAQRCodeSetup(site.Name, viewModel, loginUser);
+
+    return viewModel;
+  }
+
+  private string GenerateUserMFAQRCodeSetup(string issuer, ViewModels.VerifyOtp viewModel, User loginUser)
+  {
+
+    //otpauth://totp/{issuerName}:{userName}?secret={secret}&issuer={issuerName}
+    // Older Google Authenticator implementations ignore the issuer parameter and rely upon the issuer label prefix to disambiguate accounts. Newer implementations will use the issuer parameter for internal disambiguation, it will not be displayed to the user. We recommend using both issuer label prefix and issuer parameter together to safely support both old and new Google Authenticator versions
+    //string otpAuthUrl = $"otpauth://totp/{issuer}:{loginUser.UserName}?secret={loginUser.Secrets.TotpSecretKey}&issuer={issuer}&algorithm={loginUser.Secrets.TotpSecretKeyAlgorithm}&digits={loginUser.Secrets.TotpDigits}&period={loginUser.Secrets.TotpPeriod}";
+
+    
+    // Creates the "otpauth://totp/{issuerName}:{userName}?secret={secret}&issuer={issuerName}" and correctly encodes the values
+    QRCoder.PayloadGenerator.OneTimePassword generator = new()
+    {
+      Secret = loginUser.Secrets.TotpSecretKey,
+      AuthAlgorithm = PayloadGenerator.OneTimePassword.OneTimePasswordAuthAlgorithm.SHA1,
+      Issuer = issuer,
+      Label = loginUser.UserName,
+      Digits = loginUser.Secrets.TotpDigits,
+      Period = loginUser.Secrets.TotpPeriod
+    };
+
+    QRCoder.QRCodeGenerator qrGenerator = new QRCodeGenerator();
+    QRCodeData qrCodeData = qrGenerator.CreateQrCode(generator.ToString(), QRCodeGenerator.ECCLevel.M);
+    SvgQRCode qrCode = new SvgQRCode(qrCodeData);
+
+    return qrCode.GetGraphic(new System.Drawing.Size(150, 150), sizingMode: SvgQRCode.SizingMode.WidthHeightAttribute);
   }
 }

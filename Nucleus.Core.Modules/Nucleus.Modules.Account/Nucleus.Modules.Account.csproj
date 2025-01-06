@@ -6,19 +6,13 @@
     <EnableDefaultContentItems>false</EnableDefaultContentItems>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <RazorCompileOnBuild>true</RazorCompileOnBuild>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
   </PropertyGroup>
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
-
-  <PropertyGroup Label="Globals">
-    <SccProjectName></SccProjectName>
-    <SccProvider></SccProvider>
-    <SccAuxPath></SccAuxPath>
-    <SccLocalPath></SccLocalPath>
-  </PropertyGroup>
 
   <ItemGroup>
     <None Remove="**\*.vspscc" />
@@ -28,6 +22,8 @@
 
   <ItemGroup>
     <None Remove="license.txt" />
+    <None Remove="MfaProviders\Totp\OtpSettings.cshtml" />
+    <None Remove="MfaProviders\Totp\VerifyOtp.cshtml" />
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
     <None Remove="signup.js" />
@@ -42,13 +38,17 @@
     <None Remove="Views\SignupSettings.cshtml" />
     <None Remove="Views\UserProfile.cshtml" />
     <None Remove="Views\UserProfileSettings.cshtml" />
+    <None Remove="Views\VerifyOtp.cshtml" />
     <None Remove="_ViewImports.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="license.txt" />
+    <Content Include="MfaProviders\Totp\OtpSettings.cshtml" />
+    <Content Include="MfaProviders\Totp\VerifyOtp.cshtml" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
+    <Content Include="Views\VerifyOtp.cshtml" />
     <EmbeddedResource Include="signup.js" />
     <EmbeddedResource Include="signup.min.js" />
     <Content Include="Views\ChangePassword.cshtml" />
@@ -65,12 +65,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0" />
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0.1-alpha-1.47" />
     <PackageReference Include="Inventua.Nucleus.Extensions" Version="2.0.0" />
     <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="8.0.5" />
     <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
+    <PackageReference Include="Otp.NET" Version="1.4.0" />
+    <PackageReference Include="QRCoder" Version="1.6.0" />
   </ItemGroup>
 
   <PropertyGroup Label="Nucleus">

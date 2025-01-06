@@ -25,6 +25,9 @@ public class Settings
 
   public string IndexerName { get; set; }
 
+  /// <summary>
+  /// Content size limit, in mb
+  /// </summary>
   public int AttachmentMaxSize { get; set; } = 32;
 
   public string EncryptedApiKey { get; set; }

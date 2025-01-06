@@ -10,65 +10,79 @@ namespace Nucleus.Modules.Maps.Models;
 
 public class Settings
 {
-  private class ModuleSettingsKeys
+  private class SettingsKeys
   {
-    public const string MODULESETTING_MAPPROVIDER = "maps:mapprovider";
+    public const string SETTING_MAPPROVIDER_TYPENAME = "maps:mapprovider";
 
-    public const string MODULESETTING_MAPS_ZOOM = "maps:zoom";
-    public const string MODULESETTING_MAPS_LONGITUDE = "maps:longitude";
-    public const string MODULESETTING_MAPS_LATITUDE = "maps:latitude";
-    public const string MODULESETTING_MAPS_HEIGHT = "maps:height";
-    public const string MODULESETTING_MAPS_WIDTH = "maps:width";
-    public const string MODULESETTING_MAPS_MAP_FILE_ID = "maps:map-file:id";
-  }
-  public const string DEFAULT_MAPPROVIDER = "AzureMaps";
+    public const string SETTING_MAPS_ZOOM = "maps:zoom";
+    public const string SETTING_MAPS_LONGITUDE = "maps:longitude";
+    public const string SETTING_MAPS_LATITUDE = "maps:latitude";
+    public const string SETTING_MAPS_HEIGHT = "maps:height";
+    public const string SETTING_MAPS_WIDTH = "maps:width";
+    public const string SETTING_MAPS_MAP_FILE_ID = "maps:map-file:id";
 
-  public static string GetMapProvider(PageModule module)
-  {
-    return module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_MAPPROVIDER, DEFAULT_MAPPROVIDER);
+
+    public const string SETTING_SHOW_MARKER = "maps:show-marker";
   }
 
-  public static void SetMapProvider(PageModule module, string value)
+  public static readonly string DEFAULT_MAPPROVIDER = typeof(MapProviders.AzureMapProvider).FullName;
+
+  public static string GetMapProviderTypeName(PageModule module)
   {
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_MAPPROVIDER, value);
+    return module.ModuleSettings.Get(SettingsKeys.SETTING_MAPPROVIDER_TYPENAME, DEFAULT_MAPPROVIDER);
+  }
+
+  public static void SetMapProviderTypeName(PageModule module, string value)
+  {
+    module.ModuleSettings.Set(SettingsKeys.SETTING_MAPPROVIDER_TYPENAME, value);
   }
 
   // Azure zoom/tile grid info https://learn.microsoft.com/en-au/azure/azure-maps/zoom-levels-and-tile-grid
   // Google Maps https://developers.google.com/maps/documentation/maps-static/start#Zoomlevels
-  public int Zoom { get; set; } = 10;
+  public int Zoom { get; set; } = 14;
   public double Longitude { get; set; } 
   public double Latitude { get; set; }
   public int Height { get; set; } = 500;
   public int Width { get; set; } = 500;
   public Guid MapFileId { get; set; }
- 
+
+  public Boolean ShowMarker { get; set; } = true;
 
   public virtual void GetSettings(PageModule module)
   {
-    this.Zoom = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_MAPS_ZOOM, this.Zoom);
-    this.Latitude = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_MAPS_LATITUDE, this.Latitude);
-    this.Longitude = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_MAPS_LONGITUDE, this.Longitude);
-    this.Width = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_MAPS_WIDTH, this.Width);
-    this.Height = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_MAPS_HEIGHT, this.Height);
-    this.MapFileId = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_MAPS_MAP_FILE_ID, this.MapFileId);
+    this.Zoom = module.ModuleSettings.Get(SettingsKeys.SETTING_MAPS_ZOOM, this.Zoom);
+    this.Latitude = module.ModuleSettings.Get(SettingsKeys.SETTING_MAPS_LATITUDE, this.Latitude);
+    this.Longitude = module.ModuleSettings.Get(SettingsKeys.SETTING_MAPS_LONGITUDE, this.Longitude);
+    this.Width = module.ModuleSettings.Get(SettingsKeys.SETTING_MAPS_WIDTH, this.Width);
+    this.Height = module.ModuleSettings.Get(SettingsKeys.SETTING_MAPS_HEIGHT, this.Height);
+    this.MapFileId = module.ModuleSettings.Get(SettingsKeys.SETTING_MAPS_MAP_FILE_ID, this.MapFileId);
+
+    this.ShowMarker = module.ModuleSettings.Get(SettingsKeys.SETTING_SHOW_MARKER, this.ShowMarker);
   }
 
 
   public virtual void SetSettings(Site site, PageModule module, string apiKey)
   {
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_MAPS_ZOOM, this.Zoom);
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_MAPS_LATITUDE, this.Latitude);
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_MAPS_LONGITUDE, this.Longitude);
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_MAPS_WIDTH, this.Width);
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_MAPS_HEIGHT, this.Height);
-    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_MAPS_MAP_FILE_ID, this.MapFileId);
+    module.ModuleSettings.Set(SettingsKeys.SETTING_MAPS_ZOOM, this.Zoom);
+    module.ModuleSettings.Set(SettingsKeys.SETTING_MAPS_LATITUDE, this.Latitude);
+    module.ModuleSettings.Set(SettingsKeys.SETTING_MAPS_LONGITUDE, this.Longitude);
+    module.ModuleSettings.Set(SettingsKeys.SETTING_MAPS_WIDTH, this.Width);
+    module.ModuleSettings.Set(SettingsKeys.SETTING_MAPS_HEIGHT, this.Height);
+    module.ModuleSettings.Set(SettingsKeys.SETTING_MAPS_MAP_FILE_ID, this.MapFileId);
+
+    module.ModuleSettings.Set(SettingsKeys.SETTING_SHOW_MARKER, this.ShowMarker);
   }
 
-  public virtual void SetApiKey(PageModule module, string key)
+  public void SetMapFileId(PageModule module, Guid fileId)
+  {
+    this.MapFileId = fileId;
+    module.ModuleSettings.Set(SettingsKeys.SETTING_MAPS_MAP_FILE_ID, this.MapFileId);
+  }
+
+  public virtual void SetApiKey(Site site, string key)
   {
     throw new NotImplementedException();
   }
-
 
   public virtual string GetApiKey(Site site)
   {

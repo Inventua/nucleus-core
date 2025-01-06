@@ -29,16 +29,17 @@ internal class TextFileLogger : ILogger
   private TextFileLoggerOptions Options { get; }
   private IExternalScopeProvider ScopeProvider { get; set; }
   private System.Collections.Concurrent.ConcurrentQueue<string> Queue { get; } = new();
-  private TextFileLoggerRequestInformation RequestInformation { get; }
-    
+  //private TextFileLoggerRequestInformation RequestInformation { get; }
+  private IHttpContextAccessor HttpContextAccessor { get; }
+
   private static SemaphoreSlim _fileAccessSemaphore { get; } = new(1);
 
-  public TextFileLogger(TextFileLoggingProvider provider, TextFileLoggerOptions options, IExternalScopeProvider scopeProvider, string category, TextFileLoggerRequestInformation requestInformation)
+  public TextFileLogger(TextFileLoggingProvider provider, IHttpContextAccessor httpContextAccessor, TextFileLoggerOptions options, IExternalScopeProvider scopeProvider, string category)
   {
     this.Provider = provider;
     this.Options = options;
     this.Category = category;
-    this.RequestInformation = requestInformation;
+    this.HttpContextAccessor = httpContextAccessor;
     this.ScopeProvider = scopeProvider;
   }
 
@@ -125,13 +126,13 @@ internal class TextFileLogger : ILogger
     string requestInformation;
 
     // add request information, if we have a valid Http Context
-    if (this.RequestInformation != null)
-    {
-      requestInformation = $",{this.RequestInformation?.RemoteIpAddress},{this.RequestInformation?.RequestPath}";
+    if (this.HttpContextAccessor?.HttpContext?.Connection != null)
+    {   
+      requestInformation = $",{this.HttpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress},{this.HttpContextAccessor?.HttpContext?.Request?.Path}";
     }
     else
     {
-      requestInformation = $",{Environment.MachineName},";
+      requestInformation = $",,";
     }
 
     if (exception != null)

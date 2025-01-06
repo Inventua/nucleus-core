@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -9,13 +10,22 @@ using Nucleus.Modules.Maps.Models;
 namespace Nucleus.Modules.Maps.MapRenderers;
 
 public class GoogleMapRenderer : IMapRenderer
-{  
-  public async Task<Stream> RenderMap(Site site, IHttpClientFactory httpClientFactory, Settings settings)
+{
+  private Site Site { get; }
+  private IHttpClientFactory HttpClientFactory { get; }
+
+  public GoogleMapRenderer(Context context, IHttpClientFactory httpClientFactory)
   {
-    return await RenderGoogleMap(httpClientFactory, settings.GetApiKey(site), settings.Zoom, settings.Longitude, settings.Latitude, settings.Height, settings.Width, (settings as GoogleMapSettings)?.MapType ?? GoogleMapSettings.MapTypes.Roadmap, (settings as GoogleMapSettings).Scale);
+    this.Site = context.Site;
+    this.HttpClientFactory = httpClientFactory;
   }
 
-  private static async Task<System.IO.Stream> RenderGoogleMap(IHttpClientFactory httpClientFactory, string apiKey, int zoom, double longitude, double latitude, int height, int width, Models.GoogleMapSettings.MapTypes mapType, int scale)
+  public async Task<Stream> RenderMap(Settings settings)
+  {
+    return await RenderGoogleMap(settings.GetApiKey(this.Site), settings.Zoom, settings.Longitude, settings.Latitude, settings.Height, settings.Width, (settings as GoogleMapSettings)?.MapType ?? GoogleMapSettings.MapTypes.Roadmap, (settings as GoogleMapSettings).Scale, (settings as GoogleMapSettings).ShowMarker);
+  }
+
+  private async Task<System.IO.Stream> RenderGoogleMap(string apiKey, int zoom, double longitude, double latitude, int height, int width, Models.GoogleMapSettings.MapTypes mapType, int scale, Boolean showMarker)
   {
     // https://developers.google.com/maps/documentation/maps-static/start
     Dictionary<string, object> parameters = new()
@@ -27,7 +37,12 @@ public class GoogleMapRenderer : IMapRenderer
       { "scale", scale }
     };
 
-    HttpClient httpClient = httpClientFactory.CreateClient();
+    if (showMarker)
+    {
+      parameters.Add("markers", $"color:red|{latitude},{longitude}");
+    }
+
+    HttpClient httpClient = this.HttpClientFactory.CreateClient();
 
     HttpRequestMessage request = new(HttpMethod.Get, new System.Uri($"https://maps.googleapis.com/maps/api/staticmap?{BuildParameters(parameters)}&key={apiKey}"));
 
@@ -42,6 +57,4 @@ public class GoogleMapRenderer : IMapRenderer
   {
     return string.Join("&", parameters.Select(parameter => $"{parameter.Key}={parameter.Value}"));
   }
-
-
 }

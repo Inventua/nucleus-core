@@ -16,16 +16,16 @@
 
   case ScheduledTaskProgress.State.Error:
     <div class="alert alert-info mt-3" role="alert">
-      This task failed with an error at @(Model.LatestHistory == null ? "Unknown" : (Model.LatestHistory.FinishDate.HasValue ? Model.LatestHistory.FinishDate.FormatDate(this.Context.Request.GetUserTimeZone()) : "Unknown"))
-      and is scheduled to run @(Model.LatestHistory == null ? "immediately" : (Model.LatestHistory.NextScheduledRun.HasValue ? "next at " + Model.LatestHistory.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone()) : "immediately")).
+      This task failed with an error at @(Model.LatestHistory == null ? "Unknown" : (Model.LatestHistory.FinishDate.HasValue ? Model.LatestHistory.FinishDate.FormatDate(this.Context.Request.GetUserTimeZone(), true) : "Unknown"))
+      and is scheduled to run @(Model.LatestHistory == null ? "immediately" : (Model.LatestHistory.NextScheduledRun.HasValue ? "next at " + Model.LatestHistory.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone(), true) : "immediately")).
       Check the logs to view error details.
     </div>
     break;
 
   case ScheduledTaskProgress.State.Succeeded:
     <div class="alert alert-success mt-3" role="alert">
-      This task completed successfully at @(Model.LatestHistory == null ? "Unknown" : (Model.LatestHistory.FinishDate.HasValue ? Model.LatestHistory.FinishDate.FormatDate(this.Context.Request.GetUserTimeZone()) : "Unknown"))
-      and is scheduled to run @(Model.LatestHistory == null ? "immediately" : Model.ScheduledTask.IntervalType == ScheduledTask.Intervals.Startup ? "after the next restart" :  (Model.LatestHistory.NextScheduledRun.HasValue ? "next at " + Model.LatestHistory.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone()) : "immediately")).
+      This task completed successfully at @(Model.LatestHistory == null ? "Unknown" : (Model.LatestHistory.FinishDate.HasValue ? Model.LatestHistory.FinishDate.FormatDate(this.Context.Request.GetUserTimeZone(), true) : "Unknown"))
+      and is scheduled to run @(Model.LatestHistory == null ? "immediately" : Model.ScheduledTask.IntervalType == ScheduledTask.Intervals.Startup ? "after the next restart" : (Model.LatestHistory.NextScheduledRun.HasValue ? "next at " + Model.LatestHistory.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone(), true) : "immediately")).
     </div>
     break;
 
@@ -34,12 +34,12 @@
     {
       <div class="nucleus-flex-fields d-inline-flex column-gap-5">
         <SettingsControl caption="Last Started">
-          <div>@(Model.LatestHistory == null ? "Never" : Model.LatestHistory.StartDate.FormatDate(this.Context.Request.GetUserTimeZone()))</div>
+          <div>@(Model.LatestHistory == null ? "Never" : Model.LatestHistory.StartDate.FormatDate(this.Context.Request.GetUserTimeZone(), true))</div>
         </SettingsControl>
         @if (Model.LatestHistory != null && Model.LatestHistory.FinishDate.HasValue)
         {
           <SettingsControl caption="Finished at">
-            <div>@Model.LatestHistory.FinishDate.FormatDate(this.Context.Request.GetUserTimeZone())</div>
+            <div>@Model.LatestHistory.FinishDate.FormatDate(this.Context.Request.GetUserTimeZone(), true)</div>
           </SettingsControl>
         }
       </div>
@@ -50,7 +50,7 @@
         }
         else
         {
-          <div>@(Model.LatestHistory == null ? "Immediate" : Model.ScheduledTask.IntervalType == ScheduledTask.Intervals.Startup ? "After the next restart" : (Model.LatestHistory.NextScheduledRun.HasValue ? Model.LatestHistory.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone()) : "Immediate"))</div>
+          <div>@(Model.LatestHistory == null ? "Immediate" : Model.ScheduledTask.IntervalType == ScheduledTask.Intervals.Startup ? "After the next restart" : (Model.LatestHistory.NextScheduledRun.HasValue ? Model.LatestHistory.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone(), true) : "Immediate"))</div>
         }
       </SettingsControl>
     }

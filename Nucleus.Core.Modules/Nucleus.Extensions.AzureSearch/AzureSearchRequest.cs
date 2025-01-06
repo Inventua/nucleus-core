@@ -11,7 +11,6 @@ using Azure.Search.Documents.Models;
 using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Search;
-using Nucleus.Extensions.AzureSearch.Models;
 using OpenAI.Embeddings;
 
 // https://learn.microsoft.com/en-us/azure/search/index-projections-concept-intro?tabs=kstore-rest
@@ -59,7 +58,7 @@ internal partial class AzureSearchRequest
   /// Return a client which can be used to manage indexes
   /// </summary>
   /// <returns></returns>
-  private async Task<SearchIndexClient> SearchIndexClient()
+  private SearchIndexClient SearchIndexClient()
   {
     if (this._searchIndexClient == null)
     {
@@ -74,11 +73,11 @@ internal partial class AzureSearchRequest
   /// Return a client which can be used to retrieve results from (search) indexes
   /// </summary>
   /// <returns></returns>
-  private async Task<SearchClient> GetSearchClient()
+  private SearchClient GetSearchClient()
   {
     if (_searchClient == null)
     {
-      _searchClient = (await this.SearchIndexClient()).GetSearchClient(this.Settings.IndexName);
+      _searchClient = (this.SearchIndexClient()).GetSearchClient(this.Settings.IndexName);
     }
 
     return _searchClient;
@@ -116,7 +115,7 @@ internal partial class AzureSearchRequest
     AzureSearchSettings settings = new(site);
     try
     {
-      Response<SearchIndexStatistics> result = await (await this.SearchIndexClient()).GetIndexStatisticsAsync(settings.IndexName);
+      Response<SearchIndexStatistics> result = await (this.SearchIndexClient()).GetIndexStatisticsAsync(settings.IndexName);
       return true;
     }
     catch (Exception)
@@ -178,7 +177,7 @@ internal partial class AzureSearchRequest
 
   public async Task<List<string>> ListSemanticRankingConfigurations()
   {
-    SearchIndexClient client = await this.SearchIndexClient();
+    SearchIndexClient client = this.SearchIndexClient();
     Response<SearchIndex> response = await client.GetIndexAsync(this.Settings.IndexName);
 
     return response.Value.SemanticSearch?.Configurations.Select(config => config.Name).ToList() ?? [];
@@ -355,7 +354,7 @@ internal partial class AzureSearchRequest
   {
     try
     {
-      SearchIndexClient client = await this.SearchIndexClient();
+      SearchIndexClient client = this.SearchIndexClient();
       return await client.GetIndexAsync(this.Settings.IndexName);
     }
     catch (Azure.RequestFailedException)
@@ -381,7 +380,7 @@ internal partial class AzureSearchRequest
 
   public async Task<Boolean> AddVectorization()
   {
-    SearchIndexClient client = await this.SearchIndexClient();
+    SearchIndexClient client = this.SearchIndexClient();
 
     SearchIndex searchIndex = await client.GetIndexAsync(this.Settings.IndexName);
 
@@ -397,7 +396,7 @@ internal partial class AzureSearchRequest
 
   public async Task<Boolean> IsVectorizationConfigured()
   {
-    SearchIndexClient client = await this.SearchIndexClient();
+    SearchIndexClient client = this.SearchIndexClient();
 
     SearchIndex searchIndex = await client.GetIndexAsync(this.Settings.IndexName);
 
@@ -406,7 +405,7 @@ internal partial class AzureSearchRequest
 
   public async Task<string> AddSemanticRanking(string name)
   {
-    SearchIndexClient client = await this.SearchIndexClient();
+    SearchIndexClient client = this.SearchIndexClient();
 
     SearchIndex searchIndex = await client.GetIndexAsync(this.Settings.IndexName);
 
@@ -504,7 +503,7 @@ internal partial class AzureSearchRequest
 
   public async Task<SearchIndexStatistics> GetIndexSettings()
   {
-    SearchIndexClient client = await this.SearchIndexClient();
+    SearchIndexClient client = this.SearchIndexClient();
 
     // check index
     Response<SearchIndexStatistics> indexResponse = await client.GetIndexStatisticsAsync(this.Settings.IndexName);
@@ -514,7 +513,7 @@ internal partial class AzureSearchRequest
 
   public async Task<Boolean> DeleteIndex()
   {
-    SearchIndexClient client = await this.SearchIndexClient();
+    SearchIndexClient client = this.SearchIndexClient();
     await client.GetIndexAsync(this.Settings.IndexName);
     await client.DeleteIndexAsync(this.Settings.IndexName);
 
@@ -556,7 +555,7 @@ internal partial class AzureSearchRequest
 
     actions.Insert(0, new IndexDocumentsAction<AzureSearchDocument>(IndexActionType.MergeOrUpload, content));
 
-    SearchClient client = await this.GetSearchClient();
+    SearchClient client = this.GetSearchClient();
 
     // look for index entries for the same source & sourceId
     await CheckForDuplicates(client, content);
@@ -678,10 +677,10 @@ internal partial class AzureSearchRequest
   {
     if (!String.IsNullOrEmpty(contentItem.Content))
     {
-      string[] tokens = contentItem.Content.Split(WORD_BREAKING_CHARS, StringSplitOptions.RemoveEmptyEntries);
-      int pageCount = (int)Math.Floor((decimal)tokens.Length / WORDS_PER_CHUNK) + 1;
+      //string[] tokens = contentItem.Content.Split(WORD_BREAKING_CHARS, StringSplitOptions.RemoveEmptyEntries);
       string[] contentWords = contentItem.Content.Split(WORD_BREAKING_CHARS, StringSplitOptions.RemoveEmptyEntries);
       List<string[]> chunks = contentWords.Chunk(WORDS_PER_CHUNK).ToList();
+      int pageCount = chunks.Count(); // (int)Math.Floor((decimal)tokens.Length / WORDS_PER_CHUNK) + 1;
 
       if (contentWords.Length <= WORDS_PER_CHUNK)
       {
@@ -875,7 +874,7 @@ internal partial class AzureSearchRequest
 
   public async Task<IndexDocumentsResult> RemoveContent(AzureSearchDocument content)
   {
-    SearchClient client = await this.GetSearchClient();
+    SearchClient client = this.GetSearchClient();
     Response<IndexDocumentsResult> response = await client.DeleteDocumentsAsync<AzureSearchDocument>([content]);
     return response.Value;
   }
@@ -902,7 +901,7 @@ internal partial class AzureSearchRequest
         break;
     }
 
-    SearchClient client = await this.GetSearchClient();
+    SearchClient client = this.GetSearchClient();
     return await client.SearchAsync<AzureSearchDocument>(searchTerm, searchOptions);
   }
 
@@ -919,20 +918,20 @@ internal partial class AzureSearchRequest
 
     searchOptions.Filter = $"{nameof(AzureSearchDocument.Scope)} eq {SearchFilter.Create($"{scope}")} and {nameof(AzureSearchDocument.SourceId)} eq {SearchFilter.Create($"{sourceId}")}";
 
-    SearchClient client = await this.GetSearchClient();
+    SearchClient client = this.GetSearchClient();
     return await client.SearchAsync<AzureSearchDocument>(searchTerm, searchOptions);
   }
 
   public async Task<AzureSearchDocument> GetContentByKey(string key)
   {
-    SearchClient client = await this.GetSearchClient();
+    SearchClient client = this.GetSearchClient();
     AzureSearchDocument response = await client.GetDocumentAsync<AzureSearchDocument>(key);
     return response;
   }
 
   public async Task<Response<SearchResults<AzureSearchDocument>>> Search(SearchQuery query)
   {
-    SearchClient client = await this.GetSearchClient();
+    SearchClient client = this.GetSearchClient();
 
     // https://learn.microsoft.com/en-us/dotnet/api/azure.search.documents.searchoptions.querytype?view=azure-dotnet
     SearchOptions searchOptions = new()
@@ -999,7 +998,7 @@ internal partial class AzureSearchRequest
 
   public async Task<Response<SuggestResults<AzureSearchDocument>>> Suggest(SearchQuery query)
   {
-    SearchClient client = await this.GetSearchClient();
+    SearchClient client = this.GetSearchClient();
 
     SuggestOptions searchOptions = new()
     {

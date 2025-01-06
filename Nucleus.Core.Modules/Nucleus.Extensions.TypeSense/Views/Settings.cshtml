@@ -24,13 +24,15 @@
         </SettingsControl>
       </div>
 
-      <div>
+      <div class="nucleus-flex-fields">
         <SettingsControl caption="Attachments Size Limit (mb)" helptext="Enter maximum file size to submit to the Typesense server for indexing. A value of zero specifies no limit.">
           @Html.TextBoxFor(model => model.AttachmentMaxSize, new { @type = "number", @class = "attachments-size-limit" })
         </SettingsControl>
-        <SettingsControl caption="Indexing Pause (seconds)" helptext="Specifies the pause time (in seconds) between indexing operations.  In some environments (particularly Azure), indexing requests which are sent in rapid succession can exhaust available server resources (In Azure, SNAT ports).  This setting causes the search feed to pause between requests, which gives the server time to release unused resources.  The default value is 1.">
-          @Html.RangeFor(model => model.IndexingPause, 0, 15, 0.5)
-        </SettingsControl>
+        <div class="w-75">
+          <SettingsControl caption="Indexing Pause (seconds)" helptext="Specifies the pause time (in seconds) between indexing operations.  In some environments (particularly Azure), indexing requests which are sent in rapid succession can exhaust available server resources (In Azure, SNAT ports).  This setting causes the search feed to pause between requests, which gives the server time to release unused resources.  The default value is 1.">
+            @Html.RangeFor(model => model.IndexingPause, 0, 15, 0.5)
+          </SettingsControl>
+        </div>
       </div>
 
       <h3>Boost</h3>

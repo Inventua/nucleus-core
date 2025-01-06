@@ -5,7 +5,7 @@
   <description>
     The Google Custom Search extension provides a search provider that retrieves search results using the Google custom search service.
   </description>
-  <compatibility minVersion="2.0.0.1" maxVersion="*" />
+  <compatibility minVersion="2.1.0.0" maxVersion="*" />
   <components>
     <component folderName="GoogleCustomSearch" optional="false">
       <controlPanelExtensionDefinition id="a4aaf40e-2a49-4237-a12b-08cc53d1555a">

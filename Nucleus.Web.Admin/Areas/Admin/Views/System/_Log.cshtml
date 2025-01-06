@@ -15,7 +15,7 @@
         @foreach (var entry in Model.LogContent.Items)
         {
           <tr>
-            <td><span class="nucleus-log-date">@entry.Date.FormatDate(this.Context.Request.GetUserTimeZone())</span></td>
+            <td><span class="nucleus-log-date">@entry.Date.FormatDate(this.Context.Request.GetUserTimeZone(), true)</span></td>
             <td><span class="nucleus-log-level nucleus-log-level-@entry.Level.ToLower()">@entry.Level</span></td>
             <td class="position-relative pe-4">
               <div class="nucleus-log-category">@entry.Category</div>

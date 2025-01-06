@@ -8,4 +8,8 @@
   <SettingsControl caption="Azure Client ID" helptext="Alternative form of authentication by using the Azure Active Directory. This is optional.">
     @Html.TextBoxFor(model => model.AzureClientId)
   </SettingsControl>
+
+  @* <SettingsControl caption="Map Type" helptext="Select your map type/style.">
+    @Html.DropDownListFor(model => model.MapType, new SelectList(Model.MapTypes, "Key", "Value"))
+  </SettingsControl> *@
 </div>

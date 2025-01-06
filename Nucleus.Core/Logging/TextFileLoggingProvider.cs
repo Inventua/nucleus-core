@@ -36,11 +36,7 @@ namespace Nucleus.Core.Logging
 
 		public ILogger CreateLogger(string categoryName)
 		{
-      return new TextFileLogger(this, this.Options, this.ScopeProvider, categoryName, new() 
-      { 
-        RequestPath =  this.HttpContextAccessor?.HttpContext?.Request?.Path,
-        RemoteIpAddress = this.HttpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress 
-      });
+      return new TextFileLogger(this, this.HttpContextAccessor, this.Options, this.ScopeProvider, categoryName);
 		}
 
 		public void Dispose()

@@ -58,7 +58,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0.1-alpha-1.42" />
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.1.0-rc-1" />
     <PackageReference Include="Inventua.Nucleus.Extensions" Version="2.0.0" />
     <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0" />
     <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
@@ -67,7 +67,7 @@
 
 	<PropertyGroup Label="Nucleus">
 		<ExtensionFolder>Search</ExtensionFolder>
-		<Version>2.0.0</Version>
+		<Version>2.1.0</Version>
     <Product>Nucleus</Product>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
     <CopyToDefaultSetup>true</CopyToDefaultSetup>

@@ -56,23 +56,22 @@ namespace Nucleus.Core.Search
 
     private async Task CreateAndSubmitFeed(RunningTask task, IProgress<ScheduledTaskProgress> progress, CancellationToken cancellationToken)
     {
-      Dictionary<Guid, List<ISearchIndexManager>> activeSiteSearchIndexManagers = new();
-      List<Site> sites = new();
+      Dictionary<Site, List<ISearchIndexManager>> sites = new();
+      //List<Site> sites = new();
 
-      foreach (Site site in await this.SiteManager.List())
+      foreach (Site baseSite in await this.SiteManager.List())
       {
         List<ISearchIndexManager> activeSearchIndexManagers = new();
 
         // .List doesn't fully populate the site object, so we call .Get 
-        Site fullSite = await this.SiteManager.Get(site.Id);
-        sites.Add(fullSite);
+        Site site = await this.SiteManager.Get(baseSite.Id);
 
         // Test connections for each site/search index manager
         foreach (ISearchIndexManager searchIndexManager in this.SearchIndexManagers)
         {
           Boolean indexManagerEnabled = true;
 
-          if (fullSite.SiteSettings.TryGetValue($"{Site.SiteSearchSettingsKeys.SEARCH_INDEX_MANAGER_PREFIX}:{searchIndexManager.GetType().FullName.ToLower()}:enabled", out Boolean isEnabled))
+          if (site.SiteSettings.TryGetValue($"{Site.SiteSearchSettingsKeys.SEARCH_INDEX_MANAGER_PREFIX}:{searchIndexManager.GetType().FullName.ToLower()}:enabled", out Boolean isEnabled))
           {
             indexManagerEnabled = isEnabled;
           }
@@ -81,59 +80,58 @@ namespace Nucleus.Core.Search
           {
             if (indexManagerEnabled)
             {
-              if (await searchIndexManager.CanConnect(fullSite))
+              if (await searchIndexManager.CanConnect(site))
               {
                 activeSearchIndexManagers.Add(searchIndexManager);
               }
               else
               {
-                this.Logger?.LogWarning("Search index provider {providername} did not connect using the settings for site '{site}', and will not receive data.", searchIndexManager.GetType().FullName, fullSite.Name);
+                this.Logger?.LogWarning("Search index provider {providername} did not connect using the settings for site '{site}', and will not receive data.", searchIndexManager.GetType().FullName, site.Name);
               }
             }
             else
             {
-              this.Logger?.LogWarning("Search index provider {providername} is disabled for site '{site}', and will not receive data.", searchIndexManager.GetType().FullName, fullSite.Name);
+              this.Logger?.LogWarning("Search index provider {providername} is disabled for site '{site}', and will not receive data.", searchIndexManager.GetType().FullName, site.Name);
             }
           }
           catch (Exception e)
           {
-            this.Logger?.LogError(e, "Search index provider {providername} returned an error when connecting using the settings for site '{site}', and will not receive data.", searchIndexManager.GetType().FullName, fullSite.Name);
+            this.Logger?.LogError(e, "Search index provider {providername} returned an error when connecting using the settings for site '{site}', and will not receive data.", searchIndexManager.GetType().FullName, site.Name);
           }
         }
 
-        activeSiteSearchIndexManagers.Add(site.Id, activeSearchIndexManagers);
-        await ClearIndexes(fullSite, activeSearchIndexManagers);
+        sites.Add(site, activeSearchIndexManagers);
+        await ClearIndexes(site, activeSearchIndexManagers);
       }
 
       foreach (IContentMetaDataProducer contentProvider in this.SearchContentProviders)
       {
-        foreach (Site site in sites)
+        foreach (KeyValuePair<Site, List<ISearchIndexManager>> siteInfo in sites)
         {
-          List<ISearchIndexManager> activeSearchIndexManagers = activeSiteSearchIndexManagers[site.Id];
-          site.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.INDEX_PAGES_USE_SSL, out Boolean useSsl);
+          siteInfo.Key.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.INDEX_PAGES_USE_SSL, out Boolean useSsl);
 
-          if (!activeSearchIndexManagers.Any())
+          if (!siteInfo.Value.Any())
           {
-            this.Logger?.LogError("There are no available search index providers for site '{site}', so the search feed was terminated.", site.Name);
+            this.Logger?.LogError("There are no available search index providers for site '{site}', so the search feed was terminated.", siteInfo.Key.Name);
           }
           else
           {
             // get content for the site (once) and send each item to each available search index manager for indexing
             try
             {
-              this.Logger.LogTrace("Getting search content from {type} for site '{site}'.", contentProvider.GetType().FullName, site.Name);
+              this.Logger.LogTrace("Getting search content from {type} for site '{site}'.", contentProvider.GetType().FullName, siteInfo.Key.Name);
 
-              await foreach (ContentMetaData item in contentProvider.ListItems(site))
+              await foreach (ContentMetaData item in contentProvider.ListItems(siteInfo.Key))
               {
                 // allow IContentMetaDataProducer implementation to return nulls (and silently skip them)
                 if (item != null)
                 {
                   Boolean indexSuccess = false;
-                  item.Url = ToAbsolute(useSsl, site.DefaultSiteAlias.Alias, ParseUrl(item.Url));
+                  item.Url = ToAbsolute(useSsl, siteInfo.Key.DefaultSiteAlias.Alias, ParseUrl(item.Url));
                                 
                   this.Logger.LogTrace("Adding [{scope}] {url} to index.", item.Scope, item.Url);
 
-                  foreach (ISearchIndexManager searchIndexManager in activeSearchIndexManagers)
+                  foreach (ISearchIndexManager searchIndexManager in siteInfo.Value)
                   {
                     try
                     {

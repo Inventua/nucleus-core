@@ -11,6 +11,8 @@
   }
   else
   {
-    <button type="submit" class="btn btn-primary@(Model.DisplayMode == Nucleus.Modules.Search.ViewModels.Settings.DisplayModes.Compact ? " btn-sm": "")" formaction="@Url.NucleusAction("Index", "Search", "Search")" data-target="form.parent()">@Model.SearchButtonCaption</button>
+    <div>
+      <button type="submit" class="btn btn-primary@(Model.DisplayMode == Nucleus.Modules.Search.ViewModels.Settings.DisplayModes.Compact ? " btn-sm": " nucleus-show-progress nucleus-show-progress-after")" formaction="@Url.NucleusAction("Index", "Search", "Search")" data-target="form.parent()">@Model.SearchButtonCaption</button>
+    </div>
   }
 }

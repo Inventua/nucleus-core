@@ -9,8 +9,7 @@ else
 	<div class="nucleus-paging-control @Model.RenderMode.ToString().ToLower()">
 		@if (Model.Results.Pages.Count > 1)
 		{
-			<div class="nucleus-pagingcontrol-left">
-				
+			<div class="nucleus-pagingcontrol-left">				
 				@if (Model.RenderMode == Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Standard)
 				{
           <span class="nucleus-paging-control-summary">Page @Model.Results.CurrentPageIndex of @Model.Results.TotalPages</span>
@@ -32,7 +31,10 @@ else
 					<button type="button" class="btn nucleus-material-icon nucleus-pagingcontrol-pagebutton@(Model.Results.CurrentPageIndex == Model.Results.TotalPages ? " disabled" : "")" aria-label = "Select Last Page" data-page="@Model.Results.TotalPages">&#xe5dd;</button>
 				}
 			</div>
-
+      @if (Model.RenderMode == Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Standard)
+      {
+        <div class="spinner-border spinner-border-sm text-light nucleus-progress-spinner ms-2 collapse" role="status"></div>
+      }
 			@Html.DropDownList(Model.PropertyName + ".CurrentPageIndex", new SelectList(Model.Results.Pages, "Key", "Value", Model.Results.CurrentPageIndex), new { @class = "nucleus-pagingcontrol-pagedropdown no-appearance-override", @aria_label="Select Page", @title = "Select Page", @data_autopostbackevent = "change" })
       @if (Model.RenderMode == Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Compact)
       {
@@ -47,6 +49,11 @@ else
 <script>
 	jQuery(document).ready(function()
 	{
+    jQuery(Page).on("progress", function (e, args) 
+    {
+      jQuery(args.event?.currentTarget).find('.nucleus-progress-spinner').addClass('show');
+    });
+
 		jQuery(document).on('click', '.nucleus-paging-control [data-page]:not(.disabled)', function (event)
 		{
 			/* handle controls with a data-page attribute (the numbered page buttons and the first/last/prev/next buttons) */
@@ -63,8 +70,6 @@ else
 			event.preventDefault();
 			event.stopImmediatePropagation();
       jQuery(this).parents('form').trigger(jQuery.Event('submit', { srcElement: this, originalEvent: event }));
-
     });
 	});
-
 </script>

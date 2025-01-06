@@ -29,8 +29,6 @@
 
   <ItemGroup>
     <None Remove="Views\MapSettings\_AzureMapsSettings.cshtml" />
-    <None Remove="Views\MapViews\AzureMaps.cshtml" />
-    <None Remove="Views\MapViews\GoogleMaps.cshtml" />
   </ItemGroup>
 
   <ItemGroup>

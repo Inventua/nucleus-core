@@ -1,4 +1,5 @@
 ﻿using Nucleus.Abstractions.Models;
+using Nucleus.Modules.Maps.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Nucleus.Modules.Maps.MapRenderers;
 
-internal interface IMapRenderer
+public interface IMapRenderer
 {
-  public Task<System.IO.Stream> RenderMap(Site site, IHttpClientFactory httpClientFactory, Models.Settings settings);
+  public Task<System.IO.Stream> RenderMap(Settings settings);
 }

@@ -1,18 +1,23 @@
-﻿using Nucleus.Modules.Maps.MapRenderers;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Nucleus.Abstractions.Models;
 using Nucleus.Modules.Maps.MapGeocoders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Nucleus.Modules.Maps.MapRenderers;
+using Nucleus.Modules.Maps.Models;
 
 namespace Nucleus.Modules.Maps.MapProviders;
 
-internal interface IMapProvider
+public abstract class MapProvider
 {
-  public abstract Models.Settings GetSettings();
+  public IMapRenderer Renderer { get; protected set; }
+  public IMapGeocoder Geocoder { get; protected set; }
 
-  public abstract IMapRenderer GetRenderer();
+  public abstract Settings GetSettings(PageModule module);
 
-  public abstract IMapGeocoder GetGeocoder();
+  public abstract string SettingsView();
+
+  public MapProvider(IMapRenderer renderer,  IMapGeocoder geocoder)
+  {
+    this.Renderer = renderer;
+    this.Geocoder = geocoder;
+  }
 }

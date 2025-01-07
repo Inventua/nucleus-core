@@ -40,6 +40,14 @@
 					@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.TypeUri)
 				</div>
 			}
+      <div>
+        <h4>Two-factor authentication</h4>
+        <button type="submit" class="btn btn-secondary btn-sm" formaction="@Url.NucleusAction("SetupAuthApp", "UserProfile", "Account")">Setup authenticator app</button>
+        <button type="submit" class="btn btn-secondary btn-sm" formaction="@Url.NucleusAction("ResetAuthApp", "UserProfile", "Account")">Reset authenticator app</button>
+      </div>
+      <div class="collapse">
+        @Html.Raw(Model.QrCodeAsSvg)
+      </div>
 			<div>
 				<input type="submit" value="Save Changes" class="btn btn-primary" />
 				<a href="@(String.IsNullOrEmpty(Model.ReturnUrl) ? "/" : Model.ReturnUrl)" class="btn btn-secondary">Cancel</a>

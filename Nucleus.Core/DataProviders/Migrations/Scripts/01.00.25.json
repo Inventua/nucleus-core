@@ -1,0 +1,40 @@
+{
+	"schemaName": "Nucleus.Core",
+  "version": "01.00.25",
+  "operations": [
+    {
+      "addColumn": {
+        "table": "UserSecrets",
+        "name": "TotpSecretKey",
+        "clrType": "string",
+        "maxLength": 256,
+        "isnullable": true
+      }
+    },
+    {
+      "addColumn": {
+        "table": "UserSecrets",
+        "name": "TotpSecretKeyEncryptionAlgorithm",
+        "clrType": "string",
+        "maxLength": 256,
+        "isnullable": true
+      }
+    },
+    {
+      "addColumn": {
+        "table": "UserSecrets",
+        "name": "TotpDigits",
+        "clrType": "int",
+        "isnullable": true
+      }
+    },
+    {
+      "addColumn": {
+        "table": "UserSecrets",
+        "name": "TotpPeriod",
+        "clrType": "int",
+        "isnullable": true
+      }
+    }
+  ]
+}

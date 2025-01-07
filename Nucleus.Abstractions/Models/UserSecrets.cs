@@ -106,19 +106,40 @@ namespace Nucleus.Abstractions.Models
 		/// </summary>
 		public string Salt { get; set; }
 
-		/// <summary>
-		/// Compare the submitted password with the user's saved password.
+    /// <summary>
+    /// Secret key for multifactor authentication using TOTP (RFC6238).
+    /// </summary>
+    public string EncryptedTotpSecretKey { get; set; }
+
+    /// <summary>
+		/// Algorithm used to encrypt the <see cref="EncryptedTotpSecretKey"/>.
 		/// </summary>
-		/// <param name="password"></param>
-		/// <returns></returns>
-		/// <remarks>
-		/// Login modules should use <see langword="Nucleus.Core.UserManager.VerifyPassword" /> rather than calling this function directly, 
-		/// because UserManager.VerifyPassword tracks login failures and manages account suspension.
-		/// If the user 'secrets' record has a blank password or blank password hash algorithm, this function always returns false, because
-		/// users without a password cannot login using the login module.  Users can have no password if they are authenticated by a different
-		/// method such as OAuth, or an Authenticator app.
-		/// </remarks>
-		public Boolean VerifyPassword(string password)
+		public string TotpSecretKeyEncryptionAlgorithm { get; set; }
+
+    /// <summary>
+    /// Determines how many numeric characters are in the one-time passcode.
+    /// </summary>
+    public int TotpDigits { get; set; }
+
+    /// <summary>
+    /// Number of seconds that a one-time passcode is valid for.
+    /// </summary>
+    public int TotpPeriod { get; set; }
+
+
+    /// <summary>
+    /// Compare the submitted password with the user's saved password.
+    /// </summary>
+    /// <param name="password"></param>
+    /// <returns></returns>
+    /// <remarks>
+    /// Login modules should use <see langword="Nucleus.Core.UserManager.VerifyPassword" /> rather than calling this function directly, 
+    /// because UserManager.VerifyPassword tracks login failures and manages account suspension.
+    /// If the user 'secrets' record has a blank password or blank password hash algorithm, this function always returns false, because
+    /// users without a password cannot login using the login module.  Users can have no password if they are authenticated by a different
+    /// method such as OAuth, or an Authenticator app.
+    /// </remarks>
+    public Boolean VerifyPassword(string password)
 		{
 			if (String.IsNullOrEmpty(password)) return false;
 			if (String.IsNullOrEmpty(this.PasswordHash)) return false;

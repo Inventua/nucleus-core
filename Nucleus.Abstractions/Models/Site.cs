@@ -34,7 +34,8 @@ namespace Nucleus.Abstractions.Models
 			/// </value>
 			RequireApproval = 2,
 			/// <value>
-			/// New signups .
+			/// New signups require email verification. A verification email is sent to the user and 
+      /// they must click a link and enter a verification code to enable their account.
 			/// </value>
 			RequireEmailVerification = 4
 		}

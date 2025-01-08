@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
     <DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
     <RootNamespace>Nucleus.SAML.Client</RootNamespace>
@@ -51,14 +51,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0" />
-    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0" />
-    <PackageReference Include="ITfoxtec.Identity.Saml2.MvcCore" Version="4.10.8" />
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="3.0.0-rc-1" />
+    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="3.0.0-rc-1" />
+    <PackageReference Include="ITfoxtec.Identity.Saml2.MvcCore" Version="4.15.3" />
   </ItemGroup>
 
   <PropertyGroup Label="Nucleus">
     <ExtensionFolder>SAML Client</ExtensionFolder>
-    <Version>2.0.0</Version>
+    <Version>3.0.0</Version>
     <Product>Nucleus</Product>
     <Copyright>(c) Inventua Pty Ptd</Copyright>
     <NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>

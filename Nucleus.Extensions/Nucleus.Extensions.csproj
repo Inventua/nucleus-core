@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net9.0</TargetFramework>
 		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Nucleus.Extensions.xml</DocumentationFile>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>Provides extension methods for Nucleus and .Net core classes which provide functionality required by Nucleus core and extensions.</Description>
@@ -38,7 +38,7 @@
 
 	<ItemGroup>
 	  <PackageReference Include="DocumentPartner.ClosedXML" Version="0.95.289" />
-	  <PackageReference Include="Markdig" Version="0.37.0" />
+	  <PackageReference Include="Markdig" Version="0.39.1" />
 	  <PackageReference Include="RazorEngineCore" Version="2024.4.1" />
 	  <PackageReference Include="ReverseMarkdown" Version="4.6.0" />
 	</ItemGroup>

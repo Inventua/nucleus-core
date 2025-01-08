@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
     <DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
     <RootNamespace>Nucleus.Modules.Maps</RootNamespace>
@@ -42,16 +42,23 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Identity" Version="1.12.0" />
+    <PackageReference Include="Azure.Identity" Version="1.13.1" />
     <PackageReference Include="Azure.Maps.Rendering" Version="2.0.0-beta.1" />
     <PackageReference Include="Azure.Maps.Search" Version="2.0.0-beta.4" />
-    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0" />
-    <PackageReference Include="Inventua.Nucleus.Extensions" Version="2.0.0" />
-    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.3.0.0" />
-    <PackageReference Include="Inventua.Nucleus.Data.EntityFramework" Version="1.3.0.0" />
-
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="3.0.0-rc-1" />
+    <PackageReference Include="Inventua.Nucleus.Extensions" Version="3.0.0-rc-1" />
+    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="3.0.0-rc-1" />
+    <PackageReference Include="Inventua.Nucleus.Data.EntityFramework" Version="3.0.0-rc-1" />
+    
+    <!-- 
+      Azure.Maps.Search references Azure.Core, which references System.ClientModel >= 1.1.0, but in .NET9, System.ClientModel 1.1.0 causes 
+      a MissingMethodException on System.BinaryData System.ClientModel.Primitives.IPersistableModel`1.Write. We "manually" reference the later
+      version of System.ClientModel that contains the IPersistableModel interface.
+    -->
+    <PackageReference Include="System.ClientModel" Version="1.2.1" />
+    
     <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="9.0.0" />
   </ItemGroup>
 
   <!-- 
@@ -65,7 +72,7 @@
 
   <PropertyGroup Label="Nucleus">
     <ExtensionFolder>Maps</ExtensionFolder>
-    <Version>1.0.0</Version>
+    <Version>3.0.0</Version>
     <Copyright>(c) Inventua Pty Ptd</Copyright>
     <Product>Nucleus</Product>
     <NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>

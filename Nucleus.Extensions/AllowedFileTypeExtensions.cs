@@ -44,15 +44,15 @@ namespace Nucleus.Extensions
 			byte[] sample = new byte[63];
 
       stream.Position = 0;
-      stream.Read(sample, 0, sample.Length);
+      int bytes = stream.Read(sample, 0, sample.Length);
       stream.Position = 0;
 
-			return sample;
+			return sample.Take(bytes).ToArray();
 		}
 				
 		private static Boolean IsValid(string signature, byte[] sample)
 		{
-			List<string> signatureBytes = new();
+			List<string> signatureBytes = [];
 
 			for (int count = 0; count < (int)Math.Floor(signature.Length / (double)2); count ++)
 			{

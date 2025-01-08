@@ -11,7 +11,7 @@
     <PublishDir>Publish\</PublishDir>  <!-- command line (dotnet publish) uses this one -->
     <WebPublishMethod>FileSystem</WebPublishMethod>
     <SiteUrlToLaunchAfterPublish />
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ProjectGuid>387821b9-3bd3-4d1f-ae73-b1595a80ad48</ProjectGuid>
     <SelfContained>false</SelfContained>
     <IsWebConfigTransformDisabled>true</IsWebConfigTransformDisabled>

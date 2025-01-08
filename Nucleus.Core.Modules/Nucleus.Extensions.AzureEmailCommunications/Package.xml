@@ -1,11 +1,11 @@
 <package id="83aac7bc-fb2d-4d0e-ac9b-63f381711851" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
   <name>AzureEmailCommunications</name>
-  <version>1.0.0</version>
+  <version>3.0.0</version>
   <publisher name="Inventua" url="https://www.inventua.com/nucleus/" email="support@inventua.com" />
   <description>
 		Adds support for sending emails using a Azure Email Communications service.
 	</description>
-  <compatibility minVersion="2.0.0.0" maxVersion="*" />
+  <compatibility minVersion="3.0.0.0" maxVersion="3.*" />
   <components>
     <component folderName="AzureEmailCommunications" optional="false">
       <file name="readme.txt" />

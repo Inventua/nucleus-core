@@ -26,7 +26,7 @@ namespace Nucleus.Modules.Documents
 
 		private ILogger<DocumentsMetaDataProducer> Logger { get; }
 
-		public DocumentsMetaDataProducer(ISearchIndexHistoryManager searchIndexHistoryManager, ISiteManager siteManager, DocumentsManager documentsManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager, IExtensionManager extensionManager, ILogger<DocumentsMetaDataProducer> logger)
+		public DocumentsMetaDataProducer(ISearchIndexHistoryManager searchIndexHistoryManager, DocumentsManager documentsManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager, IExtensionManager extensionManager, ILogger<DocumentsMetaDataProducer> logger)
 		{
       this.SearchIndexHistoryManager = searchIndexHistoryManager;
       this.FileSystemManager = fileSystemManager;
@@ -71,7 +71,7 @@ namespace Nucleus.Modules.Documents
 			}
 		}
     		
-    private DateTime DocumentModifiedDate(Models.Document document)
+    private static DateTime DocumentModifiedDate(Models.Document document)
     {
       DateTime? modifiedDate = document.DateChanged ?? document.DateAdded;
 
@@ -115,7 +115,7 @@ namespace Nucleus.Modules.Documents
           documentContentItem.ContentType = document.File.GetMIMEType(false);
 
 					documentContentItem.Content = new byte[responseStream.Length];
-          responseStream.Read(documentContentItem.Content, 0, documentContentItem.Content.Length);
+          await responseStream.ReadExactlyAsync(documentContentItem.Content, 0, documentContentItem.Content.Length);
 					responseStream.Close();
 				}
 

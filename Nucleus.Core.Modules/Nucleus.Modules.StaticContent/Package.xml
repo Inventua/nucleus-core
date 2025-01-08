@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package id="a0b382dc-2e07-4573-9f58-4f7c3bac989e" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
   <name>Static Content</name>
-  <version>2.0.1</version>
+  <version>3.0.0</version>
   <publisher name="Inventua" url="https://www.inventua.com/nucleus/" email="support@inventua.com" />
   <description>
     The Static Content module displays static content files inline in markdown, html or text file format, and can serve other supported file types as regular HTTP responses.
   </description>
-  <compatibility minVersion="2.0.0.0" maxVersion="2.*" />
+  <compatibility minVersion="3.0.0.0" maxVersion="3.*" />
   <components>
     <component folderName="StaticContent" optional="false">
       <moduleDefinition id="0930d4fe-0469-47e6-a28b-7c42d85a61fd">
@@ -19,15 +19,12 @@
         <editAction>Settings</editAction>
         <categories>Content</categories>
       </moduleDefinition>
-      
       <file name="readme.txt" />
       <file name="license.txt" />
-
       <folder name="bin">
         <file name="Nucleus.Modules.StaticContent.dll" />
         <file name="HtmlAgilityPack.dll" />
       </folder>
-      
       <cleanup>
         <file name="viewer.css" />
         <file name="settings.css" />

@@ -1,9 +1,9 @@
-﻿<package id="fa397b8f-9ec2-4340-b1a7-638796e9de2f" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
+<package id="fa397b8f-9ec2-4340-b1a7-638796e9de2f" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
   <name>Maps</name>
-  <version>1.0.0</version>
+  <version>3.0.0</version>
   <publisher name="Inventua" url="https://www.inventua.com" email="support@inventua.com" />
   <description>The maps modules displays a static map, using the Azure or Google Maps service.</description>
-  <compatibility minVersion="2.0.0.0" maxVersion="*" />
+  <compatibility minVersion="3.0.0.0" maxVersion="3.*" />
   <components>
     <component folderName="Maps" optional="false">
       <moduleDefinition id="fc20b321-1803-429b-8326-e6d0b6b693ef">

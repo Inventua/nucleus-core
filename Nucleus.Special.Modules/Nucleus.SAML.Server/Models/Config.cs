@@ -83,7 +83,7 @@ namespace Nucleus.SAML.Server.Models
 			};
 		}
 
-		private X509Certificate2 LoadCertificateFromFile(string filepath, string password, string idpOrSpMessage)
+		private static X509Certificate2 LoadCertificateFromFile(string filepath, string password, string idpOrSpMessage)
 		{
 			if (String.IsNullOrEmpty(filepath))
 			{
@@ -94,7 +94,8 @@ namespace Nucleus.SAML.Server.Models
 			{
 				try
 				{
-					return new X509Certificate2(filepath, password);
+          return X509CertificateLoader.LoadPkcs12FromFile(filepath, password);
+          //return new X509Certificate2(filepath, password);
 				}
 				catch (System.Security.Cryptography.CryptographicException e)
 				{
@@ -103,11 +104,12 @@ namespace Nucleus.SAML.Server.Models
 			}
 			else
 			{
-				return new X509Certificate2(filepath);
+        return X509CertificateLoader.LoadCertificateFromFile(filepath);
+				//return new X509Certificate2(filepath);
 			}
 		}
 
-		private X509Certificate2 LoadCertificateFromStore(string thumbprint, string idpOrSpMessage)
+		private static X509Certificate2 LoadCertificateFromStore(string thumbprint, string idpOrSpMessage)
 		{
 			if (String.IsNullOrEmpty(thumbprint))
 			{

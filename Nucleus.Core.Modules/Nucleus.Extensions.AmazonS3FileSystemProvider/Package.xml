@@ -1,11 +1,11 @@
 <package id="28f54611-c14a-4a98-af7c-6a5a3d62b2e0" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
   <name>Amazon S3 File System Provider</name>
-  <version>2.0.0</version>
+  <version>3.0.0</version>
   <publisher name="Inventua" url="https://www.nucleus-cms.com" email="support@inventua.com" />
   <description>
 		Nucleus File system provider for Amazon S3 and compatible cloud storage services.
 	</description>
-  <compatibility minVersion="2.0.0.0" maxVersion="2.*" />
+  <compatibility minVersion="3.0.0.0" maxVersion="3.*" />
   <components>
     <component folderName="AmazonS3FileSystemProvider" optional="false">
       <file name="readme.txt" />

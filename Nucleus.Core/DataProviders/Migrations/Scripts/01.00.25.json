@@ -5,7 +5,7 @@
     {
       "addColumn": {
         "table": "UserSecrets",
-        "name": "TotpSecretKey",
+        "name": "EncryptedTotpSecretKey",
         "clrType": "string",
         "maxLength": 256,
         "isnullable": true

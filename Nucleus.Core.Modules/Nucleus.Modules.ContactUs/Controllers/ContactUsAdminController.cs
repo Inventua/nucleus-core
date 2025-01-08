@@ -15,15 +15,13 @@ public class ContactUsAdminController : Controller
 {
 	private Context Context { get; }
 	private IPageModuleManager PageModuleManager { get; }
-	private IContentManager ContentManager { get; }
 	private IListManager ListManager { get; }
 	private IMailTemplateManager MailTemplateManager { get; }
 
-	public ContactUsAdminController(Context Context, IPageModuleManager pageModuleManager, IContentManager contentManager, IListManager listManager, IMailTemplateManager mailTemplateManager)
+	public ContactUsAdminController(Context Context, IPageModuleManager pageModuleManager, IListManager listManager, IMailTemplateManager mailTemplateManager)
 	{
 		this.Context = Context;
 		this.PageModuleManager = pageModuleManager;
-		this.ContentManager = contentManager;
 		this.ListManager = listManager;
 		this.MailTemplateManager = mailTemplateManager;
 	}
@@ -76,7 +74,7 @@ public class ContactUsAdminController : Controller
       return BadRequest(ModelState);
     }
 
-    viewModel.SetSettings(this.Context.Site, this.Context.Module);
+    viewModel.SetSettings(this.Context.Module);
 
 		await this.PageModuleManager.SaveSettings(this.Context.Page, this.Context.Module);
 

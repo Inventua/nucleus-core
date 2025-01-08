@@ -32,7 +32,7 @@ public class Settings
   }
 
   [Required(ErrorMessage = "Send to recipients is required.", AllowEmptyStrings = false)]
-  public string SendTo { get; set; }
+  public string SendTo { get; set; } = "";
 
   [Required(ErrorMessage = "Category is required.")]
 	public Guid? CategoryListId { get; set; }
@@ -40,31 +40,31 @@ public class Settings
   [Required(ErrorMessage = "Mail template is required.")] 
   public Guid? MailTemplateId { get; set; }
 
-	public Boolean ShowName { get; set; }
+  public Boolean ShowName { get; set; } = true;
 
-	public Boolean ShowCompany { get; set; }
+	public Boolean ShowCompany { get; set; }= true;
 
-	public Boolean ShowPhoneNumber { get; set; }
+	public Boolean ShowPhoneNumber { get; set; }= true;
 
-	public Boolean ShowCategory { get; set; }
+	public Boolean ShowCategory { get; set; } = true;
 
-	public Boolean ShowSubject { get; set; }
+  public Boolean ShowSubject { get; set; } = true;
 
-	public Boolean RequireName { get; set; }
+  public Boolean RequireName { get; set; } = true;
 
-	public Boolean RequireCompany { get; set; }
-
-	public Boolean RequirePhoneNumber { get; set; }
-
-	public Boolean RequireCategory { get; set; }
-
-	public Boolean RequireSubject { get; set; }
-
-  public Boolean RecaptchaEnabled { get; set; }
+  public Boolean RequireCompany { get; set; } = true;
   
-  public string RecaptchaSiteKey { get; set; }
+	public Boolean RequirePhoneNumber { get; set; } = true;
 
-	private string RecaptchaEncryptedSecretKey { get; set; }
+  public Boolean RequireCategory { get; set; } = true;
+
+  public Boolean RequireSubject { get; set; } = true;
+
+  public Boolean RecaptchaEnabled { get; set; } = false;
+
+  public string RecaptchaSiteKey { get; set; } = "";
+
+  private string RecaptchaEncryptedSecretKey { get; set; } = "";
 
   public Boolean IsSecretKeySet 
   {
@@ -75,10 +75,10 @@ public class Settings
   }
 
   [RegularExpression("^[A-Za-z0-9/_]+$", ErrorMessage = "Action can only contain alphanumeric characters, slashes, and underscores.")]
-	public string RecaptchaAction {  get; set; }
+  public string RecaptchaAction { get; set; } = "";
 
   [Range(0.0, 1.0, ErrorMessage = "Score threshold must be between 0.0 and 1.0.")]
-  public double RecaptchaScoreThreshold { get; set; }
+  public double RecaptchaScoreThreshold { get; set; } = 0.5;
 
 	public string GetSecretKey(Site site)
 	{
@@ -106,41 +106,41 @@ public class Settings
 
 	public void ReadSettings(PageModule module)
 	{
-		this.MailTemplateId = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_MAILTEMPLATE_ID, Guid.Empty);
-    this.CategoryListId = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_CATEGORYLIST_ID, Guid.Empty);
-    this.SendTo = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SEND_TO, "");
+		this.MailTemplateId = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_MAILTEMPLATE_ID, this.MailTemplateId);
+    this.CategoryListId = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_CATEGORYLIST_ID, this.CategoryListId);
+    this.SendTo = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SEND_TO, this.SendTo);
 
-		this.ShowName = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SHOWNAME, true);
-		this.ShowCompany = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SHOWCOMPANY, true);
-		this.ShowPhoneNumber = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SHOWPHONENUMBER, true);
-		this.ShowCategory = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SHOWCATEGORY, true);
-		this.ShowSubject = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SHOWSUBJECT, true);
+		this.ShowName = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SHOWNAME, this.ShowName);
+		this.ShowCompany = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SHOWCOMPANY, this.ShowCompany);
+		this.ShowPhoneNumber = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SHOWPHONENUMBER, this.ShowPhoneNumber);
+		this.ShowCategory = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SHOWCATEGORY, this.ShowCategory);
+		this.ShowSubject = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SHOWSUBJECT, this.ShowSubject);
 
-		this.RequireName = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_REQUIRENAME, true);
-		this.RequireCompany = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_REQUIRECOMPANY, true);
-		this.RequirePhoneNumber = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_REQUIREPHONENUMBER, true);
-		this.RequireCategory = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_REQUIRECATEGORY, true);
-		this.RequireSubject = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_REQUIRESUBJECT, true);
+		this.RequireName = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_REQUIRENAME, this.RequireName);
+		this.RequireCompany = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_REQUIRECOMPANY, this.RequireCompany);
+		this.RequirePhoneNumber = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_REQUIREPHONENUMBER, this.RequirePhoneNumber);
+		this.RequireCategory = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_REQUIRECATEGORY, this.RequireCategory);
+		this.RequireSubject = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_REQUIRESUBJECT, this.RequireSubject);
 
-    this.RecaptchaEnabled = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_ENABLED, false);
+    this.RecaptchaEnabled = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_ENABLED, this.RecaptchaEnabled);
 
     ReadRecaptchaSettings(module);
   }
 
   public void ReadEncryptedKeys(PageModule module)
   {
-    this.RecaptchaEncryptedSecretKey = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SECRET_KEY, "");
+    this.RecaptchaEncryptedSecretKey = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SECRET_KEY, this.RecaptchaEncryptedSecretKey);
   }
 
   public void ReadRecaptchaSettings(PageModule module)
   {
-    this.RecaptchaSiteKey = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SITE_KEY, "");
-    this.RecaptchaEncryptedSecretKey = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SECRET_KEY, "");
-    this.RecaptchaAction = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_ACTION, "");
-    this.RecaptchaScoreThreshold = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SCORE_THRESHOLD, 0.5);
+    this.RecaptchaSiteKey = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SITE_KEY, this.RecaptchaSiteKey);
+    this.RecaptchaEncryptedSecretKey = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SECRET_KEY, this.RecaptchaEncryptedSecretKey);
+    this.RecaptchaAction = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_ACTION, this.RecaptchaAction);
+    this.RecaptchaScoreThreshold = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SCORE_THRESHOLD, this.RecaptchaScoreThreshold);
   }
 
-  public void SetSettings(Site site, PageModule module)
+  public void SetSettings(PageModule module)
 	{
 		module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_MAILTEMPLATE_ID, this.MailTemplateId);
 		module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_CATEGORYLIST_ID, this.CategoryListId);
@@ -246,5 +246,4 @@ public class Settings
 		// Convert to string and return result value
 		return System.Text.Encoding.UTF8.GetString(bytesOut);
 	}
-
 }

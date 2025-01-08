@@ -250,11 +250,12 @@ public class LoginController : Controller
 
           if (!Url.IsLocalUrl(viewModel.ReturnUrl)) viewModel.ReturnUrl = "";
 
-          if (loginUser.UserName == "caeli.walker") // loginUser.Is2FAEnabled
+          Boolean isMFAEnabled = true;
+          if (isMFAEnabled && !loginUser.IsSystemAdministrator) //(loginUser.IsMFAEnabled)
           {
             // When ready, move to another area/function/class etc where these properties are created (hidden from user) using constants?
-            loginUser.Secrets.TotpSecretKey = String.IsNullOrEmpty(loginUser.Secrets.TotpSecretKey) ? OtpNet.Base32Encoding.ToString(System.Text.Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())) : loginUser.Secrets.TotpSecretKey;
-            loginUser.Secrets.TotpSecretKeyAlgorithm = String.IsNullOrEmpty(loginUser.Secrets.TotpSecretKeyAlgorithm) ? "SHA1" : loginUser.Secrets.TotpSecretKeyAlgorithm;
+            loginUser.Secrets.EncryptedTotpSecretKey = String.IsNullOrEmpty(loginUser.Secrets.EncryptedTotpSecretKey) ? OtpNet.Base32Encoding.ToString(System.Text.Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())) : loginUser.Secrets.EncryptedTotpSecretKey;
+            loginUser.Secrets.TotpSecretKeyEncryptionAlgorithm = String.IsNullOrEmpty(loginUser.Secrets.TotpSecretKeyEncryptionAlgorithm) ? "SHA1" : loginUser.Secrets.TotpSecretKeyEncryptionAlgorithm;
             loginUser.Secrets.TotpDigits = (loginUser.Secrets.TotpDigits != 6 || loginUser.Secrets.TotpDigits != 8) ? 6 : loginUser.Secrets.TotpDigits;
             loginUser.Secrets.TotpPeriod = (loginUser.Secrets.TotpPeriod != 30 || loginUser.Secrets.TotpDigits != 60) ? 30 : loginUser.Secrets.TotpPeriod;
 
@@ -293,7 +294,7 @@ public class LoginController : Controller
       return BadRequest();
     }
 
-    if (VerifyTOTP (loginUser, viewModel.OneTimePassword))
+    if (VerifyTOTP (this.Context.Site, loginUser, viewModel.OneTimePassword))
     {
       await this.SessionManager.SignIn(session, HttpContext, viewModel.ReturnUrl);
 
@@ -308,27 +309,25 @@ public class LoginController : Controller
     }
   }
 
-  private Boolean VerifyTOTP(User loginUser, string oneTimePassword)
+  private Boolean VerifyTOTP(Site site, User loginUser, string oneTimePassword)
   {
-    return VerifyTOTP(loginUser.UserName, oneTimePassword, loginUser.Secrets.TotpSecretKey, loginUser.Secrets.TotpDigits, loginUser.Secrets.TotpPeriod );
+    // TODO! get from site settings
+    int previousTimeStepDelay = 1;
+    int futureTimeStepDelay = 1;
+
+    return VerifyTOTP(loginUser.UserName, oneTimePassword, loginUser.Secrets.EncryptedTotpSecretKey, loginUser.Secrets.TotpDigits, loginUser.Secrets.TotpPeriod, previousTimeStepDelay, futureTimeStepDelay);
   }
 
-  private Boolean VerifyTOTP(string userName, string oneTimePassword, string secretKey, int totpDigits, int totpPeriod)
+  private Boolean VerifyTOTP(string userName, string oneTimePassword, string secretKey, int totpDigits, int totpPeriod, int previousTimeStepDelay, int futureTimeStepDelay)
   {
-    
-    byte[] secret = Base32Encoding.ToBytes(secretKey);//"JBSWY3DPEHPK3PXP");
-    
-    Totp totp = new (secret, step: totpPeriod, mode: OtpHashMode.Sha1, totpSize: totpDigits);
-    // TODO put prev/future into settings
-    VerificationWindow window = new (previous: 1, future: 1);
+    MultifactorAuthenticationManager mfaManager = new();
 
-    string result = totp.ComputeTotp(); // Defaults to DateTime.UtcNow
-
-    Boolean isValid = totp.VerifyTotp(oneTimePassword, out long timeWindowUsed, window);
+    Boolean isValid = mfaManager.VerifyTOTP(userName, oneTimePassword, secretKey, totpDigits, totpPeriod, previousTimeStepDelay, futureTimeStepDelay);
 
     if (isValid)
     {
-      this.Logger.LogInformation("User '{userName}' OTP verified. Time window: {timeWindowUsed}.", userName, timeWindowUsed);
+      //this.Logger.LogInformation("User '{userName}' OTP verified. Time window: {timeWindowUsed}.", userName, timeWindowUsed);
+      this.Logger.LogInformation("User '{userName}' OTP verified. ", userName);
     }
     else
     {
@@ -471,34 +470,11 @@ public class LoginController : Controller
     viewModel.Message = viewModelLogin.Message;
     viewModel.SessionId = sessionId;
 
-    viewModel.QrCodeAsSvg = GenerateUserMFAQRCodeSetup(site.Name, viewModel, loginUser);
+    MultifactorAuthenticationManager mfaManager = new();
+
+    viewModel.QrCodeAsSvg = mfaManager.GenerateUserMFAQRCodeSetup(site.Name, loginUser);
 
     return viewModel;
   }
 
-  private string GenerateUserMFAQRCodeSetup(string issuer, ViewModels.VerifyOtp viewModel, User loginUser)
-  {
-
-    //otpauth://totp/{issuerName}:{userName}?secret={secret}&issuer={issuerName}
-    // Older Google Authenticator implementations ignore the issuer parameter and rely upon the issuer label prefix to disambiguate accounts. Newer implementations will use the issuer parameter for internal disambiguation, it will not be displayed to the user. We recommend using both issuer label prefix and issuer parameter together to safely support both old and new Google Authenticator versions
-    //string otpAuthUrl = $"otpauth://totp/{issuer}:{loginUser.UserName}?secret={loginUser.Secrets.TotpSecretKey}&issuer={issuer}&algorithm={loginUser.Secrets.TotpSecretKeyAlgorithm}&digits={loginUser.Secrets.TotpDigits}&period={loginUser.Secrets.TotpPeriod}";
-
-    
-    // Creates the "otpauth://totp/{issuerName}:{userName}?secret={secret}&issuer={issuerName}" and correctly encodes the values
-    QRCoder.PayloadGenerator.OneTimePassword generator = new()
-    {
-      Secret = loginUser.Secrets.TotpSecretKey,
-      AuthAlgorithm = PayloadGenerator.OneTimePassword.OneTimePasswordAuthAlgorithm.SHA1,
-      Issuer = issuer,
-      Label = loginUser.UserName,
-      Digits = loginUser.Secrets.TotpDigits,
-      Period = loginUser.Secrets.TotpPeriod
-    };
-
-    QRCoder.QRCodeGenerator qrGenerator = new QRCodeGenerator();
-    QRCodeData qrCodeData = qrGenerator.CreateQrCode(generator.ToString(), QRCodeGenerator.ECCLevel.M);
-    SvgQRCode qrCode = new SvgQRCode(qrCodeData);
-
-    return qrCode.GetGraphic(new System.Drawing.Size(150, 150), sizingMode: SvgQRCode.SizingMode.WidthHeightAttribute);
-  }
 }

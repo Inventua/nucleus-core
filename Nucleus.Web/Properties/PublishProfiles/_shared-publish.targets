@@ -59,7 +59,7 @@
     <ItemGroup>
       <TopLevelFilesToMoveToBin 
         Include="$(PublishUrl)\*.*" 
-        Exclude="$(PublishUrl)\*Settings.json;$(PublishUrl)\hosting.json;$(PublishUrl)\config.schema.json;$(PublishUrl)\*.txt;$(PublishUrl)\_ViewImports.cshtml;$(PublishUrl)\package.xsd;$(PublishUrl)\web.config;" />
+        Exclude="$(PublishUrl)\*Settings.json;$(PublishUrl)\hosting.json;$(PublishUrl)\config.schema.json;$(PublishUrl)\*.txt;$(PublishUrl)\_ViewStart.cshtml;$(PublishUrl)\_ViewImports.cshtml;$(PublishUrl)\package.xsd;$(PublishUrl)\web.config;" />
       <SubFolderFilesToMoveToBin
         Include="$(PublishUrl)\**\*"
         Exclude="$(PublishUrl)\*.*;$(PublishUrl)\Resources\**\*;$(PublishUrl)\Setup\**\*;$(PublishUrl)\Shared\**\*;$(PublishUrl)\Utils\**\*;$(PublishUrl)\wwwroot\**\*;$(PublishUrl)\bin\**\*;" />

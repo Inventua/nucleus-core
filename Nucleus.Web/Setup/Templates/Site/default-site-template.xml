@@ -866,18 +866,18 @@
 			<Value>
         &lt;p&gt;Click the &quot;Log in&quot; button to log in as a system administrator and set up your new site.&lt;/p&gt;
         &lt;h3&gt;Control Panel&lt;/h3&gt;
-        &lt;p&gt;After you log in, Control Panel icons are displayed on the left-hand side of the page. You can click the arrow button at the top-left of the page to display icons along the top of the page instead, if you prefer.&lt;/p&gt;
+        &lt;p&gt;After you log in, Control Panel icons are displayed on the left-hand side of the page. You can click the arrow button at the top-left of the page to display the icons along the top of the page, if you prefer.&lt;/p&gt;
         &lt;ul&gt;
         &lt;li&gt;Use the &lt;strong&gt;Pages&lt;/strong&gt; control panel to create new pages, manage existing pages and create new site content.&lt;/li&gt;
         &lt;li&gt;Use the &lt;strong&gt;Manage&lt;/strong&gt; control panel to manage site settings, including users, roles and e-mail settings.&lt;/li&gt;
         &lt;li&gt;Use the &lt;strong&gt;Extensions &lt;/strong&gt;control panel to install modules, layouts, containers and other types of extensions.&lt;/li&gt;
         &lt;li&gt;Use the &lt;strong&gt;Settings &lt;/strong&gt;control panel to manage settings for your Nucleus instance, including system administrator users, scheduled tasks and API keys.&lt;/li&gt;
-        &lt;li&gt;Use the &lt;strong&gt;System &lt;/strong&gt;control panel to view application status information and application logs.&amp;nbsp;&lt;/li&gt;
+        &lt;li&gt;Use the &lt;strong&gt;System &lt;/strong&gt;control panel to view application status information, application logs and other troubleshooting information.&amp;nbsp;&lt;/li&gt;
         &lt;/ul&gt;
         &lt;h3&gt;&lt;strong&gt;Support and Resources&lt;/strong&gt;&lt;/h3&gt;
         &lt;p&gt;Visit&amp;nbsp;&lt;a title=&quot;Nucleus Web Site&quot; href=&quot;https://www.nucleus-cms.com/&quot;&gt;https://www.nucleus-cms.com&lt;/a&gt; for documentation, help, developer information and news.&lt;/p&gt;
         &lt;h3&gt;&lt;strong&gt;Nucleus Store&lt;/strong&gt;&lt;/h3&gt;
-        &lt;p&gt;Visit &lt;a title=&quot;Nucleus Store&quot; href=&quot;https://www.nucleus-cms.com/store/home/&quot;&gt;https://www.nucleus-cms.com/store/home/&lt;/a&gt; view and download Nucleus Extensions, including modules, file system providers, search providers and authentication providers, or use the &lt;strong&gt;Store&lt;/strong&gt; tab in the &lt;strong&gt;Extensions &lt;/strong&gt;control panel.&lt;/p&gt;
+        &lt;p&gt;Visit &lt;a title=&quot;Nucleus Store&quot; href=&quot;https://www.nucleus-cms.com/store/home/&quot;&gt;https://www.nucleus-cms.com/store/home/&lt;/a&gt; to review and download Nucleus Extensions, including modules, file system providers, search providers and authentication providers, or use the &lt;strong&gt;Store&lt;/strong&gt; tab in the &lt;strong&gt;Extensions &lt;/strong&gt;control panel.&lt;/p&gt;
       </Value>
 			<SortOrder>10</SortOrder>
 		</Content>

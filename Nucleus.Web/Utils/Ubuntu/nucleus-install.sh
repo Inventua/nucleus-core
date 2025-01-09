@@ -301,7 +301,7 @@ fi
 if [ "$VERSION" == "3.0.0.0" ] || [ "$VERSION" \> "3.0.0.0" ]; then
   # install the .NET 9 runtime 
   if ! dpkg-query -W -f='${Status}' "aspnetcore-runtime-9.0"|grep "ok installed" > /dev/null ; then
-    printf "Installing .NET 8...\n"
+    printf "Installing .NET 9...\n"
     apt-get -q update && apt-get -q -y install aspnetcore-runtime-9.0
   else
     printf ".NET 9 is already installed.\n"

@@ -152,7 +152,8 @@ namespace Nucleus.Web
 
       ResourceUtilization resourceUtilization = resourceMonitor.GetUtilization(TimeSpan.FromSeconds(5));
 
-      WebHost?.Logger()?.LogCritical("Nucleus is shutting down. CPU: {cpu}, Memory: {memory}%, Start Time: {start}, Uptime: {uptime}.", resourceUtilization.CpuUsedPercentage.ToString("0.00"), resourceUtilization.MemoryUsedPercentage, process.StartTime, formattedUptime);
+      string formattedMemoryUse = Nucleus.Extensions.NumberExtensions.FormatFileSize(((long?)resourceUtilization.MemoryUsedInBytes));
+      WebHost?.Logger()?.LogCritical("Nucleus is shutting down. CPU: {cpu}%, Memory: {memory}% [{bytes}], Start Time: {start}, Uptime: {uptime}.", resourceUtilization.CpuUsedPercentage.ToString("0.00"), resourceUtilization.MemoryUsedPercentage.ToString("0.00"), formattedMemoryUse, process.StartTime, formattedUptime);
     }
 
     public static void LaunchBrowser(string[] args)

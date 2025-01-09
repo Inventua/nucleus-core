@@ -50,7 +50,7 @@ namespace Nucleus.Web
     {
       this.Environment = env;
 
-      this.Configuration = configuration; 
+      this.Configuration = configuration;
     }
 
     private static string GetEnvironmentConfigFile(string defaultFileName, string environmentName)
@@ -123,9 +123,9 @@ namespace Nucleus.Web
       {
         // This must be called before .AddStartupLogger, because the TextFileLogger uses its values.
         services.AddFolderOptions(this.Configuration);
-        
+
         services.AddStartupLogger(this.Configuration);
-        
+
         services.Logger().LogInformation(new[]
         {
           $"{System.Reflection.Assembly.GetExecutingAssembly().Product()} version {this.GetType().Assembly.Version()}. {this.GetType().Assembly.Copyright()}",
@@ -135,7 +135,7 @@ namespace Nucleus.Web
           $"Environment:             [{this.Environment.EnvironmentName}]",
           $"Urls:                    [{this.Configuration.GetValue<string>(Microsoft.AspNetCore.Hosting.WebHostDefaults.ServerUrlsKey)}]"
         });
-        
+
         services.Logger().LogInformation("Used config files: '{file}'", String.Join(',', ConfigFiles));
 
         services.AddHttpContextAccessor();  // required by many elements of the system
@@ -159,7 +159,7 @@ namespace Nucleus.Web
           logging.AddTextFileLogger(this.Configuration);
           logging.AddAzureWebAppDiagnostics();
         });
-        
+
         services.Logger().LogInformation($"App Data Folder:         [{this.Configuration.GetValue<String>($"{Nucleus.Abstractions.Models.Configuration.FolderOptions.Section}:DataFolder")}]");
 
         // Enable Open Telemetry metrics and tracing, if configured
@@ -169,8 +169,8 @@ namespace Nucleus.Web
         services.AddNucleusHealthChecks(this.Configuration);
 
         // this makes output caching available to controllers, it does not do anything automatically
-        // https://learn.microsoft.com/en-au/aspnet/core/performance/caching/output?view=aspnetcore-8.0
-        services.AddOutputCache(options=> 
+        // https://learn.microsoft.com/en-au/aspnet/core/performance/caching/output
+        services.AddOutputCache(options =>
         {
           options.AddBasePolicy(builder => builder.NoCache());
           options.AddPolicy("Expire20s", builder => builder.Expire(TimeSpan.FromSeconds(20)));
@@ -215,7 +215,7 @@ namespace Nucleus.Web
         string maxRequestSize = Configuration.GetSection("Nucleus:MaxRequestSize").Value;
         if (long.TryParse(maxRequestSize, out long maxRequestSizeValue))
         {
-          services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options => 
+          services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
           {
             options.MultipartBodyLengthLimit = maxRequestSizeValue;
 
@@ -307,7 +307,7 @@ namespace Nucleus.Web
         // check & warn if the text file logger configuration is invalid
         Nucleus.Abstractions.Models.Configuration.TextFileLoggerOptions textFileLoggerOptions = app.ApplicationServices.GetService<Microsoft.Extensions.Options.IOptions<Nucleus.Abstractions.Models.Configuration.TextFileLoggerOptions>>().Value;
         if (!textFileLoggerOptions.Enabled)
-        { 
+        {
           app.Logger().LogWarning("The text file logger was disabled because of an error accessing '{path}'.", textFileLoggerOptions.Path);
         }
 
@@ -323,14 +323,13 @@ namespace Nucleus.Web
           app.Logger().LogInformation($"Using Response Compression.");
           app.UseResponseCompression();
         }
-                
+
         // Add file providers for embedded static resources in Nucleus.Web and in control panel implementations/extensions
         app.UseEmbeddedStaticFiles(this.Environment);
 
-        // Add static file providers for the paths in FolderOptions.ALLOWED_STATICFILE_PATHS.  We expose specific folders only, rather than adding 
-        // env.ContentRootPath so that only defined folders can serve static resources.
+        // Add static file providers for the paths in FolderOptions.ALLOWED_STATICFILE_PATHS.  
         app.UseStaticFilePaths(this.Environment);
-        
+
         // Set default cache-control to NoCache.  This can be overridden by controllers or middleware.
         app.UseMiddleware<DefaultNoCacheMiddleware>();
 
@@ -342,7 +341,7 @@ namespace Nucleus.Web
         });
 
         app.UseRouting();
-        
+
         // the order here is important.  The page routing and module routing middleware sets the Nucleus context, which is used by some of the
         // authorization handlers, but ModuleRoutingMiddleware does a permission check, which requires that Authentication has run - and
         // middleware is executed in the order of the code below
@@ -371,47 +370,50 @@ namespace Nucleus.Web
           // map health check endpoint, if configured
           routes.MapNucleusHealthChecks(this.Configuration);
 
+          // use pre-compressed static resources for resources in /wwwroot. In most cases, this will just be Blazor.
+          routes.MapStaticAssets();
+
           // "Razor Pages" (Razor Pages is different to Razor views with controllers [MVC]).  We don't
           // expect that using Razor pages will be a common use case, but there's no reason to not allow them.
-          routes.MapRazorPages();
+          routes.MapRazorPages().WithStaticAssets();
 
           app.UseBlazor<Nucleus.WebAssembly.Components.App>(this.Environment, routes);
 
           // Map the error page route
           routes.MapControllerRoute(
-              name: RoutingConstants.ERROR_ROUTE_NAME,
-              pattern: $"/{RoutingConstants.ERROR_ROUTE_PATH}",
-              defaults: new { controller = "Error", action = "Index" });
+            name: RoutingConstants.ERROR_ROUTE_NAME,
+            pattern: $"/{RoutingConstants.ERROR_ROUTE_PATH}",
+            defaults: new { controller = "Error", action = "Index" });
 
           // map area routes for the admin controllers
           routes.MapControllerRoute(
-                name: RoutingConstants.AREA_ROUTE_NAME,
-                pattern: RoutingConstants.AREA_ROUTE_PATH);
+            name: RoutingConstants.AREA_ROUTE_NAME,
+            pattern: RoutingConstants.AREA_ROUTE_PATH);
 
           // map routes for extension controllers
           routes.MapControllerRoute(
-              name: RoutingConstants.EXTENSIONS_ROUTE_NAME,
-              pattern: RoutingConstants.EXTENSIONS_ROUTE_PATH);
+            name: RoutingConstants.EXTENSIONS_ROUTE_NAME,
+            pattern: RoutingConstants.EXTENSIONS_ROUTE_PATH);
 
-        // we're not currently using this route for anything
-        routes.MapControllerRoute(
+          // we're not currently using this route for anything, but it is reserved for future use as the endpoint for API calls
+          routes.MapControllerRoute(
             name: RoutingConstants.API_ROUTE_NAME,
             pattern: RoutingConstants.API_ROUTE_PATH);
 
           // Map the site map controller to /sitemap.xml
           routes.MapControllerRoute(
-              name: RoutingConstants.SITEMAP_ROUTE_NAME,
-              pattern: $"/{RoutingConstants.SITEMAP_ROUTE_PATH}",
-              defaults: new { controller = "Sitemap", action = "Index" });
+            name: RoutingConstants.SITEMAP_ROUTE_NAME,
+            pattern: $"/{RoutingConstants.SITEMAP_ROUTE_PATH}",
+            defaults: new { controller = "Sitemap", action = "Index" });
 
           // Map the site map controller to /robots.txt
           routes.MapControllerRoute(
-              name: RoutingConstants.ROBOTS_ROUTE_NAME,
-              pattern: $"/{RoutingConstants.ROBOTS_ROUTE_PATH}",
-              defaults: new { controller = "Sitemap", action = "Robots" });
+            name: RoutingConstants.ROBOTS_ROUTE_NAME,
+            pattern: $"/{RoutingConstants.ROBOTS_ROUTE_PATH}",
+            defaults: new { controller = "Sitemap", action = "Robots" });
 
           // Configure controller routes for controllers which are using attribute-based routing
-          routes.MapControllers();
+          routes.MapControllers().WithStaticAssets();
         });
 
         app.Logger().LogInformation($"Startup complete.  Nucleus is running.");

@@ -38,8 +38,8 @@
 
   <!-- https://github.com/dotnet/aspnetcore/issues/38892 (comment dated Dec 27, 2023) -->
   <Target Name="CopySystemSecurityCryptographyPkcs" AfterTargets="PostBuildEvent" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <Copy SourceFiles="$(PkgSystem_Security_Cryptography_Pkcs)\lib\net8.0\System.Security.Cryptography.Pkcs.dll" DestinationFolder="$(OutDir)" />
-    <Copy SourceFiles="$(PkgSystem_Formats_Asn1)\lib\net8.0\System.Formats.Asn1.dll" DestinationFolder="$(OutDir)" />
+    <Copy SourceFiles="$(PkgSystem_Security_Cryptography_Pkcs)\lib\net9.0\System.Security.Cryptography.Pkcs.dll" DestinationFolder="$(OutDir)" />
+    <Copy SourceFiles="$(PkgSystem_Formats_Asn1)\lib\net9.0\System.Formats.Asn1.dll" DestinationFolder="$(OutDir)" />
   </Target>
   	
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

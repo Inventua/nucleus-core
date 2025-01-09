@@ -53,7 +53,7 @@
     Default: C:\ProgramData\Nucleus
     Specifies the folder where Nucleus stores data.
   .PARAMETER NetCoreVersion
-    Default: 8.0.4
+    Default: 9.0.0
     Specifies the version of ASP.NET Core to check for and install if required.
   .PARAMETER Environment
     Default: Production
@@ -80,7 +80,7 @@ param (
 		[string]$ApplicationPool = "",
 		[string]$Path = "",
 		[string]$DataPath = "C:\ProgramData\Nucleus",
-		[string]$NetCoreVersion = "8.0.4",
+		[string]$NetCoreVersion = "9.0.0",
     [string]$Environment = "Production",
     [string]$ZipFile = "detect",
     [switch]$OverwriteExisting = $false,

@@ -932,13 +932,15 @@
       <DataModelTypeName>Nucleus.Abstractions.Models.Mail.Template.UserMailTemplateData,Nucleus.Abstractions</DataModelTypeName>
 			<Body>
         @Model.User.UserName,
+        @if (!Model.User.Verified)
+        {
         &lt;p&gt;
-        You are receiving this email because you have signed up for an account at &lt;a href="@Model.Site.AbsoluteUrl(true)"&gt;@Model.Site.Name&lt;/a&gt; and your email address needs to be verified.
+        You are receiving this email because you have signed up for an account at &lt;a href=&quot;@Model.Site.AbsoluteUrl(true)&quot;&gt;@Model.Site.Name&lt;/a&gt; and your email address needs to be verified.
         &lt;/p&gt;
 
         &lt;p&gt;
         &lt;h3&gt;Log in, and enter your verification code&lt;/h3&gt;
-        Visit &lt;a href="@Model.Site.AbsoluteUrl(@Model.LoginPage, true)?username=@Model.User.UserName"&gt;@Model.Site.AbsoluteUrl(@Model.LoginPage, true)?username=@Model.User.UserName&lt;/a&gt; to log in.
+        Visit &lt;a href=&quot;@Model.Site.AbsoluteUrl(@Model.LoginPage, true)?username=@Model.User.UserName&quot;&gt;@Model.Site.AbsoluteUrl(@Model.LoginPage, true)?username=@Model.User.UserName&lt;/a&gt; to log in.
         &lt;/p&gt;
 
         &lt;p&gt;
@@ -946,8 +948,19 @@
         &lt;/p&gt;
 
         &lt;p&gt;
-        You were sent this email because you are a registered user at &lt;a href="@Model.Site.AbsoluteUrl(true)"&gt;@Model.Site.Name&lt;/a&gt;.
+        You were sent this email because you are a registered user at &lt;a href=&quot;@Model.Site.AbsoluteUrl(true)&quot;&gt;@Model.Site.Name&lt;/a&gt;.
         &lt;/p&gt;
+        }
+        else
+        {
+        &lt;p&gt;
+        You are receiving this email because an account was created for you at &lt;a href=&quot;@Model.Site.AbsoluteUrl(true)&quot;&gt;@Model.Site.Name&lt;/a&gt;.
+        &lt;/p&gt;
+
+        &lt;p&gt;
+        &lt;span&gt;Your user name is @Model.User.UserName&lt;/span&gt;. You will need to contact the site administrator to get your password.
+        &lt;/p&gt;
+        }
       </Body>
 		</MailTemplate>
 		<MailTemplate>

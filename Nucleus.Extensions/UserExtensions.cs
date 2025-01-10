@@ -62,7 +62,7 @@ namespace Nucleus.Extensions
       return new User()
       {
         Id = user.Id,
-        Profile = user.Profile,
+        Profile = user.Profile,        
         UserName = user.UserName,
         Secrets = new()
         {
@@ -70,7 +70,9 @@ namespace Nucleus.Extensions
           PasswordResetTokenExpiryDate = user.Secrets?.PasswordResetTokenExpiryDate,
           VerificationToken = user.Secrets?.VerificationToken,
           VerificationTokenExpiryDate = user.Secrets?.VerificationTokenExpiryDate
-        }
+        },
+        Approved = user.Approved,
+        Verified = user.Verified
 			};
 		}
 	}

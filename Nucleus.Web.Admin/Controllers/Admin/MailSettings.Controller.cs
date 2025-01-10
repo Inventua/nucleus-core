@@ -45,7 +45,6 @@ public class MailSettingsController : Controller
   /// </summary>
   /// <returns></returns>
   [HttpGet]
-  [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SYSTEM_ADMIN_POLICY)]
   public async Task<ActionResult> Index()
   {
     return View("Index", await BuildViewModel(null));
@@ -56,7 +55,6 @@ public class MailSettingsController : Controller
   /// </summary>
   /// <returns></returns>
   [HttpPost]
-  [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SYSTEM_ADMIN_POLICY)]
   public async Task<ActionResult> SelectMailClient(ViewModels.Admin.MailSettings viewModel)
   {
     return View("Index", await BuildViewModel(viewModel));

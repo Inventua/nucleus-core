@@ -11,7 +11,7 @@ control panel, then click `Users`.
 |------------------|--------------------------------------------------------------------------------------|
 | User Name        | All users have a user name.  This is used to log in to the site.  |
 | Approved         | Users must be approved in order to log in to the site.   |
-| Verified         | If your site is configured to require email address verification, an email is sent to the user after signup with a link to verify their email and account. Until this is done, the user is not verified can can not log in.  |
+| Verified         | If your site is configured to require email address verification, an email is sent to the user after signup with a link to verify their email and account. Until this is done, the user is not verified and can not log in.  |
 | Expire Password  | Sets the "expire password" flag, which forces the user to change their password the next time that they log in. |
 
 

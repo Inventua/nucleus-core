@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
@@ -55,6 +56,19 @@ public static class CoreServiceExtensions
     services.AddSingleton<SecurityHeadersMiddleware>();
     return services;
   }
+
+  public static IServiceCollection AddIISServerOptions(this IServiceCollection services, IConfiguration configuration)
+  {
+    services.Configure<IISServerOptions>(configuration.GetSection("IISServerOptions")); 
+    return services;
+  }
+
+  public static IServiceCollection ConfigureIISRequestSize(this IServiceCollection services, long? maxRequestSizeValue)
+  {
+    services.Configure<IISServerOptions>(options => { options.MaxRequestBodySize = maxRequestSizeValue; });
+    return services;
+  }
+  
 
   /// <summary>
   /// Add content converters.

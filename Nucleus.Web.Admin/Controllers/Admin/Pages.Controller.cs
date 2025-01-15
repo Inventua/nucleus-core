@@ -1346,7 +1346,6 @@ public class PagesController : Controller
       (
         role => role.Id != this.Context.Site.AdministratorsRole?.Id && (existingPermissions == null || !existingPermissions.Where(item => item.Role.Id == role.Id).Any())
       )
-      .Append(new() { Id=Guid.NewGuid(), Name = "-" })
       .OrderBy(role => SiteRolesSortOrder(role))
       .ThenBy(role => role.Name);
 
@@ -1355,6 +1354,11 @@ public class PagesController : Controller
       .Select(role => role.RoleGroup.Name)
       .Distinct()
       .OrderBy(name => name);      
+
+    if (roleGroups.Any())
+    {
+      availableRoles.Append(new() { Id = Guid.NewGuid(), Name = "-" });      
+    }
 
     Dictionary<string, SelectListGroup> groups = roleGroups.ToDictionary(name => name, name => new SelectListGroup() { Name = name });
 

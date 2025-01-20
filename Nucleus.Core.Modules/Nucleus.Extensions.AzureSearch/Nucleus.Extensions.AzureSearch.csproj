@@ -67,7 +67,7 @@
     <PackageReference Include="System.ClientModel" Version="1.2.1" />
     
     <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="9.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>

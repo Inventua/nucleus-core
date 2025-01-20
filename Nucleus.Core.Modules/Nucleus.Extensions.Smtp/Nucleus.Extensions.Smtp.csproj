@@ -54,11 +54,11 @@
     <!-- seems that System.Security.Cryptography.Pkcs is generally only required at compile time, so it does not get  -->
     <!-- copied to /bin automatically.  This step (and the target below) work around this by manually copying the dll -->
     <!-- https://github.com/dotnet/aspnetcore/issues/38892 (comment dated Dec 27, 2023) -->
-    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.0" GeneratePathProperty="true" />
-    <PackageReference Include="System.Formats.Asn1" Version="9.0.0" GeneratePathProperty="true" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.1" GeneratePathProperty="true" />
+    <PackageReference Include="System.Formats.Asn1" Version="9.0.1" GeneratePathProperty="true" />
 
     <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="9.0.1" />
   </ItemGroup>
 
   <!-- https://github.com/dotnet/aspnetcore/issues/38892 (comment dated Dec 27, 2023) -->

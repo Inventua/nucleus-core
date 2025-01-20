@@ -244,7 +244,7 @@ then list the contents:
 <kbd>ls</kbd>.  
 Choose today's log - log filenames use UTC dates, so 
 the file name might not match your local time zone - then open the log file in an editor:  
-<kbd>nano 14-Dec-2022 UTC_MYCOMPUTER.log</kbd>.
+<kbd>nano dd-MMM-yyyy UTC_MYCOMPUTER.log</kbd>.
 
 4.  Try running Nucleus interactively.  
 First, you will need to configure the nucleus-service user to allow logins.

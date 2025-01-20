@@ -8,7 +8,8 @@ See also:
 1. If you don't already have one, [create an Azure free account](https://azure.microsoft.com/en-au/free). The free App Service tier isn't 
 appropriate for a production site, but you can use it to get started, and upgrade your App Service tier later.
 
-2. Sign in to the [Azure portal](https://portal.azure.com/), click "App Services" and create an App service. Choose .NET 8 and 64-bit when prompted.
+2. Sign in to the [Azure portal](https://portal.azure.com/), click "App Services" and create an App service. When prompted, choose the version 
+of .NET that matches your Nucleus version (.NET 8 for Nucleus version 2.x, .NET 9 for Nucleus version 3.x) and Platform: 64-bit.
 
 3. Identify your app service IP address. In the Azure portal App services page, click your App Service, then choose the 
 ""Networking"" option under ""Settings"". The IP address is displayed as "Inbound Address". Copy the IP address, you will need this 

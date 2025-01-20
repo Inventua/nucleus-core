@@ -286,6 +286,8 @@ if [ "$CREATE_DIRECTORIES" == true ]; then
     fi
     # Assign group ownership of app and data folders to service account
     chown -R :$SERVICE_ACCOUNT "$TARGET_DIRECTORY/$folder"
+    # set sticky bit on the directory so that new files created inherit the owner of the folder
+    chmod g+s "$TARGET_DIRECTORY/$folder"
   done
 
   # Grant read, execute but not write for nucleus group to /app

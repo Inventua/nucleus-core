@@ -38,13 +38,13 @@ connect from another computer:
 
 4.  Download the installation set:  
     #### x64
-    <kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v2.0.0/Nucleus.2.0.0.0.Install-linux_x64.zip</kbd>  
+    <kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v2.0.0/Nucleus.3.0.0.0.Install-linux_x64.zip</kbd>  
 
     #### Arm64 (for example: Raspberry Pi 3, 4, 5)
-    <kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v2.0.0/Nucleus.2.0.0.0.Install-linux_arm64.zip</kbd>  
+    <kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v2.0.0/Nucleus.3.0.0.0.Install-linux_arm64.zip</kbd>  
 
     #### Portable (other runtime environments: for example: MacOS)
-    <kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v2.0.0/Nucleus.2.0.0.0.Install-portable.zip</kbd>  
+    <kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v2.0.0/Nucleus.3.0.0.0.Install-portable.zip</kbd>  
 
     If you are installing a later version of Nucleus, download the zip file for that version instead - the installer shell script automatically 
 checks the folder which contains the shell script for the zip file with the most recent version of Nucleus. 
@@ -80,7 +80,7 @@ before running the script:
 
     Example:  
     To install to the `/home/services/nucleus-production` folder instead of using the default folder: 
-    <kbd>sudo bash ./nucleus-install.sh --zipfile Nucleus.2.0.0.0.Install.zip --target-directory /home/services/nucleus-production</kbd>
+    <kbd>sudo bash ./nucleus-install.sh --zipfile Nucleus.3.0.0.0.Install.zip --target-directory /home/services/nucleus-production</kbd>
 
 6. Once you have completed this process, [run the setup wizard](/getting-started/#setup-wizard).
 Open a web browser and enter the IP address of your server, or its host name.  By default, Nucleus is configured to use http on port 5000.
@@ -244,7 +244,7 @@ then list the contents:
 <kbd>ls</kbd>.  
 Choose today's log - log filenames use UTC dates, so 
 the file name might not match your local time zone - then open the log file in an editor:  
-<kbd>nano 14-Dec-2022 UTC_MYCOMPUTER.log</kbd>.
+<kbd>nano dd-MMM-yyyy UTC_MYCOMPUTER.log</kbd>.
 
 4.  Try running Nucleus interactively.  
 First, you will need to configure the nucleus-service user to allow logins.

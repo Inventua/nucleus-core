@@ -1,11 +1,11 @@
 <package id="e9e3de3b-ab7e-49ee-8d91-f65fe28a5f7f" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
   <name>Azure AI Chat</name>
-  <version>1.0.0</version>
+  <version>3.0.0</version>
   <publisher name="Inventua" url="https://www.inventua.com/nucleus" email="support@inventua.com" />
   <description>
 		This module works with the Azure Search extension and service to provide an AI-powered chat service.
 	</description>
-  <compatibility minVersion="2.0.0.0" maxVersion="*" />
+  <compatibility minVersion="3.0.0.0" maxVersion="3.*" />
   <components>
     <component folderName="AzureAIChat" optional="false">
       <moduleDefinition id="81046b51-6666-414c-b33e-a830daf5855e">

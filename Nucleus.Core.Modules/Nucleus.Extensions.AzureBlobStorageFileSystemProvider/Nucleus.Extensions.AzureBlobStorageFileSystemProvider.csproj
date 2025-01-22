@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
     <DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -32,14 +32,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.20.0" />
-    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.1.0-rc-1" />
-    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.23.0" />
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="3.0.0-rc-1" />
+    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="3.0.0-rc-1" />
+
+    <!-- 
+      Azure.Search.Documents references Azure.Core, which references System.ClientModel >= 1.1.0, but in .NET9, System.ClientModel 1.1.0 causes 
+      a MissingMethodException on System.BinaryData System.ClientModel.Primitives.IPersistableModel`1.Write. We "manually" reference the later
+      version of System.ClientModel that contains the IPersistableModel interface.
+    -->
+    <PackageReference Include="System.ClientModel" Version="1.2.1" />
   </ItemGroup>
 
   <PropertyGroup Label="Nucleus">
     <ExtensionFolder>AzureBlobStorageFileSystemProvider</ExtensionFolder>
-    <Version>2.0.0</Version>
+    <Version>3.0.0</Version>
     <Product>Nucleus</Product>
     <Copyright>(c) Inventua Pty Ptd</Copyright>
     <NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>

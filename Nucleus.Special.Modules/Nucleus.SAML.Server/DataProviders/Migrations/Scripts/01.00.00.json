@@ -223,18 +223,18 @@
 		{
 			"createIndex": {
 				"name": "IX_SAMLServerClientAppTokens_SAMLServerClientAppId",
-				"table": "SAMLServerClientApps",
+				"table": "SAMLServerClientAppTokens",
 				"isunique": false,
 				"columns": [ "ClientAppId" ]
 			}
 		},
 		{
-			"createIndex": {
-				"name": "IX_SAMLServerClientAppTokens_ExpiryDate",
-				"table": "SAMLServerClientApps",
-				"isunique": false,
-				"columns": [ "ExpiryDate" ]
-			}
+      "createIndex": {
+        "name": "IX_SAMLServerClientAppTokens_ExpiryDate",
+        "table": "SAMLServerClientAppTokens",
+        "isunique": false,
+        "columns": [ "ExpiryDate" ]
+      }
 		},
 		{
 			"createIndex": {

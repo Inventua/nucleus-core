@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
@@ -55,6 +56,19 @@ public static class CoreServiceExtensions
     services.AddSingleton<SecurityHeadersMiddleware>();
     return services;
   }
+
+  public static IServiceCollection AddIISServerOptions(this IServiceCollection services, IConfiguration configuration)
+  {
+    services.Configure<IISServerOptions>(configuration.GetSection("IISServerOptions")); 
+    return services;
+  }
+
+  public static IServiceCollection ConfigureIISRequestSize(this IServiceCollection services, long? maxRequestSizeValue)
+  {
+    services.Configure<IISServerOptions>(options => { options.MaxRequestBodySize = maxRequestSizeValue; });
+    return services;
+  }
+  
 
   /// <summary>
   /// Add content converters.
@@ -194,7 +208,7 @@ public static class CoreServiceExtensions
     // Load values from previously added configuration sources, replace tokens which represent environment variables with environment
     // variable vaues. This operation must take place before adding the ExpandEnvironmentVariablesConfigurationSource, otherwise it 
     // causes infinite recursion & a stack overflow.
-    Dictionary<string, string> settings = new();
+    Dictionary<string, string> settings = [];
 
     // build configuration settings so we can iterate through them. This has the downside of calling build.Build twice (once here, and
     // once when the "real" call to populate configuration classes takes place), but has the benefit of working automatically with *all*
@@ -290,7 +304,7 @@ public static class CoreServiceExtensions
       {
         app.Logger()?.LogInformation("Adding static file path: [{path}]", "/" + folderName);
         IFileProvider fileProvider = new PhysicalFileProvider(path);
-
+        
         app.UseStaticFiles(new StaticFileOptions
         {
           FileProvider = fileProvider,

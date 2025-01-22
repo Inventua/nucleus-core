@@ -245,26 +245,27 @@ namespace Nucleus.SAML.Client.Controllers
 
 					AuthnRequestsSigned = config.SignAuthnRequest,
 
-					NameIDFormats = new Uri[] { NameIdentifierFormats.Persistent },
+					NameIDFormats = [NameIdentifierFormats.Persistent],
 
-					SingleLogoutServices = new SingleLogoutService[]
-					{
-						new() { Binding = ProtocolBindings.HttpPost, Location = new Uri(defaultSite, $"{Routes.SINGLE_LOGOUT}/{providerKey}")	}
-					},									
+					SingleLogoutServices =
+          [
+            new() { Binding = ProtocolBindings.HttpPost, Location = new Uri(defaultSite, $"{Routes.SINGLE_LOGOUT}/{providerKey}")	}
+					],									
 
-					AssertionConsumerServices = new AssertionConsumerService[]
-					{
-						new() { Binding = ProtocolBindings.HttpPost, Location = new Uri(defaultSite, $"{Routes.ASSERTION_CONSUMER}/{providerKey}") }
-					},
+					AssertionConsumerServices =
+          [
+            new() { Binding = ProtocolBindings.HttpPost, Location = new Uri(defaultSite, $"{Routes.ASSERTION_CONSUMER}/{providerKey}") }
+					],
 
-					AttributeConsumingServices = new AttributeConsumingService[]
-					{
-						new() 
-						{							  
-							ServiceName = new ServiceName($"{this.Context.Site.Name} [{providerKey}] SAML Service Provider" , "en"),
+					AttributeConsumingServices =
+          [
+            new() 
+						{
+              ServiceNames = [ new($"{this.Context.Site.Name} [{providerKey}] SAML Service Provider" , "en") ],
+							//ServiceName = new ServiceName($"{this.Context.Site.Name} [{providerKey}] SAML Service Provider" , "en"),
 							RequestedAttributes = CreateRequestedAttributes(providerOption)
 						}
-					}
+					]
 				}
 				// Contact persons element is optional(SAML spec 2.3.2.2).  
 				//ContactPersons = new ContactPerson[] {
@@ -277,7 +278,7 @@ namespace Nucleus.SAML.Client.Controllers
 
 			if (config.SigningCertificate != null)
 			{
-				entityDescriptor.SPSsoDescriptor.SigningCertificates = new X509Certificate2[] { config.SigningCertificate };
+				entityDescriptor.SPSsoDescriptor.SigningCertificates = [config.SigningCertificate];
 			}
 
 			// Encryption not implemented
@@ -363,16 +364,19 @@ namespace Nucleus.SAML.Client.Controllers
 				status = Saml2StatusCodes.RequestDenied;
 			}
 
-			Saml2PostBinding responsebinding = new();
-			responsebinding.RelayState = requestBinding.RelayState;
-			Saml2LogoutResponse saml2LogoutResponse = new (await BuildConfiguration(providerOption))
+      Saml2PostBinding responsebinding = new()
+      {
+        RelayState = requestBinding.RelayState
+      };
+
+      Saml2LogoutResponse saml2LogoutResponse = new (await BuildConfiguration(providerOption))
 			{
 				InResponseToAsString = logoutRequest.IdAsString,
 				Status = status,
 			};
+
 			return responsebinding.Bind(saml2LogoutResponse).ToActionResult();
 		}
-
 
 		/// <summary>
 		/// Parse an AuthResponse, or use the value of a SAMLartifact to call the IdP artifact resolution service (which
@@ -469,7 +473,7 @@ namespace Nucleus.SAML.Client.Controllers
 		/// Request user values (claims) which are commonly used by Nucleus
 		/// </summary>
 		/// <returns></returns>
-		private IEnumerable<RequestedAttribute> CreateRequestedAttributes(Models.Configuration.SAMLProvider provider)
+		private static List<RequestedAttribute> CreateRequestedAttributes(Models.Configuration.SAMLProvider provider)
 		{
 			// return the "SAML-side" names of the claims which we can consume.  The <requestedAttributes> element is a SAML
 			// extension, and IdPs can choose to ignore it.  
@@ -514,12 +518,13 @@ namespace Nucleus.SAML.Client.Controllers
 		/// </exception>
 		private async Task<Saml2Configuration> BuildConfiguration(Models.Configuration.SAMLProvider providerOption)
 		{
-			Saml2Configuration saml2Configuration = new();
+      Saml2Configuration saml2Configuration = new()
+      {
+        CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.None,
+        RevocationMode = X509RevocationMode.NoCheck
+      };
 
-			saml2Configuration.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.None;
-			saml2Configuration.RevocationMode = X509RevocationMode.NoCheck;
-
-			if (!String.IsNullOrEmpty(providerOption.Issuer))
+      if (!String.IsNullOrEmpty(providerOption.Issuer))
 			{
 				saml2Configuration.Issuer = providerOption.Issuer;
 			}
@@ -903,11 +908,13 @@ namespace Nucleus.SAML.Client.Controllers
 		/// <returns></returns>
 		private ViewModels.Viewer BuildViewModel(string redirectUri)
 		{
-			ViewModels.Viewer viewModel = new();
-			viewModel.Options = this.Options.Value;
-			viewModel.ReturnUrl = redirectUri;
+      ViewModels.Viewer viewModel = new()
+      {
+        Options = this.Options.Value,
+        ReturnUrl = redirectUri
+      };
 
-			viewModel.ReadSettings(this.Context.Module);
+      viewModel.ReadSettings(this.Context.Module);
 
 			string layoutPath = $"ViewerLayouts/{viewModel.Layout}.cshtml";
 

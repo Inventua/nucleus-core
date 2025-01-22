@@ -61,7 +61,7 @@ Nucleus.[version].Install-win_x64.zip file.
       | -ApplicationPool                 | Specifies the name of the IIS Application Pool to create or update. Default: Application name (-Name) plus "AppPool".  |
       | -Path                            | Specifies the folder where Nucleus is installed. Default: The folder which contains this script.  |
       | -DataPath                        | Specifies the folder where Nucleus stores data. Default: C:\ProgramData\Nucleus.  |
-      | -NetCoreVersion                  | Specifies the version of ASP.NET Core to check for and install if required. Default: 8.0.4. |
+      | -NetCoreVersion                  | Specifies the version of ASP.NET Core to check for and install if required.  |
       | -Environment                     | Specifies the environment name to configure for your installation. Default: Production.  |
       | -ZipFile                         | Specifies an install or upgrade package to unzip.  If there is no zip file present in the installation folder and this parameter is not specified, the script assumes that a package has been manually un-zipped, so no package file needs to be unzipped. Default: detect  |
       | -OverwriteExisting               | If set, specifies that the script can update path, application pool and other settings on existing IIS objects, if they already exist.  If this option is not used, existing objects are not updated, and may have the wrong values. Default: false.  |
@@ -70,7 +70,7 @@ Nucleus.[version].Install-win_x64.zip file.
    ### Manual Setup
    > If you use the powershell script, you do not need to perform these steps.
 
-   1. Install the [Microsoft .Net Core Hosting Bundle](https://dotnet.microsoft.com/en-us/download/dotnet/8.0).  
+   1. Install the [Microsoft .Net Core Hosting Bundle](https://dotnet.microsoft.com/en-us/download/dotnet/).  
 
    2. In Internet Information Services (IIS) manager, add an application pool for Nucleus to use.  .Net core applications
 require a unique (not shared) application pool.  In the `.NET CLR Version` drop-down, select `NET CLR version v4.0.30319` and in the `Managed pipeline mode`

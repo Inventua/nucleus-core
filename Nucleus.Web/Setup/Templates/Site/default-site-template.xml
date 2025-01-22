@@ -866,18 +866,18 @@
 			<Value>
         &lt;p&gt;Click the &quot;Log in&quot; button to log in as a system administrator and set up your new site.&lt;/p&gt;
         &lt;h3&gt;Control Panel&lt;/h3&gt;
-        &lt;p&gt;After you log in, Control Panel icons are displayed on the left-hand side of the page. You can click the arrow button at the top-left of the page to display icons along the top of the page instead, if you prefer.&lt;/p&gt;
+        &lt;p&gt;After you log in, Control Panel icons are displayed on the left-hand side of the page. You can click the arrow button at the top-left of the page to display the icons along the top of the page, if you prefer.&lt;/p&gt;
         &lt;ul&gt;
         &lt;li&gt;Use the &lt;strong&gt;Pages&lt;/strong&gt; control panel to create new pages, manage existing pages and create new site content.&lt;/li&gt;
         &lt;li&gt;Use the &lt;strong&gt;Manage&lt;/strong&gt; control panel to manage site settings, including users, roles and e-mail settings.&lt;/li&gt;
         &lt;li&gt;Use the &lt;strong&gt;Extensions &lt;/strong&gt;control panel to install modules, layouts, containers and other types of extensions.&lt;/li&gt;
         &lt;li&gt;Use the &lt;strong&gt;Settings &lt;/strong&gt;control panel to manage settings for your Nucleus instance, including system administrator users, scheduled tasks and API keys.&lt;/li&gt;
-        &lt;li&gt;Use the &lt;strong&gt;System &lt;/strong&gt;control panel to view application status information and application logs.&amp;nbsp;&lt;/li&gt;
+        &lt;li&gt;Use the &lt;strong&gt;System &lt;/strong&gt;control panel to view application status information, application logs and other troubleshooting information.&amp;nbsp;&lt;/li&gt;
         &lt;/ul&gt;
         &lt;h3&gt;&lt;strong&gt;Support and Resources&lt;/strong&gt;&lt;/h3&gt;
         &lt;p&gt;Visit&amp;nbsp;&lt;a title=&quot;Nucleus Web Site&quot; href=&quot;https://www.nucleus-cms.com/&quot;&gt;https://www.nucleus-cms.com&lt;/a&gt; for documentation, help, developer information and news.&lt;/p&gt;
         &lt;h3&gt;&lt;strong&gt;Nucleus Store&lt;/strong&gt;&lt;/h3&gt;
-        &lt;p&gt;Visit &lt;a title=&quot;Nucleus Store&quot; href=&quot;https://www.nucleus-cms.com/store/home/&quot;&gt;https://www.nucleus-cms.com/store/home/&lt;/a&gt; view and download Nucleus Extensions, including modules, file system providers, search providers and authentication providers, or use the &lt;strong&gt;Store&lt;/strong&gt; tab in the &lt;strong&gt;Extensions &lt;/strong&gt;control panel.&lt;/p&gt;
+        &lt;p&gt;Visit &lt;a title=&quot;Nucleus Store&quot; href=&quot;https://www.nucleus-cms.com/store/home/&quot;&gt;https://www.nucleus-cms.com/store/home/&lt;/a&gt; to review and download Nucleus Extensions, including modules, file system providers, search providers and authentication providers, or use the &lt;strong&gt;Store&lt;/strong&gt; tab in the &lt;strong&gt;Extensions &lt;/strong&gt;control panel.&lt;/p&gt;
       </Value>
 			<SortOrder>10</SortOrder>
 		</Content>
@@ -932,13 +932,15 @@
       <DataModelTypeName>Nucleus.Abstractions.Models.Mail.Template.UserMailTemplateData,Nucleus.Abstractions</DataModelTypeName>
 			<Body>
         @Model.User.UserName,
+        @if (!Model.User.Verified)
+        {
         &lt;p&gt;
-        You are receiving this email because you have signed up for an account at &lt;a href="@Model.Site.AbsoluteUrl(true)"&gt;@Model.Site.Name&lt;/a&gt; and your email address needs to be verified.
+        You are receiving this email because you have signed up for an account at &lt;a href=&quot;@Model.Site.AbsoluteUrl(true)&quot;&gt;@Model.Site.Name&lt;/a&gt; and your email address needs to be verified.
         &lt;/p&gt;
 
         &lt;p&gt;
         &lt;h3&gt;Log in, and enter your verification code&lt;/h3&gt;
-        Visit &lt;a href="@Model.Site.AbsoluteUrl(@Model.LoginPage, true)?username=@Model.User.UserName"&gt;@Model.Site.AbsoluteUrl(@Model.LoginPage, true)?username=@Model.User.UserName&lt;/a&gt; to log in.
+        Visit &lt;a href=&quot;@Model.Site.AbsoluteUrl(@Model.LoginPage, true)?username=@Model.User.UserName&quot;&gt;@Model.Site.AbsoluteUrl(@Model.LoginPage, true)?username=@Model.User.UserName&lt;/a&gt; to log in.
         &lt;/p&gt;
 
         &lt;p&gt;
@@ -946,8 +948,19 @@
         &lt;/p&gt;
 
         &lt;p&gt;
-        You were sent this email because you are a registered user at &lt;a href="@Model.Site.AbsoluteUrl(true)"&gt;@Model.Site.Name&lt;/a&gt;.
+        You were sent this email because you are a registered user at &lt;a href=&quot;@Model.Site.AbsoluteUrl(true)&quot;&gt;@Model.Site.Name&lt;/a&gt;.
         &lt;/p&gt;
+        }
+        else
+        {
+        &lt;p&gt;
+        You are receiving this email because an account was created for you at &lt;a href=&quot;@Model.Site.AbsoluteUrl(true)&quot;&gt;@Model.Site.Name&lt;/a&gt;.
+        &lt;/p&gt;
+
+        &lt;p&gt;
+        &lt;span&gt;Your user name is @Model.User.UserName&lt;/span&gt;. You will need to contact the site administrator to get your password.
+        &lt;/p&gt;
+        }
       </Body>
 		</MailTemplate>
 		<MailTemplate>

@@ -79,7 +79,8 @@ public static class Extensions
       {
         ResponseWriter = WriteResponse,
         AllowCachingResponses = true
-      });
+      })
+      .DisableHttpMetrics();
 
       if (roles.Any())
       {
@@ -196,7 +197,7 @@ public static class Extensions
   /// <param name="healthReport"></param>
   /// <returns></returns>
   /// <remarks>
-  /// This is based on sample code from <seealso href="https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-8.0"/>.
+  /// This is based on sample code from <seealso href="https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks"/>.
   /// The output is intended to conform with the draft specification at <seealso href="https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check-06"/>.
   /// The draft spec appears has expired, but is the closest thing to a standard available in February 2024.   
   /// Extensions:

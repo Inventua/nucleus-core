@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package id="d70a7ff0-ff47-4daa-aeee-e9a2c29985b3" xmlns="urn:nucleus/schemas/package/1.0">
   <name>Shadow</name>
-  <version>2.0.0</version>
+  <version>3.0.0</version>
   <publisher name="Inventua" url="https://www.inventua.com/nucleus/" email="support@inventua.com" />
   <description>
     The Shadow Module displays a copy of a module from another page.
   </description>
-  <compatibility minVersion="2.0.0.0" maxVersion="2.*" />
+  <compatibility minVersion="3.0.0.0" maxVersion="3.*" />
   <components>
     <component folderName="Shadow" optional="false">
       <moduleDefinition id="ffaf61a9-6f15-4173-9927-532d3dedcdb5">
@@ -26,7 +26,6 @@
       </folder>
       <cleanup>
         <file name="settings.css" />
-
         <folder name="Views">
           <file name="_ViewImports.cshtml" />
           <file name="Viewer.cshtml" />

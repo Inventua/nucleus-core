@@ -932,13 +932,13 @@ function _Page()
     }
   }
 
-  function _dialog(title, message, icon, okCaption, cancelCaption, action)
+  function _dialog(title, message, icon, okCaption, cancelCaption, okAction, cancelAction)
   {
     if (typeof (okCaption) === 'undefined') okCaption = 'Ok';
     if (typeof (cancelCaption) === 'undefined') cancelCaption = 'Close';
 
     var okButton = '';
-    if (typeof action !== 'undefined')
+    if (typeof okAction !== 'undefined')
     {
       okButton = '<button type="button" class="btn btn-primary" data-bs-dismiss="modal">' + okCaption + '</button>';
     }
@@ -962,6 +962,7 @@ function _Page()
           iconElement = '<div class="dialog-icon"><span class="nucleus-material-icon">&#xe7f4;</span></div>';
           break;
         case 'info':
+        case 'information':
           iconClass = ' icon-info';
           iconElement = '<div class="dialog-icon"><span class="nucleus-material-icon">&#xe88e;</span></div>';
           break;
@@ -1029,14 +1030,26 @@ function _Page()
       jQuery('#' + DIALOG_ID).find('.modal-dialog').html(modalContent);
     }
 
-    if (typeof action !== 'undefined')
+    if (typeof okAction !== 'undefined')
     {
-      jQuery('#' + DIALOG_ID).find('.btn-primary').on('click', action);
+      jQuery('#' + DIALOG_ID).find('.btn-primary').on('click', okAction);
       jQuery('#' + DIALOG_ID).on('keypress', function (event)
       {
         if (event.which == 13)
         {
           jQuery(this).find('.btn-primary').trigger('click');
+        }
+      });
+    }
+
+    if (typeof cancelAction !== 'undefined')
+    {
+      jQuery('#' + DIALOG_ID).find('.btn-secondary').on('click', cancelAction);
+      jQuery('#' + DIALOG_ID).on('keypress', function (event)
+      {
+        if (event.which == 27)
+        {
+          jQuery(this).find('.btn-secondary').trigger('click');
         }
       });
     }

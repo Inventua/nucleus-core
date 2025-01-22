@@ -551,7 +551,7 @@ public class FileSystemController : Controller
       {
         ZipArchive archive = new ZipArchive(fileStream);
 
-        foreach (var entry in archive.Entries.Where(entry => true))
+        foreach (ZipArchiveEntry entry in archive.Entries)
         {
           Boolean isValid = false;
           AllowedFileType fileType = this.FileSystemOptions.AllowedFileTypes.Where(allowedtype => allowedtype.FileExtensions.Contains(System.IO.Path.GetExtension(entry.Name), StringComparer.OrdinalIgnoreCase)).FirstOrDefault();

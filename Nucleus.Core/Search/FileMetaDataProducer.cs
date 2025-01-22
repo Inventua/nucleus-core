@@ -24,7 +24,7 @@ public class FileMetaDataProducer : IContentMetaDataProducer
 
   private ILogger<FileMetaDataProducer> Logger { get; }
 
-  public FileMetaDataProducer(ISearchIndexHistoryManager searchIndexHistoryManager, ISiteManager siteManager, IFileSystemManager fileSystemManager, ILogger<FileMetaDataProducer> logger)
+  public FileMetaDataProducer(ISearchIndexHistoryManager searchIndexHistoryManager, IFileSystemManager fileSystemManager, ILogger<FileMetaDataProducer> logger)
   {
     this.SearchIndexHistoryManager = searchIndexHistoryManager;
     this.FileSystemManager = fileSystemManager;
@@ -33,9 +33,10 @@ public class FileMetaDataProducer : IContentMetaDataProducer
 
   public async override IAsyncEnumerable<ContentMetaData> ListItems(Site site)
   {
-    Boolean indexPublicFilesOnly = false;
-
-    site.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.INDEX_PUBLIC_FILES_ONLY, out indexPublicFilesOnly);
+    if (!site.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.INDEX_PUBLIC_FILES_ONLY, out bool indexPublicFilesOnly))
+    {
+      indexPublicFilesOnly = false;
+    }
 
     if (site.DefaultSiteAlias == null)
     {
@@ -148,12 +149,14 @@ public class FileMetaDataProducer : IContentMetaDataProducer
       using (System.IO.Stream responseStream = await this.FileSystemManager.GetFileContents(site, file))
       {
         contentItem.Content = new byte[responseStream.Length];
-        await responseStream.ReadAsync(contentItem.Content.AsMemory(0, contentItem.Content.Length));
+        await responseStream.ReadExactlyAsync(contentItem.Content.AsMemory(0, contentItem.Content.Length));
         responseStream.Close();
       }
 
-      string mimeType = "application/octet-stream";
-      this.ExtensionProvider.TryGetContentType(file.Path, out mimeType);
+      if (!this.ExtensionProvider.TryGetContentType(file.Path, out string mimeType))
+      {
+        mimeType = "application/octet-stream";
+      }
 
       contentItem.ContentType = mimeType;
 

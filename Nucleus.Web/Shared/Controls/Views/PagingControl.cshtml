@@ -51,7 +51,11 @@ else
 	{
     jQuery(Page).on("progress", function (e, args) 
     {
-      jQuery(args.event?.currentTarget).find('.nucleus-progress-spinner').addClass('show');
+      /* show progress indicator if a button inside the paging control was clicked */
+      if (jQuery(args.event?.originalEvent?.target).closest('.nucleus-paging-control').length > 0 )
+      {
+        jQuery(args.event?.currentTarget).find('.nucleus-progress-spinner').addClass('show');
+      }
     });
 
 		jQuery(document).on('click', '.nucleus-paging-control [data-page]:not(.disabled)', function (event)

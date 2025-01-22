@@ -29,11 +29,20 @@ public class AzureAI
 
   private readonly char[] MARKDOWN_CHARACTERS = ['#', '*', '-'];
   private readonly char[] HTML_CHARACTERS = ['>', '<'];
-   
+
+  private readonly JsonSerializerOptions JsonSerializerOptions = BuildSerializerOptions();
+    
   public AzureAI(Site site, Models.Settings settings)
   {
     this.Site = site;
     this.Settings = settings;
+  }
+
+  private static JsonSerializerOptions BuildSerializerOptions()
+  {
+    JsonSerializerOptions options = new();
+    options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    return options;
   }
 
   /// <summary>
@@ -69,7 +78,8 @@ public class AzureAI
           }
         }
       }
-      
+
+      messages.Insert(0, new SystemChatMessage(this.Settings.OpenAIRoleInfo));
       messages.Add(new UserChatMessage(question));
 
       OpenAI.Chat.ChatCompletion completion = await this.GetCompletion(messages, BuildChatOptions());
@@ -107,7 +117,7 @@ public class AzureAI
     }
   }
 
-  private bool ValidateArgs(Dictionary<string, string> args, List<string> keys)
+  private static bool ValidateArgs(Dictionary<string, string> args, List<string> keys)
   {
     foreach (string key in keys)
     {
@@ -138,9 +148,9 @@ public class AzureAI
           options: options
         );
       }
-      catch (ClientResultException ex)
+      catch (ClientResultException)
       {
-        string testError = ex.GetRawResponse()?.Content.ToString();
+        // string testError = ex.GetRawResponse()?.Content.ToString();
 
         if (retryCount >= this.Settings.OpenAIMaxRetries)
         {
@@ -158,10 +168,9 @@ public class AzureAI
 
     messages.Add(new AssistantChatMessage(originalCompletion));
 
-    var options = new JsonSerializerOptions() { };
-    options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    
 
-    messages.Add(new ToolChatMessage(call.Id, System.Text.Json.JsonSerializer.Serialize(response, options) ?? "no data"));
+    messages.Add(new ToolChatMessage(call.Id, System.Text.Json.JsonSerializer.Serialize(response, this.JsonSerializerOptions) ?? "no data"));
 
     newCompletion = await this.GetCompletion(messages, BuildToolResponseChatOptions());
 
@@ -179,9 +188,9 @@ public class AzureAI
   /// <returns></returns>
   private ChatItem ParseContent(string question, ChatCompletion completion)
   {
-    AzureChatMessageContext messageContext = completion.GetAzureMessageContext();
-    List<AzureChatCitation> originalCitations = messageContext?.Citations?.ToList() ?? [];
-    List<AzureChatCitation> referencedCitations = [];
+    ChatMessageContext messageContext = completion.GetMessageContext();
+    List<ChatCitation> originalCitations = messageContext?.Citations?.ToList() ?? [];
+    List<ChatCitation> referencedCitations = [];
 
     string answer = "";
 
@@ -195,7 +204,7 @@ public class AzureAI
         {
           if (originalCitations.Count >= originalCitationIndex)
           {
-            AzureChatCitation referencedCitation = FindBestCitation(originalCitationIndex, originalCitations);
+            ChatCitation referencedCitation = FindBestCitation(originalCitationIndex, originalCitations);
 
             if (referencedCitation != null)
             {
@@ -223,7 +232,7 @@ public class AzureAI
       // run through the [docN] instances again, and replace with a <a> element
       for (int citationIndex = 0; citationIndex < referencedCitations.Count; citationIndex++)
       {
-        AzureChatCitation referencedCitation = referencedCitations[citationIndex];
+        ChatCitation referencedCitation = referencedCitations[citationIndex];
         string link = $"<a href='{referencedCitation.Url}' class='citation-reference' target='_blank' title='{referencedCitation.Title}'>{citationIndex + 1}</a>";
 
         text = text.Replace($"[doc{citationIndex}]", link);
@@ -237,7 +246,7 @@ public class AzureAI
     {
       try
       {
-        intents = System.Text.Json.JsonSerializer.Deserialize<List<string>>(messageContext.Intent, new System.Text.Json.JsonSerializerOptions() { });
+        intents = System.Text.Json.JsonSerializer.Deserialize<List<string>>(messageContext.Intent);
       }
       catch (Exception)
       {
@@ -257,15 +266,15 @@ public class AzureAI
 
   }
 
-  private AzureChatCitation FindBestCitation(int citationIndex, List<AzureChatCitation> originalCitations)
+  private static ChatCitation FindBestCitation(int citationIndex, List<ChatCitation> originalCitations)
   {
-    AzureChatCitation referencedCitation;
+    ChatCitation referencedCitation;
 
     if (originalCitations[citationIndex - 1].Url == null)
     {
       // the API from September 2024 seems to return citations with a null url - which we can't use as a link. Look for a citation for the parent document,
       // which will have an ID that is "in the middle" of the child document ID
-      referencedCitation = originalCitations.Where(citation => citation.Url != null && originalCitations[citationIndex - 1].Filepath.Contains(citation.Filepath)).FirstOrDefault();
+      referencedCitation = originalCitations.Where(citation => citation.Url != null && originalCitations[citationIndex - 1].FilePath.Contains(citation.FilePath)).FirstOrDefault();
     }
     else
     {
@@ -281,7 +290,7 @@ public class AzureAI
     return referencedCitation;
   }
 
-  private int TryAddReferencedCitation(AzureChatCitation referencedCitation, List<AzureChatCitation> referencedCitations)
+  private static int TryAddReferencedCitation(ChatCitation referencedCitation, List<ChatCitation> referencedCitations)
   {
     if (!referencedCitations.Any(citation => citation.Url == referencedCitation.Url))
     {
@@ -366,7 +375,7 @@ public class AzureAI
   {
     ChatCompletionOptions chatOptions = new()
     {
-      MaxTokens = this.Settings.OpenAIMaxTokens,
+      MaxOutputTokenCount = this.Settings.OpenAIMaxTokens,
       Temperature = (float)this.Settings.OpenAITemperature,
       FrequencyPenalty = (float)this.Settings.OpenAIFrequencyPenalty,
       PresencePenalty = (float)this.Settings.OpenAIPresencePenalty,
@@ -385,16 +394,16 @@ public class AzureAI
       SemanticConfiguration = this.Settings.AzureSearchSemanticConfigurationName,
       TopNDocuments = this.Settings.OpenAITopNDocuments,
       InScope = this.Settings.OpenAIInScopeOnly,
-      AllowPartialResult = false,
-
+      AllowPartialResults = false,
+      
       // this (OutputContextFlags) causes an InvalidOperationException "The requested operation requires an element of type 'Object', but the target element has type 'Array'. This
       // is presumably a deserialization bug in the client library, which should get fixed at some point.
       //OutputContextFlags = DataSourceOutputContextFlags.Intent | DataSourceOutputContextFlags.Citations | DataSourceOutputContextFlags.AllRetrievedDocuments,
 
       Strictness = this.Settings.OpenAIStrictness,
       VectorizationSource = DataSourceVectorizer.FromDeploymentName(this.Settings.AzureOpenAIDeploymentName),
-      Filter = BuildPageNumberFilter(),
-      RoleInformation = this.Settings.OpenAIRoleInfo
+      Filter = BuildPageNumberFilter()
+      //RoleInformation = this.Settings.OpenAIRoleInfo
     });
 
     return chatOptions;
@@ -408,7 +417,7 @@ public class AzureAI
   {
     ChatCompletionOptions chatOptions = new()
     {
-      MaxTokens = this.Settings.OpenAIMaxTokens,
+      MaxOutputTokenCount = this.Settings.OpenAIMaxTokens,
       Temperature = (float)this.Settings.OpenAITemperature,
       FrequencyPenalty = (float)this.Settings.OpenAIFrequencyPenalty,
       PresencePenalty = (float)this.Settings.OpenAIPresencePenalty,
@@ -432,11 +441,11 @@ public class AzureAI
 
   private static DataSourceFieldMappings BuildFieldMappings()
   {
-    DataSourceFieldMappings mappings = new DataSourceFieldMappings()
+    DataSourceFieldMappings mappings = new()
     {
       UrlFieldName = "Url",
       TitleFieldName = "Title",
-      FilepathFieldName = "Id"
+      FilePathFieldName = "Id"
     };
 
     mappings.ContentFieldNames.Add("Content");

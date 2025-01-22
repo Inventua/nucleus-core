@@ -81,12 +81,12 @@
 			}
 		},
 		{
-			"createIndex": {
-				"name": "IX_OAuthServerClientApps_LoginPageId",
-				"table": "Pages",
-				"isunique": false,
-				"columns": [ "LoginPageId" ]
-			}
+      "createIndex": {
+        "name": "IX_OAuthServerClientApps_LoginPageId",
+        "table": "OAuthServerClientApps",
+        "isunique": false,
+        "columns": [ "LoginPageId" ]
+      }
 		},
 		{
 			"createIndex": {
@@ -191,20 +191,20 @@
 			}
 		},
 		{
-			"createIndex": {
-				"name": "IX_OAuthServerClientAppTokens_OAuthServerClientAppId",
-				"table": "OAuthServerClientApps",
-				"isunique": false,
-				"columns": [ "ClientAppId" ]
-			}
+      "createIndex": {
+        "name": "IX_OAuthServerClientAppTokens_OAuthServerClientAppId",
+        "table": "OAuthServerClientAppTokens",
+        "isunique": false,
+        "columns": [ "ClientAppId" ]
+      }
 		},
 		{
-			"createIndex": {
-				"name": "IX_OAuthServerClientAppTokens_ExpiryDate",
-				"table": "OAuthServerClientApps",
-				"isunique": false,
-				"columns": [ "ExpiryDate" ]
-			}
+      "createIndex": {
+        "name": "IX_OAuthServerClientAppTokens_ExpiryDate",
+        "table": "OAuthServerClientAppTokens",
+        "isunique": false,
+        "columns": [ "ExpiryDate" ]
+      }
 		},
 		{
 			"createIndex": {

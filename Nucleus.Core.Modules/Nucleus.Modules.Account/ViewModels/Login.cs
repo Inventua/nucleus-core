@@ -9,7 +9,7 @@ namespace Nucleus.Modules.Account.ViewModels
 {
 	public class Login : Models.Settings
 	{
-		public string Message { get; set; }
+    public string Message { get; set; }
 
 		public string ReturnUrl { get; set; }
 
@@ -30,5 +30,5 @@ namespace Nucleus.Modules.Account.ViewModels
 
     public IEnumerable<AuthenticationProtocol> ExternalAuthenticationProtocols { get; set; } 
 
-	}
+  }
 }

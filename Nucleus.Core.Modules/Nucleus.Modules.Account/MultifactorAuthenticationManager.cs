@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.Models;
 using OtpNet;
 using QRCoder;
@@ -11,6 +12,10 @@ namespace Nucleus.Modules.Account;
 
 public class MultifactorAuthenticationManager
 {
+  public const int PREVIOUS_TIME_STEP_DELAY_DEFAULT = 1;
+  public const int FUTURE_TIME_STEP_DELAY_DEFAULT = 1;
+
+
   /// <summary>
   /// Generates a one-time-password QR code to setup the authentication exchange.
   /// </summary>
@@ -18,12 +23,12 @@ public class MultifactorAuthenticationManager
   /// <param name="viewModel"></param>
   /// <param name="loginUser"></param>
   /// <returns></returns>
-  public string GenerateUserMFAQRCodeSetup(string issuer, User loginUser)
+  public string GenerateUserMFAQRCodeSetup(string issuer, string userName, string encryptedTotpSecretKey, string totpSecretKeyEncryptionAlgorithm, int totpDigits, int totpPeriod)
   {
     // Add both the issuer label prefix and issuer parameter for backward compatibility as older Google Authenticator implementations
     // ignored the issuer paramaters while the newer versions support it according RFC2289. 
     // Format: "otpauth://totp/{issuer}:{loginUser.UserName}?secret={loginUser.Secrets.TotpSecretKey}&issuer={issuer}&algorithm={loginUser.Secrets.TotpSecretKeyAlgorithm}&digits={loginUser.Secrets.TotpDigits}&period={loginUser.Secrets.TotpPeriod}"
-    string totpSecretKey = loginUser.Secrets.EncryptedTotpSecretKey;
+    string totpSecretKey = encryptedTotpSecretKey;
 
     // Creates url format as "otpauth://totp/{issuerName}:{userName}?secret={secret}&issuer={issuerName}" and correctly encodes the values
     QRCoder.PayloadGenerator.OneTimePassword generator = new()
@@ -31,9 +36,9 @@ public class MultifactorAuthenticationManager
       Secret = totpSecretKey,
       AuthAlgorithm = PayloadGenerator.OneTimePassword.OneTimePasswordAuthAlgorithm.SHA1,
       Issuer = issuer,
-      Label = loginUser.UserName,
-      Digits = loginUser.Secrets.TotpDigits,
-      Period = loginUser.Secrets.TotpPeriod
+      Label = userName,
+      Digits = totpDigits,
+      Period = totpPeriod
     };
 
     QRCoder.QRCodeGenerator qrGenerator = new QRCodeGenerator();
@@ -53,19 +58,7 @@ public class MultifactorAuthenticationManager
 
     string result = totp.ComputeTotp(); // Defaults to DateTime.UtcNow
 
-    Boolean isValid = totp.VerifyTotp(oneTimePassword, out long timeWindowUsed, window);
-
-    //if (isValid)
-    //{
-    //  this.Logger.LogInformation("User '{userName}' OTP verified. Time window: {timeWindowUsed}.", userName, timeWindowUsed);
-    //}
-    //else
-    //{
-    //  this.Logger.LogWarning("User '{userName}' OTP invalid.", userName);
-    //}
-
-    return isValid;
-
-
+    return totp.VerifyTotp(oneTimePassword, out long timeWindowUsed, window);
   }
+
 }

@@ -284,7 +284,31 @@ namespace Nucleus.Abstractions.Models
 		/// </summary>
 		public List<SiteSetting> SiteSettings { get; set; } = new();
 
-	}
+    /// <summary>
+    /// 
+    /// </summary>
+    public enum MultifactorAuthenticationOptions
+    {
+      /// <summary>
+      /// Disable multi-factor authentication.
+      /// </summary>
+      Disable = 0,
+      /// <summary>
+      /// Users can opt-in to multi-factor authentication.
+      /// </summary>
+      Allow = 1,
+      /// <summary>
+      /// Users must use multi-factor authentication to login.
+      /// </summary>
+      Enforce = 2
+    }
+
+    /// <summary>
+    /// Gets or sets multi-factor authentication options for the site.
+    /// </summary>
+    public MultifactorAuthenticationOptions MultifactorAuthenticationOption { get; set; } = MultifactorAuthenticationOptions.Disable;
+
+  }
 
 
 }

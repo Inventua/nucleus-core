@@ -21,6 +21,7 @@ namespace Nucleus.Web.ViewModels.Admin
 		public Boolean AllowPublicRegistration { get;set; }
 		public Boolean RequireEmailVerification { get; set; }
 		public Boolean RequireApproval { get; set; }
+    public Boolean EnableMultifactorAuthentication { get; set; }
 
 
 		public IEnumerable<LayoutDefinition> Layouts { get; set; }

@@ -56,8 +56,8 @@
     <PackageReference Include="Azure.Search.Documents" Version="11.7.0-beta.1" />
 		<PackageReference Include="Azure.Storage.Blobs" Version="12.23.0" />
 		<PackageReference Include="HtmlAgilityPack" Version="1.11.72" />
-		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="3.0.0-rc-1" />
-		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="3.0.0-rc-1" />
+		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="3.0.0" />
+		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="3.0.0" />
 
     <!-- 
       Azure.Storage.Blobs references Azure.Storage.Common which references Azure.Core, which references System.ClientModel >= 1.1.0, but in .NET9, 

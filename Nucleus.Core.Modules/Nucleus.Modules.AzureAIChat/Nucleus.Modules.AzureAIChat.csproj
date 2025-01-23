@@ -58,9 +58,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="Azure.AI.OpenAI" Version="2.1.0" />
-		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="3.0.0-rc-1" />
-		<PackageReference Include="Inventua.Nucleus.Extensions" Version="3.0.0-rc-1" />
-		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="3.0.0-rc-1" />
+		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="3.0.0" />
+		<PackageReference Include="Inventua.Nucleus.Extensions" Version="3.0.0" />
+		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="3.0.0" />
 
     <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="9.0.1" />

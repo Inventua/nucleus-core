@@ -45,10 +45,10 @@
     <PackageReference Include="Azure.Identity" Version="1.13.2" />
     <PackageReference Include="Azure.Maps.Rendering" Version="2.0.0-beta.1" />
     <PackageReference Include="Azure.Maps.Search" Version="2.0.0-beta.4" />
-    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="3.0.0-rc-1" />
-    <PackageReference Include="Inventua.Nucleus.Extensions" Version="3.0.0-rc-1" />
-    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="3.0.0-rc-1" />
-    <PackageReference Include="Inventua.Nucleus.Data.EntityFramework" Version="3.0.0-rc-1" />
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="3.0.0" />
+    <PackageReference Include="Inventua.Nucleus.Extensions" Version="3.0.0" />
+    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="3.0.0" />
+    <PackageReference Include="Inventua.Nucleus.Data.EntityFramework" Version="3.0.0" />
     
     <!-- 
       Azure.Maps.Search references Azure.Core, which references System.ClientModel >= 1.1.0, but in .NET9, System.ClientModel 1.1.0 causes 

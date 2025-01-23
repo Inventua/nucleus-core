@@ -34,7 +34,7 @@
 
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="3.7.412.2" />
-    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="3.0.0-rc-1" />
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="3.0.0" />
   </ItemGroup>
 
   <PropertyGroup Label="Nucleus">

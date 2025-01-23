@@ -14,7 +14,7 @@
 
     <Tab>
       <TabItem target="#user-profile" caption="Profile" active="true"></TabItem>
-      <TabItem target="#user-authentication-settings" caption="Authentication Settings"></TabItem>
+      @* <TabItem target="#user-authentication-settings" caption="Authentication Settings"></TabItem> *@
     </Tab>
 
 
@@ -54,10 +54,10 @@
           }
         </fieldset>
       </TabPanel>
-      <TabPanel id="user-authentication-settings">
+@*       <TabPanel id="user-authentication-settings">
         <h3>Authentication</h3>
         <div class="nucleus-flex-fields mb-3">
-          @* <button type="submit" class="btn btn-secondary btn-sm" formaction="@Url.NucleusAction("ResetAuthApp", "UserProfile", "Account")">Reset authenticator app</button> *@
+          <button type="submit" class="btn btn-secondary btn-sm" formaction="@Url.NucleusAction("ResetAuthApp", "UserProfile", "Account")">Reset authenticator app</button>
         </div>
         @if (String.IsNullOrEmpty(Model.User.Secrets.EncryptedTotpSecretKey))
         {
@@ -66,7 +66,7 @@
           <div id="verify-otp"></div>
         }
       </TabPanel>
-    </TabContent>
+ *@    </TabContent>
     <div class="nucleus-button-panel">
       <input type="submit" value="Save Changes" class="btn btn-primary" />
       <a href="@(String.IsNullOrEmpty(Model.ReturnUrl) ? "/" : Model.ReturnUrl)" class="btn btn-secondary">Cancel</a>

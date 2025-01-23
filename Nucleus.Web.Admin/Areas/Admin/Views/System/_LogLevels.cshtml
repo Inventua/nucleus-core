@@ -29,7 +29,7 @@
             </td>
             <td>
             <td class="nucleus-small-cell">
-                @if (Model.LoggingSettingsConfiguration[item.Index].Category != "Default")
+                @if (Model.LoggingSettingsConfiguration[item.Index].IsEditable)
                 {
                 <button type="submit" formaction="@Url.AreaAction("RemoveLogLevel", "System", "Admin")?name=@Model.LoggingSettingsConfiguration[item.Index].Category" class="nucleus-material-icon btn btn-danger" title="Delete Log Setting" data-target=".log-levels-setup">&#xe14c;</button>
                 }

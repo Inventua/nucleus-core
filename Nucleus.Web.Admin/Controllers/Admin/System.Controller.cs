@@ -75,7 +75,7 @@ public class SystemController : Controller
   public ActionResult Restart()
   {
     this.HostApplicationLifetime.StopApplication();
-    return View("_Restarting", new ViewModels.Admin.SystemIndexRestartComplete() { SiteUrl = this.Context.Site.AbsoluteUrl("/", Request.Scheme == "https")  });
+    return View("_Restarting", new ViewModels.Admin.SystemIndexRestartComplete() { SiteUrl = this.Context.Site.AbsoluteUrl("/", Request.Scheme == "https") });
   }
 
   /// <summary>
@@ -180,26 +180,23 @@ public class SystemController : Controller
   [HttpPost]
   public async Task<ActionResult> UpdateLogLevel(ViewModels.Admin.SystemIndex viewModel)
   {
-    string appSettingsFileName = $"appSettings.{this.HostingEnvironment.EnvironmentName}.json";
-    JsonLoadSettings settings = new() 
-    { 
-      CommentHandling= CommentHandling.Load
-    };
+    JObject appSettings = LoadConfiguration();
 
-    //JObject appSettings = Newtonsoft.Json.JsonConvert.DeserializeObject(System.IO.File.ReadAllText(appSettingsFileName), settings) as JObject;
-    JObject appSettings = JObject.Parse(System.IO.File.ReadAllText(appSettingsFileName), settings) as JObject;
-
-    if (!String.IsNullOrEmpty(viewModel.NewSetting?.Category))
+    if (appSettings != null)
     {
-      // validate that the entered 'name' is a valid class name or namespace
-      if (IsValidNamespaceOrClassName(viewModel.NewSetting.Category))
+
+      if (!String.IsNullOrEmpty(viewModel.NewSetting?.Category))
       {
-        viewModel.LoggingSettingsConfiguration.Add(viewModel.NewSetting);
-        viewModel.NewSetting = new() { Level = LogLevel.None };
-      }
-      else
-      {
-        return Json(new { Title = "Add Logging Setting", Message = $"The category '{viewModel.NewSetting.Category}' is not valid.  Logging categories must be 'Default', or match a namespace or type name.", Icon = "alert" });
+        // validate that the entered 'name' is a valid class name or namespace
+        if (IsValidNamespaceOrClassName(viewModel.NewSetting.Category))
+        {
+          viewModel.LoggingSettingsConfiguration.Add(viewModel.NewSetting);
+          viewModel.NewSetting = new() { Level = LogLevel.None };
+        }
+        else
+        {
+          return Json(new { Title = "Add Logging Setting", Message = $"The category '{viewModel.NewSetting.Category}' is not valid.  Logging categories must be 'Default', or match a namespace or type name.", Icon = "alert" });
+        }
       }
     }
 
@@ -228,7 +225,7 @@ public class SystemController : Controller
       }
     }
 
-    System.IO.File.WriteAllText(appSettingsFileName, appSettings.ToString());
+    System.IO.File.WriteAllText(BuildConfigurationSettingsFilename(), appSettings.ToString());
 
     // wait a moment for the config to update
     await Task.Delay(TimeSpan.FromSeconds(1));
@@ -240,33 +237,72 @@ public class SystemController : Controller
   [HttpPost]
   public async Task<ActionResult> RemoveLogLevel(ViewModels.Admin.SystemIndex viewModel, string name)
   {
-    string appSettingsFileName = $"appSettings.{this.HostingEnvironment.EnvironmentName}.json";
-    JsonLoadSettings settings = new()
-    {
-      CommentHandling = CommentHandling.Load
-    };
+    JObject appSettings = LoadConfiguration();
 
-    //JObject appSettings = Newtonsoft.Json.JsonConvert.DeserializeObject(System.IO.File.ReadAllText(appSettingsFileName), settings) as JObject;
-    JObject appSettings = JObject.Parse(System.IO.File.ReadAllText(appSettingsFileName), settings) as JObject;
-           
+    if (appSettings == null)
+    { 
+      return BadRequest();
+    }
+    
     JObject loggingSection = appSettings["Logging"]["LogLevel"] as JObject;
 
     if (loggingSection != null)
     {
-      JProperty setting = loggingSection.Properties().Where(item=>item.Name == name).FirstOrDefault();
+      JProperty setting = loggingSection.Properties().Where(item => item.Name == name).FirstOrDefault();
       setting?.Remove();
-    }  
+    }
     else
     {
       return BadRequest();
-    } 
+    }
 
-    System.IO.File.WriteAllText(appSettingsFileName, appSettings.ToString());
+    System.IO.File.WriteAllText(BuildConfigurationSettingsFilename(), appSettings.ToString());
 
     // wait a moment for the config to update
     await Task.Delay(TimeSpan.FromSeconds(1));
+    ModelState.Clear();
 
     return View("_LogLevels", await BuildViewModel(viewModel));
+  }
+  
+  private string BuildConfigurationSettingsFilename()
+  {
+    return $"appSettings.{this.HostingEnvironment.EnvironmentName}.json";
+  }
+
+  private JObject LoadConfiguration()
+  {
+    string appSettingsFileName = BuildConfigurationSettingsFilename();
+
+    if (System.IO.File.Exists(appSettingsFileName))
+    {
+      JsonLoadSettings settings = new()
+      {
+        CommentHandling = CommentHandling.Load
+      };
+
+      return JObject.Parse(System.IO.File.ReadAllText(appSettingsFileName), settings) as JObject;
+    }
+
+    return null;
+  }
+
+  private Boolean IsInEnvironmentAppSettingsConfig(string category)
+  {
+    JObject appSettings = LoadConfiguration();
+
+    if (appSettings != null)
+    {
+      JObject loggingSection = appSettings["Logging"]["LogLevel"] as JObject;
+
+      if (loggingSection != null)
+      {
+        JProperty setting = loggingSection.Properties().Where(item => item.Name == category).FirstOrDefault();
+        return setting != null;
+      }
+    }
+
+    return false;
   }
 
   /// <summary>
@@ -281,11 +317,11 @@ public class SystemController : Controller
   {
     if (value == "Default") return true;
     if (String.IsNullOrEmpty(value)) return false;
-    
+
     return Nucleus.Core.Plugins.AssemblyLoader.GetTypes()
       .Where(type => type.Namespace?.Equals(value) == true || type.FullName.Equals(value))
       .Any();
-  }  
+  }
 
   [HttpGet]
   public ActionResult DownloadLogFile(string logFile, string format)
@@ -303,7 +339,7 @@ public class SystemController : Controller
         case "excel":
           var exporter = new ExcelWriter<ViewModels.Admin.SystemIndex.LogEntry>(ExcelWorksheet.Modes.AutoDetect, nameof(ViewModels.Admin.SystemIndex.LogEntry.IsValid));
           string worksheetName = System.IO.Path.GetFileNameWithoutExtension(logFile);
-          exporter.Worksheet.Name = worksheetName.Substring(0, worksheetName.Length > 32 ? 32 : worksheetName.Length);          
+          exporter.Worksheet.Name = worksheetName.Substring(0, worksheetName.Length > 32 ? 32 : worksheetName.Length);
           exporter.Export(data);
           return File(exporter.GetOutputStream(), ExcelWorksheet.MIMETYPE_EXCEL, $"{exporter.Worksheet.Name}.xlsx");
 
@@ -357,7 +393,7 @@ public class SystemController : Controller
     catch (Exception)
     {
       return default;
-    }    
+    }
   }
 
   private async Task<ViewModels.Admin.SystemIndex> BuildViewModel(ViewModels.Admin.SystemIndex viewModelInput)
@@ -422,12 +458,24 @@ public class SystemController : Controller
         // this is not a critical operation.  Suppress exceptions.
       }
     }
-        
+
     IConfigurationSection loggingConfig = this.Configuration.GetSection("Logging:LogLevel");
     foreach (IConfigurationSection configItem in loggingConfig.GetChildren())
     {
-      viewModelOutput.LoggingSettingsConfiguration.Add(new() { Category = configItem.Key.Replace("Logging:LogLevel:", ""), Level = System.Enum.Parse<Microsoft.Extensions.Logging.LogLevel>(configItem.Value) });
+      viewModelOutput.LoggingSettingsConfiguration.Add(new()
+      {
+        Category = configItem.Key.Replace("Logging:LogLevel:", ""),
+        Level = System.Enum.Parse<Microsoft.Extensions.Logging.LogLevel>(configItem.Value),
+        IsEditable = configItem.Key != "Default" && IsInEnvironmentAppSettingsConfig(configItem.Key)
+      });
     }
+
+    // put the "system" (not editable) settings from appSettings.json at the top
+    viewModelOutput.LoggingSettingsConfiguration = 
+      viewModelOutput.LoggingSettingsConfiguration
+      .OrderBy(item => item.IsEditable)
+      .ThenBy(item => item.Category)
+      .ToList();
 
     viewModelOutput.LogSettings.LogFile = viewModelInput.LogSettings.LogFile;
     viewModelOutput.LogSettings.LogMessage = "";
@@ -452,7 +500,7 @@ public class SystemController : Controller
             string startTime = $"{logDate.ToLocalTime():dd MMM yyyy hh:mm tt}";
             // use start + 23h 59m unless it would be in the future, otherwise "now"
             string finishTime = logDate > DateTime.UtcNow ? "now" : $"{logDate.AddDays(1).AddSeconds(-1).ToLocalTime():dd MMM yyyy hh:mm tt}";
-            
+
             logs.Add(new Nucleus.Web.ViewModels.Admin.Shared.LogFileInfo()
             {
               Filename = file.Name,
@@ -498,7 +546,7 @@ public class SystemController : Controller
     viewModelOutput.ContentRootPath = this.HostingEnvironment.ContentRootPath;
     viewModelOutput.CacheReport = this.CacheManager.Report().OrderBy(cacheReport => cacheReport.Name).ToList();
 
-    List <ViewModels.Admin.SystemIndex.DatabaseConnection> connections = new();
+    List<ViewModels.Admin.SystemIndex.DatabaseConnection> connections = new();
 
     foreach (DatabaseSchema schema in this.DatabaseOptions.Value.Schemas)
     {

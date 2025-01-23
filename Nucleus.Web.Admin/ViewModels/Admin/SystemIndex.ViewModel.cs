@@ -56,6 +56,7 @@ public class SystemIndex
   {
     public string Category { get; set; }
     public Microsoft.Extensions.Logging.LogLevel Level { get; set; }
+    public Boolean IsEditable { get; set; }
   }
 
   public class LogSettingsViewModel

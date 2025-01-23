@@ -14,7 +14,8 @@ namespace Nucleus.Modules.Account.ViewModels
 
 		public Nucleus.Abstractions.Models.User User { get; set; }
 		public ClaimTypeOptions ClaimTypeOptions { get; set; }
-    public string QrCodeAsSvg { get; set; }
+
+    public ViewModels.VerifyOtp VerifyOtpViewModel { get; set; } 
 
   }
 }

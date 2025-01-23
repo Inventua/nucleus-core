@@ -9,6 +9,8 @@ namespace Nucleus.Modules.Account.ViewModels;
 
 public class VerifyOtp //: Models.Settings
 {
+  public string Controller { get; set; }
+
   public string Message { get; set; }
 
   public string ReturnUrl { get; set; }
@@ -20,4 +22,6 @@ public class VerifyOtp //: Models.Settings
   public Boolean Is2FARegistered { get; set; }
 
   public string QrCodeAsSvg { get; set; }
+
+  public string IsSetup { get; set; }
 }

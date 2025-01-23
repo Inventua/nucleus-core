@@ -1,0 +1,15 @@
+{
+	"schemaName": "Nucleus.Core",
+  "version": "01.00.26",
+  "operations": [
+    {
+      "addColumn": {
+        "table": "Sites",
+        "name": "MultifactorAuthenticationOption",
+        "clrType": "int",
+        "isnullable": false,
+        "defaultvaluesql": 0
+      }
+    }
+  ]
+}

@@ -249,21 +249,14 @@ public class LoginController : Controller
           }
 
           if (!Url.IsLocalUrl(viewModel.ReturnUrl)) viewModel.ReturnUrl = "";
-
-          Boolean isMFAEnabled = true;
-          if (isMFAEnabled && !loginUser.IsSystemAdministrator) //(loginUser.IsMFAEnabled)
+          
+          if (this.Context.Site.MultifactorAuthenticationOption == Site.MultifactorAuthenticationOptions.Allow && String.IsNullOrEmpty(loginUser.Secrets.EncryptedTotpSecretKey) && !loginUser.IsSystemAdministrator)
           {
-            // When ready, move to another area/function/class etc where these properties are created (hidden from user) using constants?
-            loginUser.Secrets.EncryptedTotpSecretKey = String.IsNullOrEmpty(loginUser.Secrets.EncryptedTotpSecretKey) ? OtpNet.Base32Encoding.ToString(System.Text.Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())) : loginUser.Secrets.EncryptedTotpSecretKey;
-            loginUser.Secrets.TotpSecretKeyEncryptionAlgorithm = String.IsNullOrEmpty(loginUser.Secrets.TotpSecretKeyEncryptionAlgorithm) ? "SHA1" : loginUser.Secrets.TotpSecretKeyEncryptionAlgorithm;
-            loginUser.Secrets.TotpDigits = (loginUser.Secrets.TotpDigits != 6 || loginUser.Secrets.TotpDigits != 8) ? 6 : loginUser.Secrets.TotpDigits;
-            loginUser.Secrets.TotpPeriod = (loginUser.Secrets.TotpPeriod != 30 || loginUser.Secrets.TotpDigits != 60) ? 30 : loginUser.Secrets.TotpPeriod;
-
             UserSession otpSession = await this.SessionManager.CreateNew(this.Context.Site, loginUser, viewModel.AllowRememberMe && viewModel.RememberMe, ControllerContext.HttpContext.Connection.RemoteIpAddress);
 
             await this.SessionManager.Save(otpSession);
 
-            return View("VerifyOtp", BuildVerifyOtpViewModel(this.Context.Site, viewModel, loginUser, otpSession.Id));
+            return View("_VerifyOtp", BuildVerifyOtpViewModel(viewModel, loginUser, otpSession.Id));
           }
 
           UserSession session = await this.SessionManager.CreateNew(this.Context.Site, loginUser, viewModel.AllowRememberMe && viewModel.RememberMe, ControllerContext.HttpContext.Connection.RemoteIpAddress);
@@ -294,8 +287,11 @@ public class LoginController : Controller
       return BadRequest();
     }
 
-    if (VerifyTOTP (this.Context.Site, loginUser, viewModel.OneTimePassword))
+    MultifactorAuthenticationManager mfaManager = new();
+
+    if (mfaManager.VerifyTOTP(loginUser.UserName, viewModel.OneTimePassword, loginUser.Secrets.EncryptedTotpSecretKey, loginUser.Secrets.TotpDigits, loginUser.Secrets.TotpPeriod, MultifactorAuthenticationManager.PREVIOUS_TIME_STEP_DELAY_DEFAULT, MultifactorAuthenticationManager.FUTURE_TIME_STEP_DELAY_DEFAULT))
     {
+      this.Logger.LogInformation("User '{userName}' OTP verified. ", loginUser.UserName);
       await this.SessionManager.SignIn(session, HttpContext, viewModel.ReturnUrl);
 
       string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.Content("~/").ToString() : Url.Content(viewModel.ReturnUrl);
@@ -304,38 +300,12 @@ public class LoginController : Controller
     }
     else
     {
+      this.Logger.LogWarning("User '{userName}' OTP invalid.", loginUser.UserName);
       await Task.Delay(TimeSpan.FromSeconds(10));
       return Json(new { Title = "Login", Message = "Invalid one-time password.", Icon = "alert" });
     }
   }
 
-  private Boolean VerifyTOTP(Site site, User loginUser, string oneTimePassword)
-  {
-    // TODO! get from site settings
-    int previousTimeStepDelay = 1;
-    int futureTimeStepDelay = 1;
-
-    return VerifyTOTP(loginUser.UserName, oneTimePassword, loginUser.Secrets.EncryptedTotpSecretKey, loginUser.Secrets.TotpDigits, loginUser.Secrets.TotpPeriod, previousTimeStepDelay, futureTimeStepDelay);
-  }
-
-  private Boolean VerifyTOTP(string userName, string oneTimePassword, string secretKey, int totpDigits, int totpPeriod, int previousTimeStepDelay, int futureTimeStepDelay)
-  {
-    MultifactorAuthenticationManager mfaManager = new();
-
-    Boolean isValid = mfaManager.VerifyTOTP(userName, oneTimePassword, secretKey, totpDigits, totpPeriod, previousTimeStepDelay, futureTimeStepDelay);
-
-    if (isValid)
-    {
-      //this.Logger.LogInformation("User '{userName}' OTP verified. Time window: {timeWindowUsed}.", userName, timeWindowUsed);
-      this.Logger.LogInformation("User '{userName}' OTP verified. ", userName);
-    }
-    else
-    {
-      this.Logger.LogWarning("User '{userName}' OTP invalid.", userName);
-    }
-
-    return isValid;
-  }
 
   [HttpPost]
   public async Task<ActionResult> ResendVerificationCode(ViewModels.Login viewModel)
@@ -462,17 +432,24 @@ public class LoginController : Controller
     return viewModel;
   }
 
-  private ViewModels.VerifyOtp BuildVerifyOtpViewModel(Site site, ViewModels.Login viewModelLogin, User loginUser, Guid sessionId)
+  private ViewModels.VerifyOtp BuildVerifyOtpViewModel(ViewModels.Login viewModelLogin, User loginUser, Guid sessionId)
   {
     ViewModels.VerifyOtp viewModel = new();
 
+    viewModel.Controller = "Login";
     viewModel.ReturnUrl = viewModelLogin.ReturnUrl;
     viewModel.Message = viewModelLogin.Message;
     viewModel.SessionId = sessionId;
 
     MultifactorAuthenticationManager mfaManager = new();
 
-    viewModel.QrCodeAsSvg = mfaManager.GenerateUserMFAQRCodeSetup(site.Name, loginUser);
+    // TODO! When ready, move to another area/function/class etc where these properties are created (hidden from user) using constants?
+    string encryptedTotpSecretKey = String.IsNullOrEmpty(loginUser.Secrets.EncryptedTotpSecretKey) ? OtpNet.Base32Encoding.ToString(System.Text.Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())) : loginUser.Secrets.EncryptedTotpSecretKey;
+    string totpSecretKeyEncryptionAlgorithm = String.IsNullOrEmpty(loginUser.Secrets.TotpSecretKeyEncryptionAlgorithm) ? "SHA1" : loginUser.Secrets.TotpSecretKeyEncryptionAlgorithm;
+    int totpDigits = (loginUser.Secrets.TotpDigits != 6 || loginUser.Secrets.TotpDigits != 8) ? 6 : loginUser.Secrets.TotpDigits;
+    int totpPeriod = (loginUser.Secrets.TotpPeriod != 30 || loginUser.Secrets.TotpDigits != 60) ? 30 : loginUser.Secrets.TotpPeriod;
+
+    viewModel.QrCodeAsSvg = mfaManager.GenerateUserMFAQRCodeSetup(this.Context.Site.Name, loginUser.UserName, encryptedTotpSecretKey, totpSecretKeyEncryptionAlgorithm, totpDigits, totpPeriod);
 
     return viewModel;
   }

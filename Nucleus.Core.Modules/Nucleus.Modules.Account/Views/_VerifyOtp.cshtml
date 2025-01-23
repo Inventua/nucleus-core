@@ -3,12 +3,12 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
 @Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_FORMS)
-@using (Html.BeginNucleusForm("VerifyOtp", "Login", "Account", FormMethod.Post, new { data_target = "form.parent()" }))
+@using (Html.BeginNucleusForm("VerifyOtp", @Model.Controller, "Account", FormMethod.Post, new { data_target = "form.parent()" }))
 {
   <fieldset aria-label="Two-Step Verification">
-    @if (!String.IsNullOrEmpty(Model.Message))
+    @if (!String.IsNullOrEmpty(Model?.Message))
     {
-      <div class="alert alert-warning">@Model.Message</div>
+      <div class="alert alert-warning">@Model?.Message</div>
     }
     @Html.HiddenFor(model => model.ReturnUrl)
     @Html.HiddenFor(model => model.SessionId)
@@ -20,13 +20,13 @@
       </label>
     </div>
 
-    <div class="m-5">@Html.Raw(Model.QrCodeAsSvg)</div>
+    <div class="m-5">@Html.Raw(Model?.QrCodeAsSvg)</div>
 
   </fieldset>
   <div class="account-buttons-wrapper">
     <div class="mt-2 account-main-buttons">
-      <button type="submit" class="btn btn-primary nucleus-login" data-target="form.parent()">Confirm</button>
-      <a href="@Url.Content("~/")" class="btn btn-secondary">Cancel</a>
+      @* <button type="submit" class="btn btn-primary nucleus-login" data-target="form.parent()">Confirm</button> *@
+      <a href="@Model.ReturnUrl" class="btn btn-secondary">Cancel</a>
     </div>
   </div>
 }

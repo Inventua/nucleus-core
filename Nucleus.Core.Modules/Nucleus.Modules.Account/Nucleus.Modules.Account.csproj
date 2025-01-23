@@ -38,7 +38,7 @@
     <None Remove="Views\SignupSettings.cshtml" />
     <None Remove="Views\UserProfile.cshtml" />
     <None Remove="Views\UserProfileSettings.cshtml" />
-    <None Remove="Views\VerifyOtp.cshtml" />
+    <None Remove="Views\_VerifyOtp.cshtml" />
     <None Remove="_ViewImports.cshtml" />
   </ItemGroup>
 
@@ -48,7 +48,7 @@
     <Content Include="MfaProviders\Totp\VerifyOtp.cshtml" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
-    <Content Include="Views\VerifyOtp.cshtml" />
+    <Content Include="Views\_VerifyOtp.cshtml" />
     <EmbeddedResource Include="signup.js" />
     <EmbeddedResource Include="signup.min.js" />
     <Content Include="Views\ChangePassword.cshtml" />
@@ -65,7 +65,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="3.0.0-rc-1" />
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="3.0.0-rc-3" />
     <PackageReference Include="Inventua.Nucleus.Extensions" Version="3.0.0-rc-1" />
     <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="3.0.0-rc-1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="9.0.1" />

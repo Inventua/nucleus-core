@@ -1,57 +1,75 @@
 ﻿@model Nucleus.Modules.Account.ViewModels.UserProfile
 @addTagHelper "*, Nucleus.ViewFeatures"
 @using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
 @using Nucleus.Extensions
 @using Nucleus.Abstractions.Models.Configuration
 @Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_FORMS)
+@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.JQUERY)
+@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_TOGGLESWITCH)
 @if (Model.User != null)
 {
-	@using (Html.BeginNucleusForm("SaveAccountSettings", "UserProfile", "Account", FormMethod.Post, new { @data_target = "form.parent()" }))
-	{
-		<fieldset aria-label="User Profile">
-			@Html.HiddenFor((model) => model.ReturnUrl)
-			@Html.HiddenFor(model => model.User.Id)
-			<h3>User Name</h3>
-			<div class="mb-3">@Model.User.UserName</div>
+  @using (Html.BeginNucleusForm("SaveAccountSettings", "UserProfile", "Account", FormMethod.Post, new { @data_target = "form.parent()" }))
+  {
 
-			<h3>Profile</h3>
+    <Tab>
+      <TabItem target="#user-profile" caption="Profile" active="true"></TabItem>
+      @* <TabItem target="#user-authentication-settings" caption="Authentication Settings"></TabItem> *@
+    </Tab>
 
-			@for (int profileValueCount = 0; profileValueCount < Model.User.Profile.Count; profileValueCount++)
-			{
-				<div class="settings-control" title="@Model.User.Profile[profileValueCount].UserProfileProperty.HelpText">
-					<label>
-						<span>@Model.User.Profile[profileValueCount].UserProfileProperty.Name</span>
-						@{
-							Dictionary<string, object> parameters = new();
-							ClaimTypeOption claimTypeOption = Model.User.Profile[profileValueCount].UserProfileProperty.ClaimTypeOption(Model.ClaimTypeOptions);
-							if (!String.IsNullOrEmpty(claimTypeOption.InputType))
-							{
-								parameters.Add("type", claimTypeOption.InputType);
-							}
-							if (!String.IsNullOrEmpty(claimTypeOption.Pattern))
-							{
-								parameters.Add("pattern", claimTypeOption.Pattern);
-							}
-						}
-						@Html.TextBoxFor(model => model.User.Profile[profileValueCount].Value, parameters)
-					</label>
-					@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.Id)
-					@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.Name)
-					@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.TypeUri)
-				</div>
-			}
-      <div>
-        <h4>Two-factor authentication</h4>
-        <button type="submit" class="btn btn-secondary btn-sm" formaction="@Url.NucleusAction("SetupAuthApp", "UserProfile", "Account")">Setup authenticator app</button>
-        <button type="submit" class="btn btn-secondary btn-sm" formaction="@Url.NucleusAction("ResetAuthApp", "UserProfile", "Account")">Reset authenticator app</button>
-      </div>
-      <div class="collapse">
-        @Html.Raw(Model.QrCodeAsSvg)
-      </div>
-			<div>
-				<input type="submit" value="Save Changes" class="btn btn-primary" />
-				<a href="@(String.IsNullOrEmpty(Model.ReturnUrl) ? "/" : Model.ReturnUrl)" class="btn btn-secondary">Cancel</a>
-			</div>
-		</fieldset>
-	}
+
+    <TabContent>
+      <TabPanel id="user-profile" active="true">
+        <fieldset aria-label="User Profile">
+          @Html.HiddenFor((model) => model.ReturnUrl)
+          @Html.HiddenFor(model => model.User.Id)
+          <h3>User Name</h3>
+          <div class="mb-3">@Model.User.UserName</div>
+
+          <h3>Profile</h3>
+
+          @for (int profileValueCount = 0; profileValueCount < Model.User.Profile.Count; profileValueCount++)
+          {
+            <div class="settings-control" title="@Model.User.Profile[profileValueCount].UserProfileProperty.HelpText">
+              <label>
+                <span>@Model.User.Profile[profileValueCount].UserProfileProperty.Name</span>
+                @{
+                  Dictionary<string, object> parameters = new();
+                  ClaimTypeOption claimTypeOption = Model.User.Profile[profileValueCount].UserProfileProperty.ClaimTypeOption(Model.ClaimTypeOptions);
+                  if (!String.IsNullOrEmpty(claimTypeOption.InputType))
+                  {
+                    parameters.Add("type", claimTypeOption.InputType);
+                  }
+                  if (!String.IsNullOrEmpty(claimTypeOption.Pattern))
+                  {
+                    parameters.Add("pattern", claimTypeOption.Pattern);
+                  }
+                }
+                @Html.TextBoxFor(model => model.User.Profile[profileValueCount].Value, parameters)
+              </label>
+              @Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.Id)
+              @Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.Name)
+              @Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.TypeUri)
+            </div>
+          }
+        </fieldset>
+      </TabPanel>
+@*       <TabPanel id="user-authentication-settings">
+        <h3>Authentication</h3>
+        <div class="nucleus-flex-fields mb-3">
+          <button type="submit" class="btn btn-secondary btn-sm" formaction="@Url.NucleusAction("ResetAuthApp", "UserProfile", "Account")">Reset authenticator app</button>
+        </div>
+        @if (String.IsNullOrEmpty(Model.User.Secrets.EncryptedTotpSecretKey))
+        {
+          <button class="btn btn-secondary btn-sm" formaction="@Url.NucleusAction("SetupAuthApp", "UserProfile", "Account")" data-target="#verify-otp">Enable multi-factor authentication</button>
+
+          <div id="verify-otp"></div>
+        }
+      </TabPanel>
+ *@    </TabContent>
+    <div class="nucleus-button-panel">
+      <input type="submit" value="Save Changes" class="btn btn-primary" />
+      <a href="@(String.IsNullOrEmpty(Model.ReturnUrl) ? "/" : Model.ReturnUrl)" class="btn btn-secondary">Cancel</a>
+    </div>
+  }
 }

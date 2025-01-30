@@ -5,10 +5,9 @@ StartLimitIntervalSec=0
 
 [Service]
 Type=notify
+NotifyAccess=all
 
-# use on-success to restart only when Nucleus terminates cleanly (after installing an extension) and not when there is a startup error
 Restart=always  
-
 RestartSec=3
 
 # use Development for a development environment

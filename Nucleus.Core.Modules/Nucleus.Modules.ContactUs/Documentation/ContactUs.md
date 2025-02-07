@@ -3,7 +3,7 @@ The contact us module allows the end user to send a message to email recipients.
 
 ![Contact Us Module Screenshot](ContactUs.png)
 
-To change settings for the module, click the `Settings` tab.
+You can control the display and other settings in the module settings page.
 
 ![Settings](ContactUs-settings.png)
 
@@ -45,6 +45,7 @@ The mail template specifies the format and content of email sent to the specifie
 with the Razor language. It is very strongly recommended not to combine the two as unintended results may occur.
 
 The mail template arguments specific to the Contact Us module are:
+
 |                     |                                                                                      |
 |---------------------|--------------------------------------------------------------------------------------|
 | Message.FirstName   | The first name of the sender. |
@@ -58,7 +59,7 @@ The mail template arguments specific to the Contact Us module are:
 | Site                | A site object representing the current site. |
 
 
-### Example using plain HTML and placeholders
+### Example: HTML and simple tokens
 ```
   <p>A new message was sent from the (~Site.Name) portal by (~Message.FirstName) (~Message.LastName) from (~Message.Company).</p>
   <p>Email: (~Message.Email)</p>
@@ -67,7 +68,7 @@ The mail template arguments specific to the Contact Us module are:
   (~Message.Body)
 ```
 
-### Example using HTML and Razor language
+### Example: HTML and Razor
 ```
   <p>A new message was sent from the @Model.Site.Name portal by @Model.Message.FirstName @Model.Message.LastName.</p>
 

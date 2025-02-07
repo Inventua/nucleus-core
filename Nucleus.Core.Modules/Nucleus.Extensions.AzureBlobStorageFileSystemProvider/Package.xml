@@ -17,11 +17,11 @@
         <file name="Azure.Storage.Common.dll" />
         <file name="Azure.Core.dll" />
         <file name="System.ClientModel.dll" />
+        <file name="System.Memory.Data.dll" />          
       </folder>
       <cleanup>
         <folder name="bin">
           <!-- these were shipped in an earlier version, but are not required because they are shipped with Nucleus 1.4.0 -->
-          <file name="System.Memory.Data.dll" />
           <file name="Microsoft.Bcl.AsyncInterfaces.dll" />
         </folder>
       </cleanup>

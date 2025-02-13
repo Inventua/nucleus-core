@@ -35,10 +35,10 @@ are displayed during installation and in the extensions control panel.  You can 
 Click Next.  Your project is automatically generated and you are ready to start developing.
 
 ### Develop your Module
-The templates reference version 1 of the Nucleus Nuget packages. If you want to use API methods which were introduced after version 1, 
-you should use the "Manage Nuget Packages" menu item in Visual Studio to update to the latest version.  You will need to edit your `package.xml`
-file `<compatibility>` element to specify that your extension requires a minimum version of Nucleus (the version number will match the version 
-of the Nuget packages that you reference.)  Refer to the documentation on [extension packaging](/developer/packaging/) for more information. \
+The templates reference the Nucleus Nuget packages. You will generally want to use the "Manage Nuget Packages" menu item in Visual Studio to update 
+to the latest version of each package.  You will need to edit your `package.xml` file `<compatibility>` element to specify that your extension requires 
+a minimum version of Nucleus (the version number will match the version of the Nuget packages that you reference.)  Refer to the documentation 
+on [extension packaging](/developer/packaging/) for more information. \
 \
 Nucleus Extensions are .Net Core ASP.NET MVC projects which use a [controller](https://docs.microsoft.com/en-us/aspnet/core/tutorials/first-mvc-app/adding-controller) class which contains
 actions (functions).  Controller actions execute code to populate view model classes, which are passed to Razor views to generate output.
@@ -80,13 +80,14 @@ The CacheExtension class provides an interface to the Nucleus data caching syste
 you have more than one model class that can benefit from data caching, add additional static methods to represent each one.  You can remove the Cache Extension class and the code 
 which references it from your Manager class if you don't want to cache data.\
 \
-**See also:** [Cache Manager Documentation](/api-documentation/Nucleus.Abstractions.Managers.ICacheManager/#mnu-Nucleus-Abstractions-Managers-ICacheManager). 
-
+**See also:** [Cache Manager Documentation](/api-documentation/Nucleus.Abstractions.Managers.ICacheManager/#mnu-Nucleus-Abstractions-Managers-ICacheManager).
+ 
+ 
         using System;
         using Nucleus.Abstractions.Managers;
         using Nucleus.Abstractions.Models.Cache;
         using Nucleus.Modules.Documents.Models;
-
+        
         namespace Nucleus.Modules.Documents
         {
           public static class CacheExtensions
@@ -126,33 +127,33 @@ Nucleus automatically checks that the user has ==View Permission== for a module,
 
 10.  Create your Settings View.\
 The settings view is displayed in the Nucleus administration user interface.  It will display the current settings and will contain a button to save updates to settings. 
-[Nucleus.ViewFeatures](/api-documentation/nucleus.viewfeatures.xml) includes Html Helpers, Tag Helpers and Url extensions to make it easier to develop extensions. 
-        ```
-        @model Nucleus.Extensions.GoogleAnalytics.ViewModels.Settings
-        @addTagHelper "*, Nucleus.ViewFeatures"
-        @using Nucleus.ViewFeatures.HtmlHelpers
-        @using Nucleus.ViewFeatures
-        @using Nucleus.Abstractions.Models
-        @Html.AddStyle("~!/../settings.css")
-        <div class="nucleus-editor-panel">
-          <h2 class="nucleus-control-panel-heading">Google Analytics Settings</h2>
-          @using (Html.BeginNucleusForm("Settings", "GoogleAnalytics", FormMethod.Post, new { @enctype = "multipart/form-data" }))
-          {
-            <fieldset role="group" aria-labelledby="heading">
-              <h2 class="nucleus-control-panel-heading">Settings</h2>
-              <div class="nucleus-flex-fields">
-                <SettingsControl caption="Google Analytics ID" helptext="Enter the Google Analytics ID for your site.  You can disable Google Analytics by setting a blank value.">
-                  @Html.TextBoxFor(model => model.GoogleAnalyticsId)
-                </SettingsControl>
-              </div>
+[Nucleus.ViewFeatures](/api-documentation/nucleus.viewfeatures.xml) includes Html Helpers, Tag Helpers and Url extensions to make it easier to develop extensions.
 
-              <div class="nucleus-form-buttonrow">
-                @Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "GoogleAnalytics", "GoogleAnalytics"), new { })
-              </div>
-            </fieldset>
-          }
-        </div>
-        ```
+    @model Nucleus.Extensions.GoogleAnalytics.ViewModels.Settings
+    @addTagHelper "*, Nucleus.ViewFeatures"
+    @using Nucleus.ViewFeatures.HtmlHelpers
+    @using Nucleus.ViewFeatures
+    @using Nucleus.Abstractions.Models
+    @Html.AddStyle("~!/../settings.css")
+    <div class="nucleus-editor-panel">
+      <h2 class="nucleus-control-panel-heading">Google Analytics Settings</h2>
+      @using (Html.BeginNucleusForm("Settings", "GoogleAnalytics", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+      {
+        <fieldset role="group" aria-labelledby="heading">
+          <h2 class="nucleus-control-panel-heading">Settings</h2>
+          <div class="nucleus-flex-fields">
+            <SettingsControl caption="Google Analytics ID" helptext="Enter the Google Analytics ID for your site.  You can disable Google Analytics by setting a blank value.">
+              @Html.TextBoxFor(model => model.GoogleAnalyticsId)
+            </SettingsControl>
+          </div>
+
+          <div class="nucleus-form-buttonrow">
+            @Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "GoogleAnalytics", "GoogleAnalytics"), new { })
+          </div>
+        </fieldset>
+      }
+    </div>
+
 11.  Create your Viewer View.\
 The Viewer view is a Razor view and is displayed to end users.  The content and behaviour of the viewer view is dependent on the functionality of your module.
 

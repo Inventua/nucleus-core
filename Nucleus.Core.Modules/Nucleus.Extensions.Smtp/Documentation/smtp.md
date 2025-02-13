@@ -1,6 +1,8 @@
+## SMTP Mail Provider Extension
+
 The SMTP mail provider sdds support for sending emails using SMTP. In most Nucleus installations, it is installed by default.
 
-## Setup
+### Setup
 1. Install the Nucleus [SMTP mail provider extension](/store/home/inventua/smtp-mail).
 2. In Nucleus, after logging on as a system administrator or site administator, click "Manage" and then click "Mail Settings".
 3. Select "SMTP Mail" from the *Default Mail Client* drop-down list. 

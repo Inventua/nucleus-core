@@ -1,6 +1,8 @@
-## Setup
+## Azure Communication Services Mail Provider Extension
 
-### Azure Setup
+### Setup
+
+#### Azure Setup
 > You must create both a **Communication Service** and a **Email Communication Service** in Azure.
 
 1. In Azure Portal, [Create a Email Communication Service](https://learn.microsoft.com/en-us/azure/communication-services/quickstarts/email/create-email-communication-resource?pivots=platform-azp).
@@ -22,7 +24,7 @@ then you must use the auto-generated "donotreply@your-domain.com" sender address
 8. Go to the "Overview" page for your Communication Service, and click "Manage Keys", then copy the Connection String. You
 need to paste the Connection String into the Azure Email Communications settings page in Nucleus.
 
-### Nucleus Setup
+#### Nucleus Setup
 1. Install the Nucleus [Azure Email Communications mail provider extension](/store/home/inventua/azure-mail-communication).
 2. In Nucleus, after logging on as a system administrator or site administator, click "Manage" and then click "Mail Settings".
 3. Select "Azure Email Communications" from the *Default Mail Client* drop-down list. Paste your connection string and enter your

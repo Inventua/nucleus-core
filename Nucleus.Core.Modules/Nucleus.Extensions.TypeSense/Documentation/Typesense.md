@@ -27,7 +27,7 @@ The Typesense Search extension provides a search index manager and a search prov
 The Typesense Search extension settings are accessed in the `Manage` control panel.
 
 When creating each index entry, the Typesense index provider:
-- Calls your [Tika](https://cwiki.apache.org/confluence/display/TIKA/TikaServer#TikaServer-InstallationofTikaServer) server to extract plain text from file and other content, if you have configured a Tika server Url.
+- Calls your [Tika](https://cwiki.apache.org/confluence/display/TIKA/TikaServer#TikaServer-InstallationofTikaServer) server to extract plain text from file and other content, if you have configured a Tika server Url. You need to install and configure the [Tika Server Converter extension]() for Nucleus to use a Tika server.
 - Splits large content into chunks, so that vector embedding works better.
 - Creates a vector embedding using the [gte-large](https://huggingface.co/thenlper/gte-large) language model. Vector search and embedding are built in 
 to Typesearch.

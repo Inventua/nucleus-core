@@ -13,7 +13,7 @@ The Bing Custom Search extension settings are accessed in the `Manage` control p
 {.table-25-75}
 |                            |                                                                                      |
 |----------------------------|--------------------------------------------------------------------------------------|
-| API Key                    | Get your API Key from the Azure Portal. Refer to the Azure Portal (API Key) section below for more details. |
+| API Key                    | Get your API Key from the [Azure Portal](https://portal.azure.com/). Refer to the Azure Portal (API Key) section below for more details. |
 | Custom Configuration ID    | Get your Bing Custom Search Configuration ID from [https://www.customsearch.ai/](https://www.customsearch.ai/). Refer to the Custom Search Configuration section below for more details.|
 | Safe Search                | Configures [SafeSearch filtering](https://support.microsoft.com/en-au/topic/turn-bing-safesearch-on-or-off-446ebfb8-becf-f035-9eea-b660e8420458). Options are: Off, Moderate and Strict. |
 

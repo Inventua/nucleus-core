@@ -14,8 +14,8 @@ The Google Custom Search extension settings are accessed in the `Manage` control
 {.table-25-75}
 |                               |                                                                                      |
 |-------------------------------|--------------------------------------------------------------------------------------|
-| Programmable Search Engine ID | Visit [Programmable Search Engine site](https://programmablesearchengine.google.com/controlpanel/all) to generate a Search engine ID. |
-| API Key                       | Get the Google API Key via the [Cloud console](https://console.cloud.google.com/apis/credentials). Refer to the API section below for more details. Refer to the Programmable Search Engine below for more details. |
+| Programmable Search Engine ID | Use the [Programmable Search Engine site](https://programmablesearchengine.google.com/controlpanel/all) to generate a Search engine ID. |
+| API Key                       | Use the [Cloud console](https://console.cloud.google.com/apis/credentials) to create or retrieve your Google API Key. Refer to the Programmable Search Engine and API sections below for more details. |
 | Safe Search                   | Configure SafeSearch filtering for your search engine. Options are: `SafeUndefined` (use the value from your engine's configuration), `Active` or `Off`. |
 
 ## Programmable Search Engine 

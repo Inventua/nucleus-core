@@ -1,4 +1,6 @@
-## Setup
+## SendGrid Mail Provider Extension
+
+### Setup
 1. Set up your SendGrid Service at [SendGrid](https://sendgrid.com/en-us). Once you have followed the steps to set up the service and verify your domain,
 Navigate to the [SendGrid](https://app.sendgrid.com/) management site and click the "API Keys" menu item in the "Settings" section. Create an API key, and 
 make to copy and store it safely - you can only view API keys immediately after they have been created.

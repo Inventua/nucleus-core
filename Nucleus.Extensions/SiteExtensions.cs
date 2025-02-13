@@ -177,8 +177,8 @@ public static class SiteExtensions
     {
       System.Uri uri = await fileSystemManager.GetFileDirectUrl(site, file);
       if (uri != null)
-      {
-        return uri.AbsoluteUri + $"?d={file.DateModified.ToBinary()}";
+      {        
+        return uri.AbsoluteUri + (uri.AbsoluteUri.Contains('?') ? "&" : "?") +  $"d={file.DateModified.ToBinary()}";
       }
       else
       {

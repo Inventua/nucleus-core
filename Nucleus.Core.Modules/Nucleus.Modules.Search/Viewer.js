@@ -90,7 +90,7 @@
       let form = jQuery(element).parents('form').first();
       if (typeof form.attr('data-resultsurl') !== 'undefined' && form.attr('data-resultsurl') !== '')
       {
-        window.location = form.attr('data-resultsurl') + '?search=' + form.find(selectorPrefix + '.search-term').val();
+        window.location = form.attr('data-resultsurl') + '?search=' + form.find('.search-term').val();
       }
       else
       {
@@ -104,7 +104,7 @@
       selectorPrefix = '._' + options.moduleId + ' ';
 
       /* do search on ENTER */
-      jQuery(options.searchTermSelector).on('keydown', function (event)
+      jQuery(selectorPrefix + '.search-term').on('keydown', function (event)
       {
         if (event.keyCode === 13)
         {

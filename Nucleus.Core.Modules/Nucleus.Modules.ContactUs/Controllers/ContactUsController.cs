@@ -133,6 +133,14 @@ public class ContactUsController : Controller
           viewModel.MessageSent = true;
           return View("Viewer", viewModel); 
         }
+        else if (responseToken.Score < settings.RecaptchaScoreThreshold)
+        {
+          this.Logger.LogWarning("Contact message from suspected robot, score: '{score}'. Message ignored.", responseToken?.Score);
+
+          // pretend it worked
+          viewModel.MessageSent = true;
+          return View("Viewer", viewModel); 
+        }
       }
       catch (Exception ex)
       {
@@ -219,7 +227,8 @@ public class ContactUsController : Controller
 			ShowName = settings.ShowName,
 			ShowPhoneNumber = settings.ShowPhoneNumber,
 			ShowSubject = settings.ShowSubject,
-			SendTo = settings.SendTo
+			SendTo = settings.SendTo,
+      RecaptchaScoreThreshold = settings.RecaptchaScoreThreshold
 		};
 	}
 

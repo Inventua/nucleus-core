@@ -84,7 +84,7 @@ else
         {
           @Html.HiddenFor(model => model.RecaptchaVerificationToken, new { @class = "contact-us-recaptcha-verification-token" })
         }
-        <button type="submit" class="btn btn-primary align-self-end contact-us-send" data-verification-site-key="@Model.RecaptchaSiteKey" data-verification-badge-element-selector=".recaptcha-badge" data-verification-token-element-selector=".contact-us-recaptcha-verification-token" data-verification-action="@Model.RecaptchaAction" formaction="@Url.NucleusAction("Send", "ContactUs", "ContactUs")">Send</button>
+        <button type="submit" class="btn btn-primary align-self-end contact-us-send nucleus-show-progress nucleus-show-progress-after" data-verification-site-key="@Model.RecaptchaSiteKey" data-verification-badge-element-selector=".recaptcha-badge" data-verification-token-element-selector=".contact-us-recaptcha-verification-token" data-verification-action="@Model.RecaptchaAction" formaction="@Url.NucleusAction("Send", "ContactUs", "ContactUs")">Send</button>
         <div class="recaptcha-badge ms-auto"></div>
       </div>
     }

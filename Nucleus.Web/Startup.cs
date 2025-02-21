@@ -333,6 +333,7 @@ public class Startup
   {
     try
     {
+      app.Logger().LogInformation("Starting Configuration.");
 
       app.UseNucleusOpenTelemetryEndPoint(this.Configuration, this.Environment);
 

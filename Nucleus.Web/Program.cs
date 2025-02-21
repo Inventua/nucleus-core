@@ -84,16 +84,18 @@ public class Program
       WebHost = CreateHostBuilder(args)
         .UseContentRoot(Directory.GetCurrentDirectory())
         .ConfigureAppConfiguration(Startup.ConfigureAppConfiguration)
+
         // this does nothing in Windows but in Linux it makes systemd aware when the application has started/is stopping, and configures logs
         // to be sent in a way that journald (the logging system of systemd) understands log priorities.
         .UseSystemd()
-        .Build();
 
+        .Build();   
+      
       IHostApplicationLifetime lifetime = WebHost.Services.GetService<IHostApplicationLifetime>();
       
-      // log a shutdown message
-      lifetime.ApplicationStopping.Register(LogShutdown);        
-      
+      // set up an event handler to log a shutdown message
+      lifetime.ApplicationStopping.Register(LogShutdown);     
+
       if (await CheckForAutoUpdates(WebHost))
       {
         // shut down to clean up
@@ -157,74 +159,83 @@ public class Program
       string formattedMemoryUse = Nucleus.Extensions.NumberExtensions.FormatFileSize(((long?)resourceUtilization.MemoryUsedInBytes));
       WebHost?.Logger()?.LogCritical("Nucleus is shutting down. CPU: {cpu}%, Memory: {memory}% [{bytes}], Start Time: {start}, Uptime: {uptime}.", resourceUtilization.CpuUsedPercentage.ToString("0.00"), resourceUtilization.MemoryUsedPercentage.ToString("0.00"), formattedMemoryUse, process.StartTime, formattedUptime);
     }
-    catch (ObjectDisposedException) 
+    catch (ObjectDisposedException ex) 
     {
       // WebHost.Services.GetService<IResourceMonitor> can throw an ObjectDisposedException if Nucleus fails during startup. We suppress this 
       // exception, as it is not the cause of the startup failure, and logging it can cause confusion when troubleshooting.
+
+      WebHost?.Logger()?.LogError(ex, "Nucleus is shutting down but an exception was thrown acquiring resource usage data for the shutdown message.");
     }
   }
 
   public static void LaunchBrowser(string[] args)
   {
-    Boolean doLaunchUrl = false;
-    string launchUrl = null;
-
-    for (int argIndex = 0; argIndex < args.Length; argIndex++)
+    try
     {
-      string arg = args[argIndex];
-      switch (arg)
+      Boolean doLaunchUrl = false;
+      string launchUrl = null;
+
+      for (int argIndex = 0; argIndex < args.Length; argIndex++)
       {
-        case "--launchurl":
-          doLaunchUrl = true;
-          if (args.Length >= argIndex + 1)
+        string arg = args[argIndex];
+        switch (arg)
+        {
+          case "--launchurl":
+            doLaunchUrl = true;
+            if (args.Length >= argIndex + 1)
+            {
+              launchUrl = args[argIndex + 1];
+              argIndex++;
+            }
+            else
+            {
+              WebHost?.Logger().LogError("Invalid launch args: --launchurl does not have an url specified.");
+            }
+            break;
+        }
+      }
+
+      if (doLaunchUrl)
+      {
+        if (!String.IsNullOrEmpty(launchUrl))
+        {
+          IConfiguration configuration = WebHost.Services.GetService<IConfiguration>();
+          string httpUrl = configuration.GetSection("Kestrel:EndPoints:Http:Url").Value;
+          string httpsUrl = configuration.GetSection("Kestrel:EndPoints:Https:Url").Value;
+
+          switch (launchUrl)
           {
-            launchUrl = args[argIndex + 1];
-            argIndex++;
+            case "{auto}":
+              launchUrl = !String.IsNullOrEmpty(httpsUrl) ? httpsUrl : httpUrl;
+              break;
+            case "{auto.https}":
+              launchUrl = httpsUrl;
+              break;
+            case "{auto.http}":
+              launchUrl = httpUrl;
+              break;
           }
-          else
+
+          try
           {
-            WebHost?.Logger().LogError("Invalid launch args: --launchurl does not have an url specified.");
+            System.Diagnostics.Process.Start
+            (
+              new System.Diagnostics.ProcessStartInfo(launchUrl)
+              {
+                UseShellExecute = true
+              }
+            );
           }
-          break;
+          catch (Exception ex)
+          {
+            WebHost?.Logger().LogError(ex, "Failed to launch '{url}': {message}.", launchUrl);
+          }
+        }
       }
     }
-
-    if (doLaunchUrl)
+    catch (Exception ex)
     {
-      if (!String.IsNullOrEmpty(launchUrl))
-      {
-        IConfiguration configuration = WebHost.Services.GetService<IConfiguration>();
-        string httpUrl = configuration.GetSection("Kestrel:EndPoints:Http:Url").Value;
-        string httpsUrl = configuration.GetSection("Kestrel:EndPoints:Https:Url").Value;
-
-        switch (launchUrl)
-        {
-          case "{auto}":
-            launchUrl = !String.IsNullOrEmpty(httpsUrl) ? httpsUrl : httpUrl;
-            break;
-          case "{auto.https}":
-            launchUrl = httpsUrl;
-            break;
-          case "{auto.http}":
-            launchUrl = httpUrl;
-            break;
-        }
-
-        try
-        {
-          System.Diagnostics.Process.Start
-          (
-            new System.Diagnostics.ProcessStartInfo(launchUrl)
-            {
-              UseShellExecute = true
-            }
-          );
-        }
-        catch (Exception ex)
-        {
-          WebHost?.Logger().LogInformation("Failed to launch '{url}': {message}.", launchUrl, ex.Message);
-        }
-      }
+      WebHost?.Logger().LogError(ex, "Failed to parse command line.");
     }
   }
 
@@ -263,6 +274,8 @@ public class Program
       {
         try
         {
+          host.Logger().LogCritical("Auto-installing {extensionFilename}", extensionFile);
+
           using (System.IO.Stream extensionPackage = System.IO.File.OpenRead(extensionFile))
           {
             string location = await extensionManager.SaveTempFile(extensionPackage);
@@ -281,6 +294,7 @@ public class Program
         // from staying behind forever.
         try
         {
+          host.Logger().LogCritical("Deleting {extensionFilename}", extensionFile);
           System.IO.File.Delete(extensionFile);
         }
         catch (Exception ex)

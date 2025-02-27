@@ -37,7 +37,7 @@ public class SystemController : Controller
   private const string LINUX_OS_INFO_FILE = "/etc/os-release";
 
 
-  public SystemController(IHostApplicationLifetime hostApplicationLifetime, IWebHostEnvironment hostingEnvironment, IResourceMonitor monitor, Context context, RunningTaskQueue runningTaskQueue, ICacheManager cacheManager, ILogger<SystemController> logger, IOptions<DatabaseOptions> databaseOptions, IOptions<TextFileLoggerOptions> options, IConfiguration configuration, ISessionManager sessionManager)
+  public SystemController(IHostApplicationLifetime hostApplicationLifetime, IWebHostEnvironment hostingEnvironment, Context context, RunningTaskQueue runningTaskQueue, ICacheManager cacheManager, ILogger<SystemController> logger, IOptions<DatabaseOptions> databaseOptions, IOptions<TextFileLoggerOptions> options, IConfiguration configuration, ISessionManager sessionManager, IResourceMonitor monitor = null)
   {
     this.HostApplicationLifetime = hostApplicationLifetime;
     this.HostingEnvironment = hostingEnvironment;
@@ -316,6 +316,7 @@ public class SystemController : Controller
   private Boolean IsValidNamespaceOrClassName(string value)
   {
     if (value == "Default") return true;
+    if (value == "Startup") return true;
     if (String.IsNullOrEmpty(value)) return false;
 
     return Nucleus.Core.Plugins.AssemblyLoader.GetTypes()
@@ -388,7 +389,7 @@ public class SystemController : Controller
   {
     try
     {
-      return this.Monitor.GetUtilization(TimeSpan.FromSeconds(5));
+      return this.Monitor?.GetUtilization(TimeSpan.FromSeconds(5)) ?? default;
     }
     catch (Exception)
     {

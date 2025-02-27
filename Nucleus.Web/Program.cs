@@ -14,6 +14,7 @@ using Nucleus.Abstractions.Models.Configuration;
 using Nucleus.Core.Logging;
 using Nucleus.Core.Plugins;
 using Nucleus.Extensions.Logging;
+using Nucleus.WebAssembly.Components;
 
 namespace Nucleus.Web;
 
@@ -81,39 +82,51 @@ public class Program
 
       Nucleus.Core.Managers.ExtensionManager.CleanupBackups(WebHost?.Logger());
 
-      WebHost = CreateHostBuilder(args)
-        .UseContentRoot(Directory.GetCurrentDirectory())
-        .ConfigureAppConfiguration(Startup.ConfigureAppConfiguration)
-
-        // this does nothing in Windows but in Linux it makes systemd aware when the application has started/is stopping, and configures logs
-        // to be sent in a way that journald (the logging system of systemd) understands log priorities.
-        .UseSystemd()
-
-        .Build();   
-      
-      IHostApplicationLifetime lifetime = WebHost.Services.GetService<IHostApplicationLifetime>();
-      
-      // set up an event handler to log a shutdown message
-      lifetime.ApplicationStopping.Register(LogShutdown);     
-
-      if (await CheckForAutoUpdates(WebHost))
+      try
       {
-        // shut down to clean up
-        WebHost?.Logger().LogInformation("Restarting after extensions auto-install.");
-        doTerminate = true;
+        WebHost = CreateHostBuilder(args)
+          .UseContentRoot(Directory.GetCurrentDirectory())
+          .ConfigureAppConfiguration(Startup.ConfigureAppConfiguration)
+
+          // this does nothing in Windows but in Linux it makes systemd aware when the application has started/is stopping, and configures logs
+          // to be sent in a way that journald (the logging system of systemd) understands log priorities.
+          .UseSystemd()
+
+          .Build();
+
+        IHostApplicationLifetime lifetime = WebHost.Services.GetService<IHostApplicationLifetime>();
+
+        // set up an event handler to log a shutdown message
+        lifetime.ApplicationStopping.Register(LogShutdown);
+
+        if (await CheckForAutoUpdates(WebHost))
+        {
+          // shut down to clean up
+          WebHost?.Logger().LogInformation("Restarting after extensions auto-install.");
+          doTerminate = true;
+        }
+
+        if (!doTerminate)
+        {
+          LaunchBrowser(args);
+
+          // Disabled the file system watcher, because Assembly load contexts are not unloading properly.  This disables the restart loop because doRestart 
+          // won't get set to true (which otherwise happens in FileChanged()).
+          // WatchFileChanges(WebHost.Services.GetService<IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions>>().Value.GetExtensionsFolder());
+
+          // Start the application
+          WebHost.Logger().LogInformation($"Startup complete.  Nucleus is running.");
+          WebHost.Run();
+        }
+        else
+        {
+          WebHost.Logger().LogTrace($"Startup: doTerminate flag is set, shutting down.");
+        }
       }
-
-      if (!doTerminate)
+      catch (Exception ex) 
       {
-        LaunchBrowser(args);
-
-        // Disabled the file system watcher, because Assembly load contexts are not unloading properly.  This disables the restart loop because doRestart 
-        // won't get set to true (which otherwise happens in FileChanged()).
-        // WatchFileChanges(WebHost.Services.GetService<IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions>>().Value.GetExtensionsFolder());
-
-        // Start the application
-        WebHost.Run();
-      }        
+        WebHost?.Logger().LogError(ex, $"Startup error.");
+      }
     }
   }
 
@@ -154,10 +167,20 @@ public class Program
         formattedUptime += $"{upTime.Seconds} seconds";
       }
 
-      ResourceUtilization resourceUtilization = resourceMonitor.GetUtilization(TimeSpan.FromSeconds(5));
+      // resource monitoring can be disabled, so resourceMonitor can be null
+      ResourceUtilization? resourceUtilization = resourceMonitor?.GetUtilization(TimeSpan.FromSeconds(5));
 
-      string formattedMemoryUse = Nucleus.Extensions.NumberExtensions.FormatFileSize(((long?)resourceUtilization.MemoryUsedInBytes));
-      WebHost?.Logger()?.LogCritical("Nucleus is shutting down. CPU: {cpu}%, Memory: {memory}% [{bytes}], Start Time: {start}, Uptime: {uptime}.", resourceUtilization.CpuUsedPercentage.ToString("0.00"), resourceUtilization.MemoryUsedPercentage.ToString("0.00"), formattedMemoryUse, process.StartTime, formattedUptime);
+      if (resourceUtilization != null)
+      {
+        // resource monitoring is enabled, log message with cpu and memory usage included
+        string formattedMemoryUse = Nucleus.Extensions.NumberExtensions.FormatFileSize(((long?)resourceUtilization?.MemoryUsedInBytes));
+        WebHost?.Logger()?.LogCritical("Nucleus is shutting down. CPU: {cpu}%, Memory: {memory}% [{bytes}], Start Time: {start}, Uptime: {uptime}.", resourceUtilization?.CpuUsedPercentage.ToString("0.00"), resourceUtilization?.MemoryUsedPercentage.ToString("0.00"), formattedMemoryUse, process.StartTime, formattedUptime);
+      }
+      else
+      {
+        // resource monitoring is disabled, log simplified message
+        WebHost?.Logger()?.LogCritical("Nucleus is shutting down. Start Time: {start}, Uptime: {uptime}.", process.StartTime, formattedUptime);
+      }
     }
     catch (ObjectDisposedException ex) 
     {

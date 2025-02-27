@@ -30,7 +30,23 @@ public static class Extensions
     config.GetSection(InstrumentationOptions.Section)
       .Bind(instrumentationOptions, options => options.BindNonPublicProperties = true);
 
-    if (instrumentationOptions.Enabled)
+    // resource monitoring (IResourceMonitor) is used by the system information page, and is also used by OpenTelemetry, but does not work 
+    // properly in Ubuntu 24.04.2 because /sys/fs/cgroup/user.slice/memory.current contains 0 shortly after a restart, and 
+    // https://github.com/dotnet/extensions/blob/main/src/Libraries/Microsoft.Extensions.Diagnostics.ResourceMonitoring/Linux/LinuxUtilizationParserCgroupV2.cs 
+    // line 264 throws an exception if the value is 0. Resource monitoring is initialized during .AddResourceMonitoring, so this exception is 
+    // un-catchable and crashes Nucleus during startup.
+    // Therefore, in Ubuntu 24.04.2 instrumentation should not be enabled. But in Windows, we want to add resource monitoring regardless of whether
+    // instrumentation is enabled, so that we can use IResourceMonitor to display memory usage information in the system information page.
+    
+    // Add Resource Monitoring if we are running in WIndows or instrumentation is enabled
+    if (instrumentationOptions.Enabled || OperatingSystem.IsWindows())
+    {
+      services.AddResourceMonitoring();
+    }
+
+    // only start instrumentation if it is enabled, and we are not on MacOS, because resource monitoring does
+    // not work in MacOS, https://github.com/dotnet/extensions/issues/5962
+    if (instrumentationOptions.Enabled && !OperatingSystem.IsMacOS())
     {
       // Enable Open Telemetry metrics and tracing
       // https://learn.microsoft.com/en-us/dotnet/core/diagnostics/distributed-tracing-instrumentation-walkthroughs
@@ -89,7 +105,7 @@ public static class Extensions
     }
 
     // we add resource monitoring regardless of config file settings, because we use IResourceMonitor in the system information page
-    services.AddResourceMonitoring();
+    //services.AddResourceMonitoring();
 
     return services;
   }

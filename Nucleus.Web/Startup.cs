@@ -452,7 +452,7 @@ public class Startup
         routes.MapControllers().WithStaticAssets();
       });
 
-      app.Logger().LogInformation($"Startup complete.  Nucleus is running.");
+      app.Logger().LogInformation($"Startup configuration complete.");
     }
     catch (Exception ex)
     {

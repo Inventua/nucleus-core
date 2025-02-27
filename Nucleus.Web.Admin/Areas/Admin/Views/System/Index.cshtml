@@ -64,14 +64,17 @@
             <th scope="row">Server Time</th>
             <td>@DateTime.UtcNow.FormatDate(this.Context.Request.GetUserTimeZone(), true) [UTC @this.Context.Request.GetUserTimeZone().BaseUtcOffset.FormatTimeSpan(FormatExtensions.TimespanFormats.TimeOffset)]</td>
           </tr>
-          <tr>
-            <th scope="row">CPU Used</th>
-            <td>@Model.CpuUsedPercentage.ToString("0.00")%</td>
-          </tr>
-          <tr>
-            <th scope="row">Memory Used</th>
-            <td>@Model.MemoryUsedPercentage.ToString("0.00")% [@(((long?)Model.MemoryUsedBytes).FormatFileSize())]</td>
-          </tr>
+          @if (Model.MemoryUsedPercentage > 0)
+          {
+            <tr>
+              <th scope="row">CPU Used</th>
+              <td>@Model.CpuUsedPercentage.ToString("0.00")%</td>
+            </tr>
+            <tr>
+              <th scope="row">Memory Used</th>
+              <td>@Model.MemoryUsedPercentage.ToString("0.00")% [@(((long?)Model.MemoryUsedBytes).FormatFileSize())]</td>
+            </tr>
+          }
         </tbody>
       </table>
 

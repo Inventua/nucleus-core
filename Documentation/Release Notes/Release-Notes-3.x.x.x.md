@@ -1,5 +1,26 @@
 # Release Notes
 
+## Version 3.0.0.2
+27 February 2025
+
+- Added a bug workaround for Linux.  
+Resource monitoring (IResourceMonitor) is used by the system information page, and is also used by OpenTelemetry, but does not work properly in Ubuntu 24.04.2 
+because /sys/fs/cgroup/user.slice/memory.current contains the value "0" shortly after a restart, and the .NET component which retieves memory usage 
+[LinuxUtilizationParserCgroupV2](https://github.com/dotnet/extensions/blob/main/src/Libraries/Microsoft.Extensions.Diagnostics.ResourceMonitoring/Linux/LinuxUtilizationParserCgroupV2.cs) 
+throws an exception if the value is 0. Resource monitoring is initialized automatically during dependency injection setup, so this exception is un-catchable and crashes Nucleus during startup.
+
+ Because of the bug:
+ - In Ubuntu 24.04.2 instrumentation should not be enabled. By default, instrumentation is not enabled.
+ - AddResourceMonitoring should not be called unless instrumentation is enabled, or we are running in Windows (this is the logic that was added for this change).
+ - The system administration page was updated to make IResourceMonitor an optional dependency, and to suppress the memory and CPU display if 
+   IResourceMonitor it is not available.
+
+## Version 3.0.0.1
+14 February 2025
+
+- Fixed GetDirectFilePath().  The function was appending "?d=(timestamp)" to the query string without checking whether the Uri already contains "?" and 
+using "&" instead.  This breaks the site icon and CSS when using the Azure Blob Storage provider, because SAS tokens contain querystring elements.
+
 ## Version 3.0.0.0
 7 February 2025
 

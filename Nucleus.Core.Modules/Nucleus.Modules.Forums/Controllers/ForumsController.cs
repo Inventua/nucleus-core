@@ -902,12 +902,20 @@ namespace Nucleus.Modules.Forums.Controllers
       if (forumPostId != Guid.Empty)
       {
         post = await this.ForumsManager.GetForumPost(forumPostId);
+        if (post == null)
+        {
+          throw new InvalidOperationException($"Invalid Forum Post Id: '{forumPostId}'");
+        }
         forum = await this.ForumsManager.Get(post.ForumId);
         subscription = await this.ForumsManager.GetSubscription(post, HttpContext.User);
       }
       else
       {
         forum = await this.ForumsManager.Get(forumId);
+        if (forum == null)
+        {
+          throw new InvalidOperationException($"Invalid Forum Id: '{forumId}'");
+        }
         post = new();
         subscription = null;
       }
